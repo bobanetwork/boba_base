@@ -11,13 +11,53 @@ import { predeploys } from '../src/predeploys'
 /* Imports: Internal */
 import { getDeployedContract } from '../src/hardhat-deploy-ethers'
 
+const MoonbeamDev = {
+  chainID: 1281,
+  accounts: [
+      {
+          privateKey: '0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133',
+      },
+      {
+          privateKey: '0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b',
+      },
+      {
+          privateKey: '0x0b6e18cafb6ed99687ec547bd28139cafdd2bffe70e6b688025de6b445aa5c5b',
+      },
+      {
+          privateKey: '0x39539ab1876910bbf3a223d84a29e28f1cb4e2e456503e7e91ed39b2e7223d68',
+      },
+      {
+          privateKey: '0x7dce9bc8babb68fec1409be38c8e1a52650206a7ed90ff956ae8a6d15eeaaef4',
+      },
+      {
+          privateKey: '0xb9d2ea9a615f3165812e8d44de0d24da9bbd164b65c4f0573e1ce2c8dbd9c8df',
+      },
+      {
+          privateKey: '0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18',
+      },
+      {
+          privateKey: '0x0d6dcaaef49272a5411896be8ad16c01c35d6f8c18873387b71fbc734759b0ab',
+      },
+      {
+          privateKey: '0x4c42532034540267bf568198ccec4cb822a025da542861fcb146a5fab6433ff8',
+      },
+      {
+          privateKey: '0x94c49300a58d576011096bcb006aa06f5a91b34b4383891e8029c21dc39fbb8b',
+      },
+      {
+          privateKey: '0x99b3c12287537e38c90a9219d4cb074a89a16e9cdb20bf85728ebd97c343e342',
+      },
+  ]
+};
+
 // This is a TEMPORARY way to fund the default hardhat accounts on L2. The better way to do this is
 // to make a modification to hardhat-ovm. However, I don't have the time right now to figure the
 // details of how to make that work cleanly. This is fine in the meantime.
 const deployFn: DeployFunction = async (hre) => {
   // Only execute this step if we're on the hardhat chain ID.
   const { chainId } = await hre.ethers.provider.getNetwork()
-  if (chainId === defaultHardhatNetworkParams.chainId) {
+  // if (chainId === defaultHardhatNetworkParams.chainId) {
+    if (chainId === MoonbeamDev.chainID) {
     const L1StandardBridge = await getDeployedContract(
       hre,
       'Proxy__L1StandardBridge',
@@ -30,11 +70,7 @@ const deployFn: DeployFunction = async (hre) => {
       iface: 'BOBA',
     })
 
-    // Default has 20 accounts but we restrict to 20 accounts manually as well just to prevent
-    // future problems if the number of default accounts increases for whatever reason.
-    const accounts = normalizeHardhatNetworkAccountsConfig(
-      defaultHardhatNetworkHdAccountsConfigParams
-    ).slice(0, 20)
+    const accounts = MoonbeamDev.accounts;
 
     // Boba holder
     const BobaHolder = new hre.ethers.Wallet(
@@ -55,7 +91,7 @@ const deployFn: DeployFunction = async (hre) => {
         '0x',
         {
           value: depositAmount,
-          gasLimit: 2_000_000, // Idk, gas estimation was broken and this fixes it.
+          // gasLimit: 2_000_000, // Idk, gas estimation was broken and this fixes it.
         }
       )
       await fundETHTx.wait()
@@ -82,7 +118,7 @@ const deployFn: DeployFunction = async (hre) => {
         depositBobaAmount,
         8_000_000,
         '0x',
-        { gasLimit: 2_000_000 } // Idk, gas estimation was broken and this fixes it.
+        // { gasLimit: 2_000_000 } // Idk, gas estimation was broken and this fixes it.
       )
       await fundBobaTx.wait()
       console.log(`✓ Funded ${wallet.address} on L2 with 5000.0 BOBA`)

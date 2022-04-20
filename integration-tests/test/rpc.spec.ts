@@ -19,6 +19,7 @@ import {
   hardhatTest,
   envConfig,
   gasPriceOracleWallet,
+  isMoonbeam,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
@@ -147,7 +148,7 @@ describe('Basic RPC tests', () => {
     })
 
     it('{tag:rpc} should reject a transaction with a too low gas limit or too low', async () => {
-      const isHH = await isHardhat()
+      const isHH = await isMoonbeam()
       let gasPrice
       if (isHH) {
         gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
