@@ -32,7 +32,16 @@ export const isLiveNetwork = () => {
 }
 
 export const HARDHAT_CHAIN_ID = 31337
-export const MOONBEAM_CHAIN_ID = 1281
+export const AVALANCHE_CHAIN_ID = 43113
+
+/*
+Network Name: Avalanche FUJI C-Chain
+New RPC URL: https://api.avax-test.network/ext/bc/C/rpc
+ChainID: 43113
+Symbol: AVAX
+Explorer: https://testnet.snowtrace.io/
+*/
+
 export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
