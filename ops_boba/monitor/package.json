@@ -1,0 +1,33 @@
+{
+  "name": "@boba/monitor",
+  "version": "1.0.0",
+  "description": "boba monitor",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./exec/run-monitor.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@boba/contracts": "0.0.1",
+    "@boba/register": "0.0.1",
+    "@eth-optimism/sdk": "1.0.1",
+    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/core-utils": "0.8.1",
+    "@eth-optimism/common-ts": "0.2.2",
+    "@ethersproject/providers": "5.4.5",
+    "axios": "0.26.0",
+    "async-mutex": "^0.3.1",
+    "dotenv": "^9.0.0",
+    "ethers": "^5.1.4",
+    "lodash": "4.17.21",
+    "mysql": "^2.18.1",
+    "node-fetch": "2.6.0",
+    "web3": "1.6.0",
+    "winston": "3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb": "18.2.1",
+    "eslint-plugin-import": "^2.23.4"
+  }
+}

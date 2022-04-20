@@ -1,0 +1,70 @@
+service: sls-boba-mainnet-token
+
+frameworkVersion: '2'
+configValidationMode: warn
+
+provider:
+  name: aws
+  runtime: python3.7
+  lambdaHashingVersion: '20201221'
+  stackName: sls-boba-mainnet-token
+  stage: prod
+  region: us-east-1
+  role: ${file(env-mainnet.yml):ROLE}
+  environment:
+    WEB3_URL: ${file(env-mainnet.yml):WEB3_URL}
+    BOBA_ADDRESS: ${file(env-mainnet.yml):BOBA_ADDRESS}
+    DEPLOYER_ADDRESS: ${file(env-mainnet.yml):DEPLOYER_ADDRESS}
+
+package:
+  exclude:
+    - .gitignore
+  individually: true
+
+functions:
+  token_getSupply:
+    handler: token_getSupply.token_getSupply
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-mainnet.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-mainnet.yml):SUBNET_ID_1}
+        - ${file(env-mainnet.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.supply
+          method: get
+          cors: true
+
+  token_getCirculatingSupply:
+    handler: token_getCirculatingSupply.token_getCirculatingSupply
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-mainnet.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-mainnet.yml):SUBNET_ID_1}
+        - ${file(env-mainnet.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.circulatingSupply
+          method: get
+          cors: true
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    slimPatternsAppendDefaults: false
+    slimPatterns:
+      - "**/*.egg-info*"
+    strip: false
+    zip: true
+    useDownloadCache: false
+    useStaticCache: false
