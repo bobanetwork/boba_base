@@ -41,7 +41,7 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`BobaTuringCredit is at ${BobaTuringCredit.address}`)
   console.log(`BobaTuringHelper is at ${BobaTuringHelper.address}`)
 
-  const depositBobaAmountL2 = utils.parseEther('500') //too much? 
+  const depositBobaAmountL2 = utils.parseEther('500') //too much?
 
   // Deposit Boba to BobaTuringHelper and set Turing price
   const approveL2BobaTx = await L2Boba.approve(
@@ -60,7 +60,7 @@ const deployFn: DeployFunction = async (hre) => {
     `Boba was added for BobaTuringHelper in BobaTuringCredit: ${addBalanceTx.hash}`
   )
 
-  const turingPrice = utils.parseEther('0.1')
+  const turingPrice = utils.parseEther('0.01')
   const setPriceTx = await BobaTuringCredit.updateTuringPrice(turingPrice)
   await setPriceTx.wait()
 
