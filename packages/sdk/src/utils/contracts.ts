@@ -29,10 +29,10 @@ export const DEFAULT_L2_CONTRACT_ADDRESSES: OEL2ContractsLike = {
   OVM_L1BlockNumber: predeploys.OVM_L1BlockNumber,
   OVM_L2ToL1MessagePasser: predeploys.OVM_L2ToL1MessagePasser,
   OVM_DeployerWhitelist: predeploys.OVM_DeployerWhitelist,
-  OVM_ETH: predeploys.L2_L1NativeToken,
+  L2_BOBA: predeploys.L2_BOBA,
   OVM_GasPriceOracle: predeploys.OVM_GasPriceOracle,
   OVM_SequencerFeeVault: predeploys.OVM_SequencerFeeVault,
-  WETH: predeploys.L2_BOBA, // NEED TO FIX !!
+  L2_L1NativeToken: predeploys.L2_L1NativeToken,
 }
 
 /**
@@ -42,7 +42,6 @@ export const DEFAULT_L2_CONTRACT_ADDRESSES: OEL2ContractsLike = {
 const NAME_REMAPPING = {
   AddressManager: 'Lib_AddressManager',
   OVM_L1BlockNumber: 'iOVM_L1BlockNumber',
-  WETH: 'WETH9',
 }
 
 /**
