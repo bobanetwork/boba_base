@@ -11,9 +11,15 @@ The key differences that need to be considered are:
 3. Chain IDs, and, 
 4. The fee token.
 
-The settings need to be changed in dozens of places, so the easiest way to tackle this is as a PR on top of the base system.
+The settings need to be changed in dozens of places, so the easiest way to tackle this is as a PR on top of the base system. As the deployment proceeds, various new files will be generated, such as the `state-dump` file which defines the intial state of the L2. 
 
-As the deployment proceeds, various new files will be generated, such as the `state-dump` file which defines the intial state of the L2. 
+NOTE - the biggest changes are in three areas:
+
+1. `docker-compose-_________.yaml`, such as `docker-compose-moonbeam.yaml`
+2. The SDK, which hardcodes certain chainIDs and contract addresses. Frankly, this is very error prone and a better system would be good. For example, a master config file somewhere that contains all the major changes.
+3. The integration test `test/shared/utils.ts` and `env.ts`. likewise, there is proably a better way of doing this, so that all the changes are contained in one configuration file or system. 
+
+NOTE - not all changes have a convenient local hardhat development stack. The Avalanche one looks a bit convoluted.
 
 ## Proof of concept Step 1 - deploy the L1 contracts
 
@@ -62,3 +68,7 @@ There are defaults in many places that relate to BOBA and ETH, which are proably
 The key idea is that your local L2 will now write transactions into those new contracts on the new L1. The major issues there are address configuration.
 
 For example, the `SDK` stores key addresses in `SDK\src\utils\contracts.ts` and the new chain needs to be added there - just follow the structure for the other chains.
+
+## Moonbeam
+
+Chain IDs (`1281`) are for the local development chain - that's good.
