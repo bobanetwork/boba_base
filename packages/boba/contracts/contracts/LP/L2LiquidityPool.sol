@@ -385,7 +385,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         PoolInfo storage pool = poolInfo[_l2TokenAddress];
         uint256 poolLiquidity = pool.userDepositAmount;
         uint256 poolBalance;
-        if (_l2TokenAddress == Lib_PredeployAddresses.OVM_ETH) {
+        if (_l2TokenAddress == Lib_PredeployAddresses.L2_BOBA) {
             poolBalance = address(this).balance;
         } else {
             poolBalance = IERC20(_l2TokenAddress).balanceOf(address(this));
@@ -561,14 +561,14 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         nonReentrant
         whenNotPaused
     {
-        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Either Amount Incorrect or Token Address Incorrect");
+        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
-        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.OVM_ETH), "Either Amount Incorrect or Token Address Incorrect");
+        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
             _amount = msg.value;
-            _tokenAddress = Lib_PredeployAddresses.OVM_ETH;
+            _tokenAddress = Lib_PredeployAddresses.L2_BOBA;
         }
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
@@ -604,7 +604,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         );
 
         // transfer funds if users deposit ERC20
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
@@ -630,14 +630,14 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
         IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
-        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.OVM_ETH, "Either Amount Incorrect or Token Address Incorrect");
+        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
-        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.OVM_ETH), "Either Amount Incorrect or Token Address Incorrect");
+        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends ovm_ETH or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
             _amount = msg.value;
-            _tokenAddress = Lib_PredeployAddresses.OVM_ETH;
+            _tokenAddress = Lib_PredeployAddresses.L2_BOBA;
         }
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
@@ -650,7 +650,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         );
 
         // transfer funds if users deposit ERC20
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
@@ -715,7 +715,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -754,7 +754,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -797,7 +797,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -825,7 +825,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         require(L1LiquidityPoolAddress != address(0), "L1 Liquidity Pool Not Registered");
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
-        if (_tokenAddress == Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress == Lib_PredeployAddresses.L2_BOBA) {
             require(_amount <= address(this).balance, "Requested ETH exceeds pool balance");
             L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
@@ -930,7 +930,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
         uint256 receivedAmount = _amount.sub(totalFee);
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             if (receivedAmount > IERC20(_tokenAddress).balanceOf(address(this))) {
                 replyNeeded = true;
             } else {
@@ -1012,7 +1012,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
             IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
         } else {
             //this is ovm_ETH

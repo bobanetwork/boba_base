@@ -8,28 +8,28 @@ import { Lib_PredeployAddresses } from "../../libraries/constants/Lib_PredeployA
 import { L2StandardERC20 } from "../../standards/L2StandardERC20.sol";
 
 /**
- * @title OVM_ETH
- * @dev The ETH predeploy provides an ERC20 interface for ETH deposited to Layer 2. Note that
+ * @title L2_BOBA
+ * @dev The L2 BOBA predeploy provides an ERC20 interface for BOBA deposited to Layer 2. Note that
  * unlike on Layer 1, Layer 2 accounts do not have a balance field.
  */
-contract OVM_ETH is L2StandardERC20 {
+contract L2_BOBA is L2StandardERC20 {
     /***************
      * Constructor *
      ***************/
 
-    constructor()
-        L2StandardERC20(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, address(0), "Ether", "ETH", 18)
+    constructor(
+        address _l1TokenAddress
+    )
+        L2StandardERC20(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, _l1TokenAddress, "BOBA Network", "BOBA", 18)
     {}
 
-    // ETH ERC20 features are disabled until further notice.
-    // Discussion here: https://github.com/ethereum-optimism/optimism/discussions/1444
-
+    // BOBA features are disabled until further notice.
     function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
-        revert("OVM_ETH: transfer is disabled pending further community discussion.");
+        revert("L2_BOBA: transfer is disabled pending further community discussion.");
     }
 
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
-        revert("OVM_ETH: approve is disabled pending further community discussion.");
+        revert("L2_BOBA: approve is disabled pending further community discussion.");
     }
 
     function transferFrom(
@@ -37,7 +37,7 @@ contract OVM_ETH is L2StandardERC20 {
         address recipient,
         uint256 amount
     ) public virtual override returns (bool) {
-        revert("OVM_ETH: transferFrom is disabled pending further community discussion.");
+        revert("L2_BOBA: transferFrom is disabled pending further community discussion.");
     }
 
     function increaseAllowance(address spender, uint256 addedValue)
@@ -46,7 +46,7 @@ contract OVM_ETH is L2StandardERC20 {
         override
         returns (bool)
     {
-        revert("OVM_ETH: increaseAllowance is disabled pending further community discussion.");
+        revert("L2_BOBA: increaseAllowance is disabled pending further community discussion.");
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue)
@@ -55,6 +55,6 @@ contract OVM_ETH is L2StandardERC20 {
         override
         returns (bool)
     {
-        revert("OVM_ETH: decreaseAllowance is disabled pending further community discussion.");
+        revert("L2_BOBA: decreaseAllowance is disabled pending further community discussion.");
     }
 }

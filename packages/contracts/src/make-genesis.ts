@@ -6,8 +6,8 @@ import {
   getStorageLayout,
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
-import { utils, BigNumber } from 'ethers'
-import { L2GovernanceERC20Helper } from './L2GovernanceERC20Helper'
+import { utils, BigNumber, constants } from 'ethers'
+import { L2_L1NativeTokenHepler } from './L2_L1NativeTokenHepler'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -50,6 +50,12 @@ export interface RollupDeployConfig {
   l1BobaTokenAddress: any
   // Block height to activate berlin hardfork
   berlinBlock: number
+  // L1 native token - name
+  l1NativeTokenName: string
+  // L1 native token - symbol
+  l1NativeTokenSymbol: string
+  // L1 native token - decimals
+  l1NativeTokenDecimals: number
 }
 
 const addSlotsForBobaProxyContract = (
@@ -100,10 +106,18 @@ export const makeL2GenesisFile = async (
     OVM_SequencerFeeVault: {
       l1FeeWallet: cfg.l1FeeWalletAddress,
     },
-    OVM_ETH: {
+    L2_BOBA: {
+      _name: 'Boba Network',
+      _symbol: 'BOBA',
+      l1Token: cfg.l1BobaTokenAddress,
+      l2Bridge:predeploys.L2StandardBridge,
+    },
+    L2_L1NativeToken: {
       l2Bridge: predeploys.L2StandardBridge,
-      _name: 'Ether',
-      _symbol: 'ETH',
+      l1Token: constants.AddressZero,
+      _name: cfg.l1NativeTokenName, // from env
+      _symbol: cfg.l1NativeTokenSymbol, // from env
+      _decimals: cfg.l1NativeTokenDecimals, // from env
     },
     L2CrossDomainMessenger: {
       // We default the xDomainMsgSender to this value to save gas.
@@ -112,11 +126,6 @@ export const makeL2GenesisFile = async (
       l1CrossDomainMessenger: cfg.l1CrossDomainMessengerAddress,
       // Set the messageNonce to a high value to avoid overwriting old sent messages.
       messageNonce: 100000,
-    },
-    WETH9: {
-      name: 'Wrapped Ether',
-      symbol: 'WETH',
-      decimals: 18,
     },
     Lib_ResolvedDelegateBobaProxy: {
       proxyOwner: cfg.deployer,
@@ -129,13 +138,6 @@ export const makeL2GenesisFile = async (
     BobaTuringHelper: {
       Self: predeploys.BobaTuringHelper
     },
-    // Token decimal is 0 for BOBA Token
-    L2GovernanceERC20: {
-      _name: 'Boba Network',
-      _symbol: 'BOBA',
-      l1Token: cfg.l1BobaTokenAddress,
-      l2Bridge:predeploys.L2StandardBridge,
-    },
     Proxy__Boba_GasPriceOracle: {
       proxyOwner: cfg.deployer,
       proxyTarget: predeploys.Boba_GasPriceOracle
@@ -143,14 +145,16 @@ export const makeL2GenesisFile = async (
     Boba_GasPriceOracle: {
       _owner: cfg.gasPriceOracleOwner,
       feeWallet: cfg.l1FeeWalletAddress,
-      l2BobaAddress: predeploys.L2GovernanceERC20,
+      l1NativeTokenL2Address: predeploys.L2_L1NativeToken,
       minPriceRatio: 500,
       maxPriceRatio: 5000,
       priceRatio: 2000,
       gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
       metaTransactionFee: utils.parseEther('3'),
-      receivedETHAmount: utils.parseEther('0.005'),
+      receivedBOBAAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
+      isBobaTokenPriceHigh: false,
+      decimals: 0,
     }
   }
 
@@ -171,9 +175,9 @@ export const makeL2GenesisFile = async (
     } else if (predeployName === 'BobaTuringHelper') {
       // Add a default BobaTuringHelper for testing purposes
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
-    } else if (predeployName === 'L2GovernanceERC20') {
+    } else if (predeployName === 'L2_L1NativeToken') {
       // Fix the address(this) of L2GovernanceERC20
-      dump[predeployAddress].code = L2GovernanceERC20Helper.L2GovernanceERC20Bytecode
+      dump[predeployAddress].code = L2_L1NativeTokenHepler.L2_L1NativeTokenBytecode
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')

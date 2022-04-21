@@ -13,7 +13,6 @@ import { loadContract } from '@eth-optimism/contracts'
 import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
-import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
@@ -77,7 +76,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Lib_AddressManager: Contract
     OVM_GasPriceOracle: Contract
     Proxy__L1StandardBridge: Contract
-    DiscretionaryExitBurn: Contract
     Proxy__L1LiquidityPool: Contract
     Proxy__L2LiquidityPool: Contract
     CanonicalTransactionChain: Contract
@@ -143,18 +141,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     )
     this.logger.info('Connected to Proxy__L1StandardBridge', {
       address: this.state.Proxy__L1StandardBridge.address,
-    })
-
-    this.logger.info('Connecting to DiscretionaryExitBurn...')
-    const DiscretionaryExitBurnAddress =
-      await this.state.Lib_AddressManager.getAddress('DiscretionaryExitBurn')
-    this.state.DiscretionaryExitBurn = new Contract(
-      DiscretionaryExitBurnAddress,
-      DiscretionaryExitBurnJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to DiscretionaryExitBurn', {
-      address: this.state.DiscretionaryExitBurn.address,
     })
 
     this.logger.info('Connecting to Proxy__L1LiquidityPool...')

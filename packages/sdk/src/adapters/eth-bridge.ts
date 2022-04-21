@@ -45,7 +45,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
           from: event.args._from,
           to: event.args._to,
           l1Token: ethers.constants.AddressZero,
-          l2Token: predeploys.OVM_ETH,
+          l2Token: predeploys.L2_L1NativeToken,
           amount: event.args._amount,
           data: event.args._data,
           logIndex: event.logIndex,
@@ -77,7 +77,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
         // Only find ETH withdrawals.
         return (
           hexStringEquals(event.args._l1Token, ethers.constants.AddressZero) &&
-          hexStringEquals(event.args._l2Token, predeploys.OVM_ETH)
+          hexStringEquals(event.args._l2Token, predeploys.L2_L1NativeToken)
         )
       })
       .map((event) => {
@@ -107,7 +107,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
     // Only support ETH deposits and withdrawals.
     return (
       hexStringEquals(toAddress(l1Token), ethers.constants.AddressZero) &&
-      hexStringEquals(toAddress(l2Token), predeploys.OVM_ETH)
+      hexStringEquals(toAddress(l2Token), predeploys.L2_L1NativeToken)
     )
   }
 

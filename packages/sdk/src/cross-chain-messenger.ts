@@ -1266,7 +1266,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<TransactionRequest> => {
       return this.bridges.ETH.populateTransaction.deposit(
         ethers.constants.AddressZero,
-        predeploys.OVM_ETH,
+        predeploys.L2_L1NativeToken,
         amount,
         opts
       )
@@ -1281,7 +1281,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<TransactionRequest> => {
       return this.bridges.ETH.populateTransaction.withdraw(
         ethers.constants.AddressZero,
-        predeploys.OVM_ETH,
+        predeploys.L2_L1NativeToken,
         amount,
         opts
       )
