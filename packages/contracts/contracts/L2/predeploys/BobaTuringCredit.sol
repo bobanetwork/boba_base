@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import "../../libraries/constants/Lib_PredeployAddresses.sol";
 
 /* Interface */
 import "@boba/turing-hybrid-compute/contracts/ITuringHelper.sol";
@@ -24,7 +23,6 @@ contract BobaTuringCredit {
 
     mapping(address => uint256) public prepaidBalance;
 
-    // We keep this storage to avoid changing l2geth
     address public turingToken;
     uint256 public turingPrice;
     uint256 public ownerRevenue;
@@ -64,7 +62,6 @@ contract BobaTuringCredit {
 
     constructor(uint256 _turingPrice) {
         turingPrice = _turingPrice;
-        turingToken = Lib_PredeployAddresses.L2_BOBA;
     }
 
     /********************

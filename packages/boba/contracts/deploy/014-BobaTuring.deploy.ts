@@ -12,9 +12,6 @@ let L2Boba: Contract
 let BobaTuringHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
-  // This is predeployed in the state dump file
-  return
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -31,30 +28,20 @@ const deployFn: DeployFunction = async (hre) => {
 
   const L2BobaAddress = await addressManager.getAddress('TK_L2BOBA')
 
-  L2Boba = getContractFactory('L2GovernanceERC20')
-    .connect((hre as any).deployConfig.deployer_l2)
-    .attach(L2BobaAddress) as any
-
   // Set turing token
-  const setToken = await BobaTuringCredit.updateTuringToken(L2Boba.address)
+  const setToken = await BobaTuringCredit.updateTuringToken(L2BobaAddress)
   await setToken.wait()
-  console.log(`Turing token was set to L2 Boba at ${L2Boba.address}`)
+  console.log(`Turing token was set to L2 Boba at ${L2BobaAddress}`)
 
   console.log(`BobaTuringCredit is at ${BobaTuringCredit.address}`)
   console.log(`BobaTuringHelper is at ${BobaTuringHelper.address}`)
 
   const depositBobaAmountL2 = utils.parseEther('500') //too much?
 
-  // Deposit Boba to BobaTuringHelper and set Turing price
-  const approveL2BobaTx = await L2Boba.approve(
-    BobaTuringCredit.address,
-    depositBobaAmountL2
-  )
-  await approveL2BobaTx.wait()
-
   const addBalanceTx = await BobaTuringCredit.addBalanceTo(
     depositBobaAmountL2,
-    BobaTuringHelper.address
+    BobaTuringHelper.address,
+    { value: depositBobaAmountL2 }
   )
   await addBalanceTx.wait()
 
