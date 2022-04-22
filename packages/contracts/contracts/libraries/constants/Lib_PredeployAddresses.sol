@@ -13,7 +13,8 @@ library Lib_PredeployAddresses {
     // BOBA is the L2 native token
     address payable internal constant L2_BOBA = payable(0x4200000000000000000000000000000000000006);
     // L1 native token is a ERC20 token on L2
-    address internal constant L1_NATIVE_TOKEN_L2_ADDRESS = 0x4200000000000000000000000000000000000023;
+    address internal constant L1_NATIVE_TOKEN_L2_ADDRESS =
+        0x4200000000000000000000000000000000000023;
 
     // solhint-disable-next-line max-line-length
     address internal constant L2_CROSS_DOMAIN_MESSENGER =

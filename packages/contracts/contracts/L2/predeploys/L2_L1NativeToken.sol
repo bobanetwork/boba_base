@@ -5,7 +5,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import { IL2StandardERC20 } from "../../standards/IL2StandardERC20.sol";
 
-contract L2_L1NativeToken is IL2StandardERC20, ERC20, ERC20Permit{
+contract L2_L1NativeToken is IL2StandardERC20, ERC20, ERC20Permit {
     address public l1Token;
     address public l2Bridge;
     uint8 private _decimals;

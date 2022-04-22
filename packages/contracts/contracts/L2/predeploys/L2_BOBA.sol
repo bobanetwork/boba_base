@@ -17,10 +17,14 @@ contract L2_BOBA is L2StandardERC20 {
      * Constructor *
      ***************/
 
-    constructor(
-        address _l1TokenAddress
-    )
-        L2StandardERC20(Lib_PredeployAddresses.L2_STANDARD_BRIDGE, _l1TokenAddress, "BOBA Network", "BOBA", 18)
+    constructor(address _l1TokenAddress)
+        L2StandardERC20(
+            Lib_PredeployAddresses.L2_STANDARD_BRIDGE,
+            _l1TokenAddress,
+            "BOBA Network",
+            "BOBA",
+            18
+        )
     {}
 
     // BOBA features are disabled until further notice.

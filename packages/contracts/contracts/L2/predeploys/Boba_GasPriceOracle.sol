@@ -11,7 +11,6 @@ import { L2StandardBridge } from "../messaging/L2StandardBridge.sol";
 import { L2_L1NativeToken } from "./L2_L1NativeToken.sol";
 import { OVM_GasPriceOracle } from "./OVM_GasPriceOracle.sol";
 
-
 /* Contract Imports */
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
@@ -67,17 +66,11 @@ contract Boba_GasPriceOracle {
     // Price ratio without discount
     uint256 public marketPriceRatio;
 
-    // Need to consider which token price is higher
-    // If boba price is higher, then price ratio = boba price / native token price
-    // If native token price is higher, then price ratio = native token price / boba price
-    // We can add decimals to the price ratio to avoid rounding errors
-    bool public isBobaTokenPriceHigh = false;
-
     // Decimals of the price ratio
     uint256 public decimals = 0;
 
     // 10 ** decimals
-    uint256 public multiplier = 10 ** decimals;
+    uint256 public multiplier = 10**decimals;
 
     /*************
      *  Events   *
@@ -85,9 +78,9 @@ contract Boba_GasPriceOracle {
 
     event TransferOwnership(address, address);
     event UseBobaAsFeeToken(address);
-    event SwapBOBAForETHMetaTransaction(address);
+    event SwapL1NativeTokenForBOBAMetaTransaction(address);
     event UseL1NativeTokenAsFeeToken(address);
-    event UpdatePriceRatio(address, uint256, uint256, bool);
+    event UpdatePriceRatio(address, uint256, uint256);
     event UpdateMaxPriceRatio(address, uint256);
     event UpdateMinPriceRatio(address, uint256);
     event UpdateGasPriceOracleAddress(address, address);
@@ -116,7 +109,7 @@ contract Boba_GasPriceOracle {
      ********************/
 
     /**
-     * Receive ETH
+     * Receive BOBA
      */
     receive() external payable {}
 
@@ -161,9 +154,8 @@ contract Boba_GasPriceOracle {
         priceRatio = 2000;
         minPriceRatio = 500;
         marketPriceRatio = 2000;
-        isBobaTokenPriceHigh = false;
         decimals = 0;
-        multiplier = 10 ** decimals;
+        multiplier = 10**decimals;
     }
 
     /**
@@ -191,25 +183,20 @@ contract Boba_GasPriceOracle {
     ) public {
         require(!Address.isContract(tokenOwner), "Account not EOA");
         require(spender == address(this), "Spender is not this contract");
-        uint256 totalCost;
-        if (isBobaTokenPriceHigh) {
-            // marketPriceRatio = boba price / native token price
-            totalCost = receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(metaTransactionFee);
-        } else {
-            // marketPriceRatio = native token price / boba price
-            totalCost = receivedBOBAAmount.div(marketPriceRatio).div(multiplier).add(metaTransactionFee);
-        }
+        uint256 totalCost = receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(
+            metaTransactionFee
+        );
         require(value >= totalCost, "Value is not enough");
         L2_L1NativeToken l1NativeTokenOnL2 = L2_L1NativeToken(l1NativeTokenL2Address);
         l1NativeTokenOnL2.permit(tokenOwner, spender, value, deadline, v, r, s);
         IERC20(l1NativeTokenOnL2).safeTransferFrom(tokenOwner, address(this), totalCost);
         (bool sent, ) = address(tokenOwner).call{ value: receivedBOBAAmount }("");
-        require(sent, "Failed to send ETH");
-        emit SwapBOBAForETHMetaTransaction(tokenOwner);
+        require(sent, "Failed to send BOBA");
+        emit SwapL1NativeTokenForBOBAMetaTransaction(tokenOwner);
     }
 
     /**
-     * Add the users that want to use ETH as the fee token
+     * Add the users that want to use L1 native token as the fee token
      */
     function useL1NativeTokenAsFeeToken() public {
         require(!Address.isContract(msg.sender), "Account not EOA");
@@ -219,27 +206,25 @@ contract Boba_GasPriceOracle {
             "Insufficient Boba balance"
         );
         l1NativeTokenFeeTokenUsers[msg.sender] = true;
-        l1NativeTokenFeeTokenUsers[msg.sender] = false;
         emit UseL1NativeTokenAsFeeToken(msg.sender);
     }
 
     /**
-     * Update the price ratio of ETH and BOBA
-     * @param _priceRatio the price ratio of ETH and BOBA
-     * @param _marketPriceRatio tha market price ratio of ETH and BOBA
+     * Update the price ratio of L1 native token and BOBA
+     * @param _priceRatio the price ratio of ETL1 native token and BOBA
+     * @param _marketPriceRatio tha market price ratio of L1 native token and BOBA
      */
-    function updatePriceRatio(uint256 _priceRatio, uint256 _marketPriceRatio, bool _isBobaTokenPriceHigh) public onlyOwner {
+    function updatePriceRatio(uint256 _priceRatio, uint256 _marketPriceRatio) public onlyOwner {
         require(_priceRatio <= maxPriceRatio && _priceRatio >= minPriceRatio);
         require(_marketPriceRatio <= maxPriceRatio && _marketPriceRatio >= minPriceRatio);
         priceRatio = _priceRatio;
         marketPriceRatio = _marketPriceRatio;
-        isBobaTokenPriceHigh = _isBobaTokenPriceHigh;
-        emit UpdatePriceRatio(owner(), _priceRatio, _marketPriceRatio, _isBobaTokenPriceHigh);
+        emit UpdatePriceRatio(owner(), _priceRatio, _marketPriceRatio);
     }
 
     /**
-     * Update the maximum price ratio of ETH and BOBA
-     * @param _maxPriceRatio the maximum price ratio of ETH and BOBA
+     * Update the maximum price ratio of L1 native token and BOBA
+     * @param _maxPriceRatio the maximum price ratio of L1 native token and BOBA
      */
     function updateMaxPriceRatio(uint256 _maxPriceRatio) public onlyOwner {
         require(_maxPriceRatio >= minPriceRatio && _maxPriceRatio > 0);
@@ -248,8 +233,8 @@ contract Boba_GasPriceOracle {
     }
 
     /**
-     * Update the minimum price ratio of ETH and BOBA
-     * @param _minPriceRatio the minimum price ratio of ETH and BOBA
+     * Update the minimum price ratio of L1 native token and BOBA
+     * @param _minPriceRatio the minimum price ratio of L1 native token and BOBA
      */
     function updateMinPriceRatio(uint256 _minPriceRatio) public onlyOwner {
         require(_minPriceRatio <= maxPriceRatio && _minPriceRatio > 0);
@@ -293,9 +278,9 @@ contract Boba_GasPriceOracle {
      * @param _decimals the diciimal places for price ratio
      */
     function updateDecimals(uint256 _decimals) public onlyOwner {
-        require(_decimals < 5);
+        require(_decimals < 10);
         decimals = _decimals;
-        multiplier = 10 ** _decimals;
+        multiplier = 10**_decimals;
         emit UpdateDecimals(owner(), _decimals);
     }
 
@@ -303,12 +288,8 @@ contract Boba_GasPriceOracle {
      * Get the price for swapping l1 native token for BOBA
      */
     function getL1NativeTokenForSwap() public view returns (uint256) {
-        if (isBobaTokenPriceHigh) {
-            // marketPriceRatio = boba price / native token price
-            return receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(metaTransactionFee);
-        }
         // marketPriceRatio = native token price / boba price
-        return receivedBOBAAmount.div(marketPriceRatio).div(multiplier).add(metaTransactionFee);
+        return receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(metaTransactionFee);
     }
 
     /**
@@ -317,10 +298,7 @@ contract Boba_GasPriceOracle {
      */
     function getL1NativeTokenFee(bytes memory _txData) public view returns (uint256) {
         OVM_GasPriceOracle gasPriceOracleContract = OVM_GasPriceOracle(gasPriceOracleAddress);
-        if (isBobaTokenPriceHigh) {
-        return gasPriceOracleContract.getL1Fee(_txData).mul(priceRatio);
-        }
-        return gasPriceOracleContract.getL1Fee(_txData).div(priceRatio);
+        return gasPriceOracleContract.getL1Fee(_txData).mul(priceRatio).div(multiplier);
     }
 
     /**
@@ -328,7 +306,8 @@ contract Boba_GasPriceOracle {
      */
     function withdrawL1NativeToken() public {
         require(
-            L2_L1NativeToken(l1NativeTokenL2Address).balanceOf(address(this)) >= MIN_WITHDRAWAL_AMOUNT,
+            L2_L1NativeToken(l1NativeTokenL2Address).balanceOf(address(this)) >=
+                MIN_WITHDRAWAL_AMOUNT,
             // solhint-disable-next-line max-line-length
             "Boba_GasPriceOracle: withdrawal amount must be greater than minimum withdrawal amount"
         );
@@ -348,7 +327,7 @@ contract Boba_GasPriceOracle {
      */
     function withdrawBOBA() public onlyOwner {
         (bool sent, ) = feeWallet.call{ value: address(this).balance }("");
-        require(sent, "Failed to send ETH to fee wallet");
+        require(sent, "Failed to send BOBA to fee wallet");
         emit WithdrawBOBA(owner(), feeWallet);
     }
 }

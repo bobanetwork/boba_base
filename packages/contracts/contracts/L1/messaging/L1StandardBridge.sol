@@ -130,7 +130,13 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
         sendCrossDomainMessage(l2TokenBridge, _l2Gas, message);
 
         // compute and update deposit hash
-        _updateDepositHash(address(0), Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS, _from, _to, msg.value);
+        _updateDepositHash(
+            address(0),
+            Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS,
+            _from,
+            _to,
+            msg.value
+        );
 
         emit NativeTokenDepositInitiated(_from, _to, msg.value, _data);
     }

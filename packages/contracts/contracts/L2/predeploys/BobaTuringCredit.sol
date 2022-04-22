@@ -138,10 +138,9 @@ contract BobaTuringCredit {
 
         ownerRevenue -= _withdrawAmount;
 
-        (bool sent,) = owner.call{value: _withdrawAmount}("");
+        (bool sent, ) = owner.call{ value: _withdrawAmount }("");
         require(sent, "Failed to send BOBA");
 
         emit WithdrawRevenue(msg.sender, _withdrawAmount);
-
     }
 }
