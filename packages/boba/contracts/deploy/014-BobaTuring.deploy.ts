@@ -12,6 +12,8 @@ let L2Boba: Contract
 let BobaTuringHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  // This is predeployed in the state dump file
+  return
 
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)

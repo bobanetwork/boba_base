@@ -133,7 +133,8 @@ export const makeL2GenesisFile = async (
     },
     BobaTuringCredit: {
       owner: cfg.deployer,
-      turingPrice: cfg.bobaTuringPrice
+      turingPrice: cfg.bobaTuringPrice,
+      turingToken: predeploys.L2_BOBA,
     },
     BobaTuringHelper: {
       Self: predeploys.BobaTuringHelper

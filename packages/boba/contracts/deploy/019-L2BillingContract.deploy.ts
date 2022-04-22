@@ -118,11 +118,11 @@ const deployFn: DeployFunction = async (hre) => {
   )
   console.log(`Added BobaBillingContract to DiscretionaryExitFee`)
 
-    // Register the address of the L2 NFT bridge
-    const Proxy__L2NFTBridgeSubmission = await hre.deployments.getOrNull(
-      'Proxy__L2NFTBridge'
-    )
-  L2NFTBridgeContract  = new Contract(
+  // Register the address of the L2 NFT bridge
+  const Proxy__L2NFTBridgeSubmission = await hre.deployments.getOrNull(
+    'Proxy__L2NFTBridge'
+  )
+  L2NFTBridgeContract = new Contract(
     Proxy__L2NFTBridgeSubmission.address,
     L2NFTBridgeJson.abi,
     (hre as any).deployConfig.deployer_l2
