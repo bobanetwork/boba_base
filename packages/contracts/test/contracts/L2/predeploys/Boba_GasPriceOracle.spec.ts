@@ -537,7 +537,7 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('get decimals and multiplier', () => {
+  describe('get decimals', () => {
     it('should revert if caller is not owner', async () => {
       await expect(Boba_GasPriceOracle.connect(signer2).updateDecimals(3)).to.be
         .reverted
@@ -545,12 +545,9 @@ describe('Boba_GasPriceOracle', () => {
     it('should change when updateDecimals is called', async () => {
       await Boba_GasPriceOracle.connect(signer1).updateDecimals(2)
       expect(await Boba_GasPriceOracle.decimals()).to.equal(BigNumber.from(2))
-      expect(await Boba_GasPriceOracle.multiplier()).to.equal(
-        BigNumber.from(100)
-      )
     })
 
-    it('are the 11th and 12th storage slots', async () => {
+    it('are the 11th storage slots', async () => {
       const newDecimals = 4
 
       // set the price
@@ -562,12 +559,6 @@ describe('Boba_GasPriceOracle', () => {
         11
       )
       expect(await Boba_GasPriceOracle.decimals()).to.equal(decimalsSlot)
-
-      const multiplierSlot = await signer1.provider.getStorageAt(
-        Boba_GasPriceOracle.address,
-        12
-      )
-      expect(await Boba_GasPriceOracle.multiplier()).to.equal(multiplierSlot)
     })
   })
 
@@ -609,7 +600,8 @@ describe('Boba_GasPriceOracle', () => {
       const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
       const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-      const multiplier = await Boba_GasPriceOracle.multiplier()
+      const decimals = await Boba_GasPriceOracle.decimals()
+      const multiplier = BigNumber.from(10).pow(decimals)
       expect(
         receivedBOBAAmount
           .mul(marketPriceRatio)
@@ -648,7 +640,9 @@ describe('Boba_GasPriceOracle', () => {
         const L1NativeTokenFee = await Boba_GasPriceOracle.getL1NativeTokenFee(
           input
         )
-        const multiplier = await Boba_GasPriceOracle.multiplier()
+
+        const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
+        const multiplier = BigNumber.from(10).pow(priceRatioDecimals)
 
         const expected = calculateL1Fee(
           input,

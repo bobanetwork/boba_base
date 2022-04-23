@@ -37,7 +37,7 @@ export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
 export const GWEI = BigNumber.from(1e9)
-export const OVM_ETH_ADDRESS = predeploys.OVM_ETH
+export const L2_BOBA_ADDRESS = predeploys.L2_BOBA
 
 const gasPriceValidator = makeValidator((gasPrice) => {
   if (gasPrice === 'onchain') {
@@ -217,14 +217,14 @@ export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   return L1StandardBridge
 }
 
-export const getOvmEth = (wallet: Wallet) => {
-  const OVM_ETH = new Contract(
-    OVM_ETH_ADDRESS,
-    getContractInterface('OVM_ETH'),
+export const getL2BOBA = (wallet: Wallet) => {
+  const L2_BOBA = new Contract(
+    L2_BOBA_ADDRESS,
+    getContractInterface('L2_BOBA'),
     wallet
   )
 
-  return OVM_ETH
+  return L2_BOBA
 }
 
 export const fundUser = async (
@@ -334,7 +334,7 @@ export const isMoonbeam = async () => {
    const chainId = await l1Wallet.getChainId()
    return chainId === MOONBEAM_CHAIN_ID
  }
- 
+
 export const die = (...args) => {
   console.log(...args)
   process.exit(1)

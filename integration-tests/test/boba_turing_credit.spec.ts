@@ -84,7 +84,7 @@ describe('Boba Turing Credit Test', async () => {
     const depositBOBAAmount = utils.parseEther('10000')
 
     const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
-    const preL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+    const preL2BOBABalance = await env.l2Wallet.getBalance()
 
     const approveL1BOBATX = await L1BOBAToken.approve(
       L1StandardBridge.address,
@@ -103,7 +103,7 @@ describe('Boba Turing Credit Test', async () => {
     )
 
     const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
-    const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+    const postL2BOBABalance = await env.l2Wallet.getBalance()
 
     expect(preL1BOBABalance).to.deep.eq(
       postL1BOBABalance.add(depositBOBAAmount)
@@ -149,15 +149,10 @@ describe('Boba Turing Credit Test', async () => {
       TuringHelperAddress
     )
 
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositAmount
-    )
-    await approveTx.wait()
-
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositAmount,
-      TuringHelperAddress
+      TuringHelperAddress,
+      { value: depositAmount }
     )
     await depositTx.wait()
 
@@ -171,14 +166,8 @@ describe('Boba Turing Credit Test', async () => {
   it('{tag:boba} Should not increase balance for not Turing helper contracts', async () => {
     const depositAmount = utils.parseEther('100')
 
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositAmount
-    )
-    await approveTx.wait()
-
     await expect(
-      BobaTuringCredit.addBalanceTo(depositAmount, L2BOBAToken.address)
+      BobaTuringCredit.addBalanceTo(depositAmount, L2BOBAToken.address, { value: depositAmount })
     ).to.be.revertedWith('Invalid Helper Contract')
   })
 

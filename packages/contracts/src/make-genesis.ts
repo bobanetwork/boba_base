@@ -154,7 +154,6 @@ export const makeL2GenesisFile = async (
       receivedBOBAAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
       decimals: 0,
-      multiplier: 1,
     }
   }
 
