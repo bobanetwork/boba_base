@@ -36,7 +36,7 @@ if [[ $BUILD == 1 ]]; then
 fi
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-DOCKERFILE="docker-compose-moonbeam.yml"
+DOCKERFILE="docker-compose.yml"
 
 if [[ $BUILD == 1 ]]; then
   docker-compose build --parallel -- builder l2geth l1_chain
