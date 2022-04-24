@@ -144,6 +144,21 @@ export const CONTRACT_ADDRESSES: {
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
 
+  1287: {
+    l1: {
+      AddressManager: "0x08404344A38b1ED3fC365cb2bD74F600540C6c59",
+      L1CrossDomainMessenger: "0xEb0d3b107528FE17b9F55360D03351fe3D0ACaB2",
+      L1CrossDomainMessengerFast: "0x78D714e1b47Bb86FE15788B917C9CC7B77975529",
+      L1StandardBridge: "0x833e568FFccc6cEde30c0a264CD987BD25AaD472",
+      StateCommitmentChain: "0x2003D25cab7Fbc3E5D006c8AF8292adA6b517583",
+      CanonicalTransactionChain: "0xa07c914699AB12A2975153e2C91Dd25889cC5856",
+      BondManager: "0x71697B855cD2a51204A9c8a5EaF0a63BD378675B",
+      L1MultiMessageRelayer:"0x1b21Fd23828753b2dBbDc77797Ed96Eb6ff9A3ac",
+      L1MultiMessageRelayerFast:"0x1b21Fd23828753b2dBbDc77797Ed96Eb6ff9A3ac",
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  }
+
 }
 
 /**
