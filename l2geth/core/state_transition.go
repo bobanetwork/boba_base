@@ -72,8 +72,10 @@ type StateTransition struct {
 	isFeeTokenUpdate bool
 	// Boba fee token selection flag
 	isBobaFeeTokenSelect bool
-	// Fee ratio between Boba an ETH
+	// Fee ratio between Boba and ETH
 	bobaPriceRatio *big.Int
+	// actual fee ratio = bobaPriceRatio / bobaPriceRatioDivisor
+	bobaPriceRatioDivisor *big.Int
 }
 
 // Message represents a message sent to a contract.
@@ -139,6 +141,7 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 	l1Fee := new(big.Int)
 	l2ExtraGas := new(big.Int)
 	bobaPriceRatio := new(big.Int)
+	bobaPriceRatioDivisor := big.NewInt(1)
 	gasPrice := msg.GasPrice()
 	// The gasUsed hard fork
 	isGasUpdate := evm.ChainConfig().IsGasUpdate(evm.BlockNumber)
@@ -168,6 +171,8 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 		if isBobaFeeTokenSelect {
 			gasPrice = big.NewInt(0)
 			bobaPriceRatio = evm.StateDB.GetBobaPriceRatio()
+			bobaPriceRatioDecimals := evm.StateDB.GetBobaPriceRatioDecimals()
+			bobaPriceRatioDivisor = new(big.Int).Exp(big.NewInt(10), bobaPriceRatioDecimals, nil)
 		}
 	}
 
@@ -190,6 +195,8 @@ func NewStateTransition(evm *vm.EVM, msg Message, gp *GasPool) *StateTransition 
 		isBobaFeeTokenSelect: isBobaFeeTokenSelect,
 		// BOBA price relative to ETH
 		bobaPriceRatio: bobaPriceRatio,
+		// actual fee ratio = bobaPriceRatio / bobaPriceRatioDivisor
+		bobaPriceRatioDivisor: bobaPriceRatioDivisor,
 	}
 }
 
@@ -257,7 +264,8 @@ func (st *StateTransition) buyGas() error {
 	if st.isBobaFeeTokenSelect {
 		// note that in this case, st.gasPrice = 0 but st.msg.GasPrice() is NOT zero
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.msg.Gas()), st.msg.GasPrice())
-		bobaval = new(big.Int).Mul(ethval, st.bobaPriceRatio)
+		preBobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
+		bobaval = new(big.Int).Div(preBobaval, st.bobaPriceRatioDivisor)
 		if st.state.GetBobaBalance(st.msg.From()).Cmp(bobaval) < 0 {
 			return errInsufficientBobaBalanceForGas
 		}
@@ -361,7 +369,8 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	// BOBA is used to pay for the gas fee
 	if st.isBobaFeeTokenSelect {
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
-		bobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
+		preBobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
+		bobaval := new(big.Int).Div(preBobaval, st.bobaPriceRatioDivisor)
 		st.state.AddBobaBalance(rcfg.OvmBobaGasPricOracle, bobaval)
 	}
 
@@ -403,7 +412,8 @@ func (st *StateTransition) refundGas() {
 	// Else, return ETH for remaining gas
 	if st.isBobaFeeTokenSelect {
 		remainingETH := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.msg.GasPrice())
-		remainingBoba := new(big.Int).Mul(remainingETH, st.bobaPriceRatio)
+		preRemainingBoba := new(big.Int).Mul(remainingETH, st.bobaPriceRatio)
+		remainingBoba := new(big.Int).Div(preRemainingBoba, st.bobaPriceRatioDivisor)
 		st.state.AddBobaBalance(st.msg.From(), remainingBoba)
 	} else {
 		remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
