@@ -167,7 +167,9 @@ describe('Boba Turing Credit Test', async () => {
     const depositAmount = utils.parseEther('100')
 
     await expect(
-      BobaTuringCredit.addBalanceTo(depositAmount, L2BOBAToken.address, { value: depositAmount })
+      BobaTuringCredit.addBalanceTo(depositAmount, L2BOBAToken.address, {
+        value: depositAmount,
+      })
     ).to.be.revertedWith('Invalid Helper Contract')
   })
 
@@ -188,15 +190,10 @@ describe('Boba Turing Credit Test', async () => {
 
     const preBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
 
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositAmount
-    )
-    await approveTx.wait()
-
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositAmount,
-      TuringTestAddress
+      TuringTestAddress,
+      { value: depositAmount }
     )
     await depositTx.wait()
 
@@ -225,5 +222,32 @@ describe('Boba Turing Credit Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance)
     expect(returnStr).to.be.deep.eq(payloadStr)
     expect(returnTime).to.be.deep.eq(payloadTime)
+  })
+
+  it('{tag:boba} Should not increase balance for incorrect amount', async () => {
+    const depositAmount = utils.parseEther('100')
+    const TuringHelperAddress = TuringHelper.address
+
+    await expect(
+      BobaTuringCredit.addBalanceTo(
+        depositAmount.sub(BigNumber.from('1')),
+        TuringHelperAddress,
+        { value: depositAmount }
+      )
+    ).to.be.revertedWith('Invalid amount')
+
+    await expect(
+      BobaTuringCredit.addBalanceTo(0, TuringHelperAddress, { value: 0 })
+    ).to.be.revertedWith('Invalid amount')
+  })
+
+  it('{tag:boba} Should not increase balance for EOA accounts as helper contract address', async () => {
+    const depositAmount = utils.parseEther('100')
+
+    await expect(
+      BobaTuringCredit.addBalanceTo(depositAmount, env.l2Wallet.address, {
+        value: depositAmount,
+      })
+    ).to.be.revertedWith('Address is EOA')
   })
 })

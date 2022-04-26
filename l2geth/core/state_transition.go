@@ -33,7 +33,7 @@ import (
 
 var (
 	errInsufficientBalanceForGas     = errors.New("insufficient balance to pay for gas")
-	errInsufficientBobaBalanceForGas = errors.New("insufficient boba balance to pay for gas")
+	errInsufficientBobaBalanceForGas = errors.New("insufficient secondary fee token balance to pay for gas")
 )
 
 /*
@@ -367,6 +367,7 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	st.refundGas()
 
 	// BOBA is used to pay for the gas fee
+	// This number is written to the state and receipt
 	if st.isBobaFeeTokenSelect {
 		ethval := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
 		preBobaval := new(big.Int).Mul(ethval, st.bobaPriceRatio)
@@ -410,11 +411,31 @@ func (st *StateTransition) refundGas() {
 
 	// Return BOBA for remaining gas, exchanged at the original rate.
 	// Else, return ETH for remaining gas
+	// Need to make sure that initialDeductedBoba = refundedBoba + bobaToVault
+	// Since bobaToVault is calculated from gasUsage,
+	// which is the calculated with the same method in state_process.go
+	// We can change the way to calculate refundedBoba
+	// st.msg.Gas() = st.gas + st.gasUsed()
+	// st.msg.Gas() * gasPrice / divisor = st.gas * gasPrice / divisor + st.gasUsed() * gasPrice / divisor
+	// refundedBoba = st.gas * gasPrice / divisor = st.msg.Gas() * gasPrice / divisor - st.gasUsed() * gasPrice / divisor
+	// This is used to cover a sitution like
+	// initialDeductedBoba = 97,277,000, refundedBoba = 96,488,800, bobaToVault = 788,200, decimals = 3 - haven't devided by 10^3
+	// initialDeductedBoba = 97,277, refundedBoba = 96,488, bobaToVault = 788
+	// refundedBoba + bobaToVault != initialDeductedBoba
+	// By using refundedBoba = initialDeductedBoba - bobaToVault, to make sure that refundedBoba + bobaToVault = initialDeductedBoba
 	if st.isBobaFeeTokenSelect {
-		remainingETH := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.msg.GasPrice())
-		preRemainingBoba := new(big.Int).Mul(remainingETH, st.bobaPriceRatio)
-		remainingBoba := new(big.Int).Div(preRemainingBoba, st.bobaPriceRatioDivisor)
-		st.state.AddBobaBalance(st.msg.From(), remainingBoba)
+		// initial deducted BOBA
+		ethInitVal := new(big.Int).Mul(new(big.Int).SetUint64(st.msg.Gas()), st.msg.GasPrice())
+		preInitialBobaVal := new(big.Int).Mul(ethInitVal, st.bobaPriceRatio)
+		initialBobaVal := new(big.Int).Div(preInitialBobaVal, st.bobaPriceRatioDivisor)
+
+		// BOBA to vault - this is written to state and receipt
+		ethVaultVal := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
+		preBobaToVaultVal := new(big.Int).Mul(ethVaultVal, st.bobaPriceRatio)
+		bobaToVaultVal := new(big.Int).Div(preBobaToVaultVal, st.bobaPriceRatioDivisor)
+
+		// refund Boba
+		st.state.AddBobaBalance(st.msg.From(), new(big.Int).Sub(initialBobaVal, bobaToVaultVal))
 	} else {
 		remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
 		st.state.AddBalance(st.msg.From(), remaining)

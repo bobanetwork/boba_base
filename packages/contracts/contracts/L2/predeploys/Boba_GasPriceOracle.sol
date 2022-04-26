@@ -74,7 +74,7 @@ contract Boba_GasPriceOracle {
      *************/
 
     event TransferOwnership(address, address);
-    event UseBobaAsFeeToken(address);
+    event UseBOBAAsFeeToken(address);
     event SwapL1NativeTokenForBOBAMetaTransaction(address);
     event UseL1NativeTokenAsFeeToken(address);
     event UpdatePriceRatio(address, uint256, uint256);
@@ -162,13 +162,13 @@ contract Boba_GasPriceOracle {
         // Users should have more than 3 BOBA
         require(address(msg.sender).balance >= 3e18, "Insufficient BOBA balance");
         l1NativeTokenFeeTokenUsers[msg.sender] = false;
-        emit UseBobaAsFeeToken(msg.sender);
+        emit UseBOBAAsFeeToken(msg.sender);
     }
 
     /**
      * Swap native token for BOBA
      */
-    function swapNativeTokenForBOBAMetaTransaction(
+    function swapL1NativeTokenForBOBAMetaTransaction(
         address tokenOwner,
         address spender,
         uint256 value,
