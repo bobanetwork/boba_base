@@ -562,10 +562,11 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('withdrawL1NativeToken', () => {
+  describe('withdrawSecondardyFeeToken', () => {
     it('should revert if the balance is not enough', async () => {
-      await expect(Boba_GasPriceOracle.connect(signer2).withdrawL1NativeToken())
-        .to.be.reverted
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).withdrawSecondardyFeeToken()
+      ).to.be.reverted
     })
   })
 
@@ -593,10 +594,10 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('getL1NativeTokenForSwap', () => {
+  describe('getSecondardyFeeTokenForSwap', () => {
     it('should get correct BOBA for swapping L1 native token for BOBA', async () => {
-      const L1NativeTokenCost =
-        await Boba_GasPriceOracle.getL1NativeTokenForSwap()
+      const SecondardyFeeTokenCost =
+        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
       const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
       const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
@@ -607,7 +608,7 @@ describe('Boba_GasPriceOracle', () => {
           .mul(marketPriceRatio)
           .div(multiplier)
           .add(metaTransactionFee)
-      ).to.equal(L1NativeTokenCost)
+      ).to.equal(SecondardyFeeTokenCost)
     })
   })
 
@@ -637,9 +638,8 @@ describe('Boba_GasPriceOracle', () => {
         )
         await tx.wait()
         const priceRatio = await Boba_GasPriceOracle.priceRatio()
-        const L1NativeTokenFee = await Boba_GasPriceOracle.getL1NativeTokenFee(
-          input
-        )
+        const SecondardyFeeTokenFee =
+          await Boba_GasPriceOracle.getSecondardyFeeTokenFee(input)
 
         const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
         const multiplier = BigNumber.from(10).pow(priceRatioDecimals)
@@ -653,7 +653,7 @@ describe('Boba_GasPriceOracle', () => {
         )
           .mul(priceRatio)
           .div(multiplier)
-        expect(L1NativeTokenFee).to.deep.equal(expected)
+        expect(SecondardyFeeTokenFee).to.deep.equal(expected)
       })
     }
   })

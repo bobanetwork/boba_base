@@ -18,13 +18,13 @@ contract Boba_GasPriceOracleProxyCall {
     /**
      * Add the users that want to use ETH as the fee token
      */
-    function useL1NativeTokenAsFeeToken() public {
-        Boba_GasPriceOracle(gasPriceOracleAddress).useL1NativeTokenAsFeeToken();
+    function useSecondardyFeeTokenAsFeeToken() public {
+        Boba_GasPriceOracle(gasPriceOracleAddress).useSecondardyFeeTokenAsFeeToken();
     }
 }
 
 
 interface Boba_GasPriceOracle {
   function useBobaAsFeeToken() external;
-  function useL1NativeTokenAsFeeToken() external;
+  function useSecondardyFeeTokenAsFeeToken() external;
 }
