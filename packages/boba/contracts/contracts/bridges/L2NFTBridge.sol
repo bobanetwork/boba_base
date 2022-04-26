@@ -362,9 +362,13 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         internal
         onlyWithBillingContract()
     {
+        // Load billingContract contract
+        L2BillingContract billingContract = L2BillingContract(payable(billingContractAddress));
+        // Check Boba amount
+        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
         // Collect the exit fee
-        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        (bool sent,) = billingContractAddress.call{value: billingContract.exitFee()}("");
+        require(sent, "Failed to collect exit fee");
 
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract != address(0), "Can't Find L1 NFT Contract");

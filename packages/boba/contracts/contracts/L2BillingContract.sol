@@ -45,6 +45,12 @@ contract L2BillingContract {
     }
 
     /*************
+     * Call back *
+     *************/
+
+    receive() external payable {}
+
+    /*************
      * Functions *
      *************/
 

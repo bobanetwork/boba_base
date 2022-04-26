@@ -544,17 +544,24 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         whenNotPaused
         onlyWithBillingContract
     {
+        // Load billingContract contract
+        L2BillingContract billingContract = L2BillingContract(payable(billingContractAddress));
+        // Check Boba amount
+        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
         // Collect the exit fee
-        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        (bool sent,) = billingContractAddress.call{gas: SAFE_GAS_STIPEND, value: billingContract.exitFee()}("");
+        require(sent, "Failed to collect exit fee");
 
-        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
+        // BOBA amount
+        uint256 netBobaAmount = msg.value - billingContract.exitFee();
+
+        require(netBobaAmount != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
-        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
+        require(!(netBobaAmount != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends BOBA or ERC20
-        if (msg.value != 0) {
+        if (netBobaAmount != 0) {
             // override the _amount and token address
-            _amount = msg.value;
+            _amount = netBobaAmount;
             _tokenAddress = Lib_PredeployAddresses.L2_BOBA;
         }
         PoolInfo storage pool = poolInfo[_tokenAddress];

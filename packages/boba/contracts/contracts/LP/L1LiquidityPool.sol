@@ -897,7 +897,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         uint256 _ownerRewardFeeRate
     )
         external
-        onlyFromCrossDomainAccount(address(L2LiquidityPoolAddress))
+        onlyOwner()
         onlyInitialized()
     {
         require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");
