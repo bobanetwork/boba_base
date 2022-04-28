@@ -18,7 +18,7 @@ import { OptimismEnv } from './shared/env'
 // TX size enforced by CTC:
 const MAX_ROLLUP_TX_SIZE = 50_000
 
-describe('Native ETH Integration Tests', async () => {
+describe('Native BOBA Integration Tests', async () => {
   let env: OptimismEnv
   let l1Bob: Wallet
   let l2Bob: Wallet
@@ -188,7 +188,7 @@ describe('Native ETH Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositETH fails with a TOO large data argument', async () => {
+  it('{tag:other} deposit BOBA fails with a TOO large data argument', async () => {
     const depositAmount = 10
 
     const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE + 1)

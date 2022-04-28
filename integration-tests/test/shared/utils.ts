@@ -235,7 +235,7 @@ export const fundUser = async (
 ) => {
   console.log("DEPOSIT ETH");
 
-  const mes = await messenger.depositETH(amount, {
+  const mes = await messenger.depositNativeToken(amount, {
     l2GasLimit: DEFAULT_TEST_GAS_L2,
     // overrides: {
     //   gasPrice: DEFAULT_TEST_GAS_L1,

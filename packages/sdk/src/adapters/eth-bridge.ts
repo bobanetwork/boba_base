@@ -33,7 +33,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
     }
   ): Promise<TokenBridgeMessage[]> {
     const events = await this.l1Bridge.queryFilter(
-      this.l1Bridge.filters.ETHDepositInitiated(address),
+      this.l1Bridge.filters.NativeTokenDepositInitiated(address),
       opts?.fromBlock,
       opts?.toBlock
     )
@@ -138,7 +138,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
       }
 
       if (opts?.recipient === undefined) {
-        return this.l1Bridge.populateTransaction.depositETH(
+        return this.l1Bridge.populateTransaction.depositNativeToken(
           opts?.l2GasLimit || 200_000, // Default to 200k gas limit.
           '0x', // No data.
           {
@@ -147,7 +147,7 @@ export class ETHBridgeAdapter extends StandardBridgeAdapter {
           }
         )
       } else {
-        return this.l1Bridge.populateTransaction.depositETHTo(
+        return this.l1Bridge.populateTransaction.depositNativeTokenTo(
           toAddress(opts.recipient),
           opts?.l2GasLimit || 200_000, // Default to 200k gas limit.
           '0x', // No data.

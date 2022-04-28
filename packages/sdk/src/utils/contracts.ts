@@ -241,13 +241,13 @@ export const BRIDGE_ADAPTER_DATA: {
   1281: {
     Standard: {
       Adapter: StandardBridgeAdapter,
-      l1Bridge: "0x78D714e1b47Bb86FE15788B917C9CC7B77975529",
-      l2Bridge: "0x78D714e1b47Bb86FE15788B917C9CC7B77975529",
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      l2Bridge: predeploys.L2StandardBridge,
     },
     ETH: {
       Adapter: ETHBridgeAdapter,
-      l1Bridge: "0x78D714e1b47Bb86FE15788B917C9CC7B77975529",
-      l2Bridge: "0x78D714e1b47Bb86FE15788B917C9CC7B77975529",
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      l2Bridge: predeploys.L2StandardBridge,
     },
   },
 }
@@ -338,6 +338,7 @@ export const getAllOEContracts = (
       CanonicalTransactionChain: undefined,
       BondManager: undefined,
       L1MultiMessageRelayer: undefined,
+      L1MultiMessageRelayerFast: undefined,
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   }
