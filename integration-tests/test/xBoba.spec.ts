@@ -7,10 +7,14 @@ import xL2GovernanceERC20 from '@boba/contracts/artifacts/contracts/standards/xL
 import xL2GovernanceERC20Helper from '@boba/contracts/artifacts/contracts/test-helpers/xL2GovernanceERC20Helper.sol/xL2GovernanceERC20Helper.json'
 
 import { OptimismEnv } from './shared/env'
+import { isMoonbeam } from './shared/utils'
 
 describe('xBOBA Test', async () => {
-  // Disable xBOBA
-  return
+  const isMB = await isMoonbeam()
+  if (isMB) {
+    console.log('Skipping xBOBA tests on Moonbeam')
+    return
+  }
 
   let Factory__xBoba: ContractFactory
   let Factory_xBobaHelper: ContractFactory

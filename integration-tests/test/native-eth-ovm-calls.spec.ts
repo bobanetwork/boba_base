@@ -21,13 +21,10 @@ describe('Native BOBA value integration tests', () => {
     wallet = env.l2Wallet
     other = Wallet.createRandom().connect(wallet.provider)
 
-    const L1StandardBridgeAddress = await env.addressesBASE
-      .Proxy__L1StandardBridge
-
     L1StandardBridge = getContractFactory(
       'L1StandardBridge',
       env.l1Wallet
-    ).attach(L1StandardBridgeAddress)
+    ).attach(env.addressesBASE.Proxy__L1StandardBridge)
 
     L1BOBAToken = getContractFactory('BOBA', env.l1Wallet).attach(
       env.addressesBOBA.TOKENS.BOBA.L1

@@ -19,12 +19,14 @@ import TimelockJson from '../artifacts/contracts/MockTimelock.sol/MockTimelock.j
 import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 
 import { OptimismEnv } from './shared/env'
+import { isMoonbeam } from './shared/utils'
 
 describe('Dao Action Test', async () => {
-
-  // Skip DAO tests
-  return
-
+  const isMB = await isMoonbeam()
+  if (isMB) {
+    console.log('Skipping NFT Bridge tests on Moonbeam')
+    return
+  }
   let Factory__GovernorBravoDelegate: ContractFactory
   let GovernorBravoDelegate: Contract
 

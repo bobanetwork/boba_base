@@ -434,10 +434,12 @@ export class OptimismEnv {
         } catch (err) {
           if (
             err.message.includes('Nonce too low') ||
+            err.message.includes('nonce too low') ||
             err.message.includes('transaction was replaced') ||
             err.message.includes(
               'another transaction with same nonce in the queue'
-            )
+            ) ||
+            err.message.includes('replacement transaction underpriced')
           ) {
             // Sometimes happens when we run tests in parallel.
             await sleep(5000)

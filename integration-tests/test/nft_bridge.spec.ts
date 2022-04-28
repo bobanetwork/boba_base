@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
-import { getFilteredLogIndex } from './shared/utils'
+import { getFilteredLogIndex, isMoonbeam } from './shared/utils'
 
 import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
 import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
@@ -24,9 +24,11 @@ import { OptimismEnv } from './shared/env'
 import { ethers } from 'hardhat'
 
 describe('NFT Bridge Test', async () => {
-  // TODO
-  // NFT bridge contracts need to be fixed
-  return
+  const isMB = await isMoonbeam()
+  if (isMB) {
+    console.log('Skipping NFT Bridge tests on Moonbeam')
+    return
+  }
 
   let Factory__L1ERC721: ContractFactory
   let Factory__L2ERC721: ContractFactory

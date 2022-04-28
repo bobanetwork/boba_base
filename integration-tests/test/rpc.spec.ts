@@ -1,5 +1,6 @@
 /* Imports: External */
 import { expectApprox, sleep } from '@eth-optimism/core-utils'
+import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 import { Wallet, BigNumber, Contract, ContractFactory, constants } from 'ethers'
 import { serialize } from '@ethersproject/transactions'
 import { ethers } from 'hardhat'
@@ -12,14 +13,13 @@ import {
 import { expect } from './shared/setup'
 import {
   defaultTransactionFactory,
-  fundUser,
   L2_CHAINID,
   gasPriceForL2,
   isHardhat,
   hardhatTest,
   envConfig,
   gasPriceOracleWallet,
-  isMoonbeam,
+  approveERC20,
 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
@@ -32,6 +32,9 @@ describe('Basic RPC tests', () => {
   let revertMessage: string
   let revertingTx: TransactionRequest
   let revertingDeployTx: TransactionRequest
+
+  let L1BOBAToken: Contract
+  let L1StandardBridge: Contract
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -60,6 +63,15 @@ describe('Basic RPC tests', () => {
       await ethers.getContractFactory('ValueContext', wallet)
     ValueContext = await Factory__ValueContext.deploy()
     await ValueContext.deployTransaction.wait()
+
+    L1BOBAToken = getContractFactory('BOBA', env.l1Wallet).attach(
+      env.addressesBOBA.TOKENS.BOBA.L1
+    )
+
+    L1StandardBridge = getContractFactory(
+      'L1StandardBridge',
+      env.l1Wallet
+    ).attach(env.addressesBASE.Proxy__L1StandardBridge)
   })
 
   describe('eth_sendRawTransaction', () => {
@@ -148,16 +160,15 @@ describe('Basic RPC tests', () => {
     })
 
     it('{tag:rpc} should reject a transaction with a too low gas limit or too low', async () => {
-      const isHH = await isMoonbeam()
-      let gasPrice
-      if (isHH) {
-        gasPrice = await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-          gasPriceOracleWallet
-        ).gasPrice()
+      const initialGasPrice =
         await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
           gasPriceOracleWallet
-        ).setGasPrice(1000)
-      }
+        ).gasPrice()
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+        gasPriceOracleWallet
+      ).setGasPrice(1000)
+
+      console.log('SET GAS PRICE')
 
       const tx = {
         ...defaultTransactionFactory(),
@@ -178,12 +189,10 @@ describe('Basic RPC tests', () => {
         /gas price too low: 1 wei, use at least tx\.gasPrice = \d+ wei/
       )
 
-      if (isHH) {
-        // Reset the gas price to its original price
-        await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
-          gasPriceOracleWallet
-        ).setGasPrice(gasPrice)
-      }
+      // Reset the gas price to its original price
+      await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(
+        gasPriceOracleWallet
+      ).setGasPrice(initialGasPrice.toNumber() === 0 ? 1 : initialGasPrice)
     })
 
     //   it('{tag:rpc} should reject a transaction with too high of a fee', async () => {
@@ -242,7 +251,18 @@ describe('Basic RPC tests', () => {
         // Fund account to call from
         const from = wallet.address
         const value = 15
-        await fundUser(env.messenger, value, from)
+
+        await approveERC20(L1BOBAToken, L1StandardBridge.address, value)
+        await env.waitForXDomainTransaction(
+          L1StandardBridge.depositERC20To(
+            L1BOBAToken.address,
+            predeploys.L2_BOBA,
+            from,
+            value,
+            999999,
+            '0xFFFF'
+          )
+        )
 
         // Do the call and check msg.value
         const data = ValueContext.interface.encodeFunctionData('getCallValue')

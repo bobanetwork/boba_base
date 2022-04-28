@@ -341,9 +341,9 @@ export const isHardhat = async () => {
 }
 
 export const isMoonbeam = async () => {
-   const chainId = await l1Wallet.getChainId()
-   return chainId === MOONBEAM_CHAIN_ID
- }
+  const chainId = await l1Wallet.getChainId()
+  return chainId === MOONBEAM_CHAIN_ID
+}
 
 export const die = (...args) => {
   console.log(...args)
