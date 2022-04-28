@@ -31,7 +31,6 @@ import {
   l2Wallet_3,
   l1Wallet_4,
   l2Wallet_4,
-  fundUser,
   getL2BOBA,
   getL1Bridge,
   //getL2Bridge,
@@ -185,7 +184,9 @@ export class OptimismEnv {
     const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
     const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
     if (balance.lt(utils.parseEther(min))) {
-      await fundUser(messenger, utils.parseEther(topUp))
+      // NEED TO FIX
+      // await fundUser(messenger, utils.parseEther(topUp))
+      console.error('NEED TO FIX - fundUser')
     }
 
     return new OptimismEnv({

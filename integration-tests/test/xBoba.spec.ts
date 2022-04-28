@@ -9,6 +9,9 @@ import xL2GovernanceERC20Helper from '@boba/contracts/artifacts/contracts/test-h
 import { OptimismEnv } from './shared/env'
 
 describe('xBOBA Test', async () => {
+  // Disable xBOBA
+  return
+
   let Factory__xBoba: ContractFactory
   let Factory_xBobaHelper: ContractFactory
   let xBoba: Contract

@@ -54,7 +54,8 @@ contract DiscretionaryExitFee is Ownable {
         // BOBA amount
         uint256 netBobaAmount = msg.value - billingContract.exitFee();
 
-        require(!(netBobaAmount != 0 && _l2Token != Lib_PredeployAddresses.L2_BOBA), "Amount Incorrect");
+        require(netBobaAmount != 0 || _l2Token != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
+        require(!(netBobaAmount != 0 && _l2Token != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
 
         if (netBobaAmount != 0) {
             // override the _amount and token address

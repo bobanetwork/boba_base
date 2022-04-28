@@ -227,6 +227,7 @@ export const getL2BOBA = (wallet: Wallet) => {
   return L2_BOBA
 }
 
+// NEED TO FIX
 export const fundUser = async (
   messenger: CrossChainMessenger,
   amount: NumberLike,
@@ -256,6 +257,15 @@ export const fundUser = async (
     })
     await tx.wait()
   }
+}
+
+export const approveERC20 = async (
+  ERC20: Contract,
+  targetAddress: string,
+  amount: any
+) => {
+  const approveTx = await ERC20.approve(targetAddress, amount)
+  await approveTx.wait()
 }
 
 export const conditionalTest = (

@@ -476,12 +476,9 @@ describe('Basic RPC tests', () => {
     })
 
     describe('eth_getBalance', () => {
-      it('{tag:rpc} should get the OVM_ETH balance', async () => {
+      it('{tag:rpc} should get the BOBA balance', async () => {
         const rpcBalance = await env.l2Provider.getBalance(env.l2Wallet.address)
-        const contractBalance =
-          await env.messenger.contracts.l2.OVM_ETH.balanceOf(
-            env.l2Wallet.address
-          )
+        const contractBalance = await env.L2BOBA.balanceOf(env.l2Wallet.address)
         expect(rpcBalance).to.be.deep.eq(contractBalance)
       })
     })

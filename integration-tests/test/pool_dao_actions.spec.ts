@@ -21,6 +21,10 @@ import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/
 import { OptimismEnv } from './shared/env'
 
 describe('Dao Action Test', async () => {
+
+  // Skip DAO tests
+  return
+
   let Factory__GovernorBravoDelegate: ContractFactory
   let GovernorBravoDelegate: Contract
 

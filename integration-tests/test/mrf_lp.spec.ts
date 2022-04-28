@@ -1427,6 +1427,14 @@ describe('Liquidity Pool Test', async () => {
           { value: exitFee.sub(BigNumber.from(1)) }
         )
       ).to.be.revertedWith('Insufficient Boba amount')
+
+      await expect(
+        L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
+          fastExitAmount,
+          env.L2BOBA.address,
+          { value: exitFee }
+        )
+      ).to.be.revertedWith('Insufficient Boba amount')
     })
 
     it('{tag:mrf} should fast exit L2', async () => {
