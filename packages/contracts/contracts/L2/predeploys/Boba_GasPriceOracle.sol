@@ -55,7 +55,7 @@ contract Boba_GasPriceOracle {
     address public gasPriceOracleAddress = 0x420000000000000000000000000000000000000F;
 
     // Record the wallet address that wants to use boba as fee token
-    mapping(address => bool) public l1NativeTokenFeeTokenUsers;
+    mapping(address => bool) public secondaryFeeTokenUsers;
 
     // swap fee for the meta transaction
     uint256 public metaTransactionFee = 1e15;
@@ -161,7 +161,7 @@ contract Boba_GasPriceOracle {
         require(!Address.isContract(msg.sender), "Account not EOA");
         // Users should have more than 3 BOBA
         require(address(msg.sender).balance >= 3e18, "Insufficient BOBA balance");
-        l1NativeTokenFeeTokenUsers[msg.sender] = false;
+        secondaryFeeTokenUsers[msg.sender] = false;
         emit UseBOBAAsFeeToken(msg.sender);
     }
 
@@ -202,7 +202,7 @@ contract Boba_GasPriceOracle {
             L2_L1NativeToken(secondardyFeeTokenAddress).balanceOf(msg.sender) >= 2e18,
             "Insufficient Boba balance"
         );
-        l1NativeTokenFeeTokenUsers[msg.sender] = true;
+        secondaryFeeTokenUsers[msg.sender] = true;
         emit UseSecondardyFeeTokenAsFeeToken(msg.sender);
     }
 

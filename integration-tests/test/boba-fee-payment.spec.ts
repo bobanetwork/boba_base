@@ -86,7 +86,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await registerTx.wait()
 
     expect(
-      await Boba_GasPriceOracle.l1NativeTokenFeeTokenUsers(env.l2Wallet.address)
+      await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet.address)
     ).to.be.deep.eq(true)
   })
 
@@ -1107,7 +1107,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await registerTx.wait()
 
     expect(
-      await Boba_GasPriceOracle.l1NativeTokenFeeTokenUsers(env.l2Wallet.address)
+      await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet.address)
     ).to.be.deep.eq(false)
   })
 
