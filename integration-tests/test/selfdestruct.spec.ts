@@ -172,7 +172,7 @@ describe('Self Destruct Tests', async () => {
     it('{tag:other} should use secondary fee token as fee token', async () => {
       await Boba_GasPriceOracle.connect(
         env.l2Wallet_2
-      ).useSecondardyFeeTokenAsFeeToken()
+      ).useSecondaryFeeTokenAsFeeToken()
 
       const isSecondaryFeeTokenSelect =
         await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet_2.address)
@@ -387,7 +387,7 @@ describe('SSTORE tests', async () => {
     it('{tag:other} should use secondary fee token as fee token', async () => {
       await Boba_GasPriceOracle.connect(
         env.l2Wallet_2
-      ).useSecondardyFeeTokenAsFeeToken()
+      ).useSecondaryFeeTokenAsFeeToken()
 
       const isSecondaryFeeTokenSelect =
         await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet_2.address)

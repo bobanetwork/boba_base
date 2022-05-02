@@ -82,7 +82,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   it('{tag:boba} should register to use secondary fee token as the fee token', async () => {
     // Register l1wallet for using secondary fee token as the fee token
     const registerTx =
-      await Boba_GasPriceOracle.useSecondardyFeeTokenAsFeeToken()
+      await Boba_GasPriceOracle.useSecondaryFeeTokenAsFeeToken()
     await registerTx.wait()
 
     expect(
@@ -93,7 +93,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
   it('{tag:boba} should not register the fee tokens for non EOA accounts', async () => {
     await expect(Boba_GasPriceOracleProxyCall.useBobaAsFeeToken()).to.be
       .reverted
-    await expect(Boba_GasPriceOracleProxyCall.useSecondardyFeeTokenAsFeeToken())
+    await expect(Boba_GasPriceOracleProxyCall.useSecondaryFeeTokenAsFeeToken())
       .to.be.reverted
   })
 
@@ -107,13 +107,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     const amount = utils.parseEther('0.0000001')
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
     expect(BobaBalanceBefore.gt(amount))
 
@@ -128,19 +128,19 @@ describe('Boba Fee Payment Integration Tests', async () => {
     expect(receipt.status).to.eq(1)
 
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
@@ -153,15 +153,15 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     // Make sure that we deduct boba from user's account
     expect(
-      SecondardyFeeTokenBalanceBefore.sub(SecondardyFeeTokenBalanceAfter)
-    ).to.deep.equal(txSecondardyFeeTokenFee)
+      SecondaryFeeTokenBalanceBefore.sub(SecondaryFeeTokenBalanceAfter)
+    ).to.deep.equal(txSecondaryFeeTokenFee)
 
     // Make sure that the boba fee vault receives the tx fee
     expect(
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    ).to.deep.equal(txSecondardyFeeTokenFee)
+    ).to.deep.equal(txSecondaryFeeTokenFee)
 
     await setPrices(env, 1)
   })
@@ -171,34 +171,34 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     const amount = utils.parseEther('0.0000001')
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-    expect(SecondardyFeeTokenFeeVaultBalanceBefore.gt(amount))
+    expect(SecondaryFeeTokenFeeVaultBalanceBefore.gt(amount))
 
     const tx = await secondaryFeeToken.transfer(other, amount)
     const receipt = await tx.wait()
     expect(receipt.status).to.eq(1)
 
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
@@ -211,15 +211,15 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     // Make sure that we deduct secondary fee token from user's account
     expect(
-      SecondardyFeeTokenBalanceBefore.sub(SecondardyFeeTokenBalanceAfter)
-    ).to.deep.equal(txSecondardyFeeTokenFee.add(amount))
+      SecondaryFeeTokenBalanceBefore.sub(SecondaryFeeTokenBalanceAfter)
+    ).to.deep.equal(txSecondaryFeeTokenFee.add(amount))
 
     // Make sure that the secondary fee token fee vault receives the tx fee
     expect(
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    ).to.deep.equal(txSecondardyFeeTokenFee)
+    ).to.deep.equal(txSecondaryFeeTokenFee)
 
     await setPrices(env, 1)
   })
@@ -228,27 +228,27 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1000)
 
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
     await expect(
-      secondaryFeeToken.transfer(other, SecondardyFeeTokenBalanceBefore)
+      secondaryFeeToken.transfer(other, SecondaryFeeTokenBalanceBefore)
     ).to.be.revertedWith(
       'execution reverted: ERC20: transfer amount exceeds balance'
     )
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
     // Make sure that Boba balance doesn't change
@@ -258,13 +258,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     expect(BobaFeeVaultBalanceAfter).to.deep.equal(BobaFeeVaultBalanceBefore)
 
     // Make sure that we don't deduct secondary fee token from user's account
-    expect(SecondardyFeeTokenBalanceBefore).to.deep.equal(
-      SecondardyFeeTokenBalanceAfter
+    expect(SecondaryFeeTokenBalanceBefore).to.deep.equal(
+      SecondaryFeeTokenBalanceAfter
     )
 
     // Make sure that the secondary fee token vault doesn't change
-    expect(SecondardyFeeTokenFeeVaultBalanceAfter).to.deep.equal(
-      SecondardyFeeTokenFeeVaultBalanceBefore
+    expect(SecondaryFeeTokenFeeVaultBalanceAfter).to.deep.equal(
+      SecondaryFeeTokenFeeVaultBalanceBefore
     )
 
     await setPrices(env, 1)
@@ -274,13 +274,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1000)
 
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
     const unsigned = await env.l2Wallet.populateTransaction({
       to: env.l2Wallet.address,
@@ -292,30 +292,30 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-    const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-      SecondardyFeeTokenBalanceAfter
+    const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+      SecondaryFeeTokenBalanceAfter
     )
-    const SecondardyFeeTokenFeeReceived =
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+    const SecondaryFeeTokenFeeReceived =
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(txSecondardyFeeTokenFee)
+    expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
     // There is no inflation
-    expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-      SecondardyFeeTokenBalanceDiff
+    expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+      SecondaryFeeTokenBalanceDiff
     )
 
     expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -328,13 +328,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1000)
 
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
     const unsigned = await env.l2Wallet.populateTransaction({
       to: env.l2Wallet.address,
@@ -346,30 +346,30 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-    const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-      SecondardyFeeTokenBalanceAfter
+    const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+      SecondaryFeeTokenBalanceAfter
     )
-    const SecondardyFeeTokenFeeReceived =
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+    const SecondaryFeeTokenFeeReceived =
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(txSecondardyFeeTokenFee)
+    expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
     // There is no inflation
-    expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-      SecondardyFeeTokenBalanceDiff
+    expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+      SecondaryFeeTokenBalanceDiff
     )
 
     expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -382,13 +382,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1000)
 
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
     const tx = await secondaryFeeToken.transfer(env.l2Wallet.address, 0)
@@ -396,30 +396,30 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-    const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-      SecondardyFeeTokenBalanceAfter
+    const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+      SecondaryFeeTokenBalanceAfter
     )
-    const SecondardyFeeTokenFeeReceived =
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+    const SecondaryFeeTokenFeeReceived =
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(txSecondardyFeeTokenFee)
+    expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
     // There is no inflation
-    expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-      SecondardyFeeTokenBalanceDiff
+    expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+      SecondaryFeeTokenBalanceDiff
     )
 
     expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -439,13 +439,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     while (gasLimit < estimatedGas.toNumber() + 1000) {
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
       const tx = await env.l2Wallet.sendTransaction({
         to: env.l2Wallet.address,
@@ -456,33 +456,31 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const priceRatio = await Boba_GasPriceOracle.priceRatio()
       const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
       const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
 
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -505,13 +503,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
     while (gasLimit < estimatedGas.toNumber() + 1000) {
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
       const tx = await secondaryFeeToken.transfer(
         env.l2Wallet.address,
@@ -522,33 +520,31 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const priceRatio = await Boba_GasPriceOracle.priceRatio()
       const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
       const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
 
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -576,16 +572,15 @@ describe('Boba Fee Payment Integration Tests', async () => {
   })
 
   it('{tag:boba} should not be able to withdraw fees before the minimum is met', async function () {
-    const SecondardyFeeTokenBalance = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalance = await secondaryFeeToken.balanceOf(
       Boba_GasPriceOracle.address
     )
     const MIN_WITHDRAWAL_AMOUNT =
       await Boba_GasPriceOracle.MIN_WITHDRAWAL_AMOUNT()
-    if (SecondardyFeeTokenBalance.gt(MIN_WITHDRAWAL_AMOUNT)) {
+    if (SecondaryFeeTokenBalance.gt(MIN_WITHDRAWAL_AMOUNT)) {
       this.skip()
     }
-    await expect(Boba_GasPriceOracle.withdrawSecondardyFeeToken()).to.be
-      .rejected
+    await expect(Boba_GasPriceOracle.withdrawSecondaryFeeToken()).to.be.rejected
   })
 
   it('{tag:boba} should be able to withdraw fees back to L1 once the minimum is met', async function () {
@@ -617,7 +612,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     )
 
     // Submit the withdrawal.
-    const withdrawTx = await Boba_GasPriceOracle.withdrawSecondardyFeeToken({
+    const withdrawTx = await Boba_GasPriceOracle.withdrawSecondaryFeeToken({
       gasPrice: 0,
     })
 
@@ -657,7 +652,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       value: ethers.utils.parseEther('1'),
     })
     const receipt = await tx.wait()
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(tx.gasPrice)
       .mul(priceRatio)
       .div(priceRatioDivisor)
@@ -668,7 +663,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
     expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
     expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
-    expect(json.l2BobaFee).to.deep.equal(txSecondardyFeeTokenFee)
+    expect(json.l2BobaFee).to.deep.equal(txSecondaryFeeTokenFee)
   })
 
   // Boba Ethereum special fields on the receipt
@@ -699,7 +694,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         gasPrice,
       })
       const receipt = await tx.wait()
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -710,7 +705,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))
       expect(scaled.toString()).to.deep.equal(json.l1FeeScalar)
       expect(l1Fee).to.deep.equal(BigNumber.from(json.l1Fee))
-      expect(json.l2BobaFee).to.deep.equal(txSecondardyFeeTokenFee)
+      expect(json.l2BobaFee).to.deep.equal(txSecondaryFeeTokenFee)
 
       gasPrice += 1
     }
@@ -725,13 +720,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await setPriceRatio.wait()
 
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
       const tx = await env.l2Wallet.sendTransaction({
@@ -741,7 +736,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const receipt = await tx.wait()
       const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
       const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -750,28 +745,26 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ])
       const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
-      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondardyFeeTokenFee)
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -790,13 +783,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await setDecimals.wait()
 
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
       const tx = await env.l2Wallet.sendTransaction({
@@ -806,7 +799,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const receipt = await tx.wait()
       const priceRatio = await Boba_GasPriceOracle.priceRatio()
       const priceRatioDivisor = BigNumber.from(10).pow(BigNumber.from(decimals))
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -815,28 +808,26 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ])
       const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
-      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondardyFeeTokenFee)
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -856,20 +847,20 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await setPriceRatio.wait()
 
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
       const tx = await secondaryFeeToken.transfer(env.l2Wallet.address, 0)
       const receipt = await tx.wait()
       const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
       const priceRatioDivisor = BigNumber.from(10).pow(priceRatioDecimals)
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -879,28 +870,26 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ])
       const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
-      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondardyFeeTokenFee)
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -919,20 +908,20 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await setDecimals.wait()
 
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
       const tx = await secondaryFeeToken.transfer(env.l2Wallet.address, 0)
       const receipt = await tx.wait()
       const priceRatio = await Boba_GasPriceOracle.priceRatio()
       const priceRatioDivisor = BigNumber.from(10).pow(BigNumber.from(decimals))
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(tx.gasPrice)
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -942,29 +931,27 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ])
       const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
 
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
-      expect(l1NativeTokenFeeReceipt).to.deep.eq(SecondardyFeeTokenBalanceDiff)
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+      expect(l1NativeTokenFeeReceipt).to.deep.eq(SecondaryFeeTokenBalanceDiff)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -979,13 +966,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     await setPrices(env, 1000)
 
     const BobaBalanceBefore = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceBefore =
+    const SecondaryFeeTokenFeeVaultBalanceBefore =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
     const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
@@ -995,7 +982,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const decimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(BigNumber.from(decimals))
-    const txSecondardyFeeTokenFee = receipt.gasUsed
+    const txSecondaryFeeTokenFee = receipt.gasUsed
       .mul(BigNumber.from(1000))
       .mul(priceRatio)
       .div(priceRatioDivisor)
@@ -1004,26 +991,26 @@ describe('Boba Fee Payment Integration Tests', async () => {
     ])
     const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
     const BobaBalanceAfter = await env.l2Wallet.getBalance()
-    const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
       env.l2Wallet.address
     )
     const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
       predeploys.OVM_SequencerFeeVault
     )
-    const SecondardyFeeTokenFeeVaultBalanceAfter =
+    const SecondaryFeeTokenFeeVaultBalanceAfter =
       await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-    const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-      SecondardyFeeTokenBalanceAfter
+    const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+      SecondaryFeeTokenBalanceAfter
     )
-    const SecondardyFeeTokenFeeReceived =
-      SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-        SecondardyFeeTokenFeeVaultBalanceBefore
+    const SecondaryFeeTokenFeeReceived =
+      SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+        SecondaryFeeTokenFeeVaultBalanceBefore
       )
-    expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(txSecondardyFeeTokenFee)
-    expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondardyFeeTokenFee)
+    expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+    expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondaryFeeTokenFee)
     // There is no inflation
-    expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-      SecondardyFeeTokenBalanceDiff
+    expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+      SecondaryFeeTokenBalanceDiff
     )
 
     expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -1043,13 +1030,13 @@ describe('Boba Fee Payment Integration Tests', async () => {
     let gasLimit = estimatedGas.toNumber()
     while (gasLimit < estimatedGas.toNumber() + 10000) {
       const BobaBalanceBefore = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceBefore = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceBefore =
+      const SecondaryFeeTokenFeeVaultBalanceBefore =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
 
       const TestContract = await Factory__Boba_GasPriceOracleProxyCall.deploy(
@@ -1059,7 +1046,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const priceRatio = await Boba_GasPriceOracle.priceRatio()
       const decimals = await Boba_GasPriceOracle.decimals()
       const priceRatioDivisor = BigNumber.from(10).pow(BigNumber.from(decimals))
-      const txSecondardyFeeTokenFee = receipt.gasUsed
+      const txSecondaryFeeTokenFee = receipt.gasUsed
         .mul(BigNumber.from(1000))
         .mul(priceRatio)
         .div(priceRatioDivisor)
@@ -1068,28 +1055,26 @@ describe('Boba Fee Payment Integration Tests', async () => {
       ])
       const l1NativeTokenFeeReceipt = BigNumber.from(json.l2BobaFee)
       const BobaBalanceAfter = await env.l2Wallet.getBalance()
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet.address
       )
       const BobaFeeVaultBalanceAfter = await env.l2Wallet.provider.getBalance(
         predeploys.OVM_SequencerFeeVault
       )
-      const SecondardyFeeTokenFeeVaultBalanceAfter =
+      const SecondaryFeeTokenFeeVaultBalanceAfter =
         await secondaryFeeToken.balanceOf(Boba_GasPriceOracle.address)
-      const SecondardyFeeTokenBalanceDiff = SecondardyFeeTokenBalanceBefore.sub(
-        SecondardyFeeTokenBalanceAfter
+      const SecondaryFeeTokenBalanceDiff = SecondaryFeeTokenBalanceBefore.sub(
+        SecondaryFeeTokenBalanceAfter
       )
-      const SecondardyFeeTokenFeeReceived =
-        SecondardyFeeTokenFeeVaultBalanceAfter.sub(
-          SecondardyFeeTokenFeeVaultBalanceBefore
+      const SecondaryFeeTokenFeeReceived =
+        SecondaryFeeTokenFeeVaultBalanceAfter.sub(
+          SecondaryFeeTokenFeeVaultBalanceBefore
         )
-      expect(SecondardyFeeTokenBalanceDiff).to.deep.equal(
-        txSecondardyFeeTokenFee
-      )
-      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondardyFeeTokenFee)
+      expect(SecondaryFeeTokenBalanceDiff).to.deep.equal(txSecondaryFeeTokenFee)
+      expect(l1NativeTokenFeeReceipt).to.deep.equal(txSecondaryFeeTokenFee)
       // There is no inflation
-      expect(SecondardyFeeTokenFeeReceived).to.deep.equal(
-        SecondardyFeeTokenBalanceDiff
+      expect(SecondaryFeeTokenFeeReceived).to.deep.equal(
+        SecondaryFeeTokenBalanceDiff
       )
 
       expect(BobaBalanceBefore).to.deep.equal(BobaBalanceAfter)
@@ -1120,22 +1105,22 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
     await fundBobaTx.wait()
 
-    const fundSecondardyFeeTokenTx = await secondaryFeeToken.transfer(
+    const fundSecondaryFeeTokenTx = await secondaryFeeToken.transfer(
       wallet.address,
       ethers.utils.parseEther('10')
     )
-    await fundSecondardyFeeTokenTx.wait()
+    await fundSecondaryFeeTokenTx.wait()
 
     // Register the fee token
     const registerTx = await Boba_GasPriceOracle.connect(
       wallet
-    ).useSecondardyFeeTokenAsFeeToken()
+    ).useSecondaryFeeTokenAsFeeToken()
     await registerTx.wait()
 
-    const addSecondardyFeeTokenTx = await secondaryFeeToken
+    const addSecondaryFeeTokenTx = await secondaryFeeToken
       .connect(env.l2Wallet)
       .transfer(wallet.address, ethers.utils.parseEther('200'))
-    await addSecondardyFeeTokenTx.wait()
+    await addSecondaryFeeTokenTx.wait()
 
     // Transfer all Boba to the original owner
     const BobaBalance = await wallet.getBalance()
@@ -1159,37 +1144,37 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
     await fundTx.wait()
 
-    const fundSecondardyFeeTokenTx = await secondaryFeeToken.transfer(
+    const fundSecondaryFeeTokenTx = await secondaryFeeToken.transfer(
       wallet.address,
       ethers.utils.parseEther('10')
     )
-    await fundSecondardyFeeTokenTx.wait()
+    await fundSecondaryFeeTokenTx.wait()
 
     // Register the fee token
     const registerTx = await Boba_GasPriceOracle.connect(
       wallet
-    ).useSecondardyFeeTokenAsFeeToken()
+    ).useSecondaryFeeTokenAsFeeToken()
     await registerTx.wait()
 
-    const SecondardyFeeTokenBalance = await secondaryFeeToken.balanceOf(
+    const SecondaryFeeTokenBalance = await secondaryFeeToken.balanceOf(
       wallet.address
     )
     const estimateGas = await secondaryFeeToken
       .connect(wallet)
-      .estimateGas.transfer(env.l2Wallet.address, SecondardyFeeTokenBalance)
+      .estimateGas.transfer(env.l2Wallet.address, SecondaryFeeTokenBalance)
     const priceRatio = await Boba_GasPriceOracle.priceRatio()
     const decimals = await Boba_GasPriceOracle.decimals()
     const priceRatioDivisor = BigNumber.from(10).pow(BigNumber.from(decimals))
-    const returnSecondardyFeeTokenTx = await secondaryFeeToken
+    const returnSecondaryFeeTokenTx = await secondaryFeeToken
       .connect(wallet)
       .transfer(
         env.l2Wallet.address,
-        SecondardyFeeTokenBalance.sub(
+        SecondaryFeeTokenBalance.sub(
           estimateGas.mul(priceRatio).div(priceRatioDivisor)
         ),
         { gasLimit: estimateGas }
       )
-    await returnSecondardyFeeTokenTx.wait()
+    await returnSecondaryFeeTokenTx.wait()
 
     await expect(
       wallet.sendTransaction({
@@ -1212,15 +1197,15 @@ describe('Boba Fee Payment Integration Tests', async () => {
     })
     await transferTx.wait()
 
-    const fundSecondardyFeeTokenTx = await secondaryFeeToken.transfer(
+    const fundSecondaryFeeTokenTx = await secondaryFeeToken.transfer(
       randomWallet.address,
       ethers.utils.parseEther('10')
     )
-    await fundSecondardyFeeTokenTx.wait()
+    await fundSecondaryFeeTokenTx.wait()
 
     const registerTx = await Boba_GasPriceOracle.connect(
       randomWallet
-    ).useSecondardyFeeTokenAsFeeToken()
+    ).useSecondaryFeeTokenAsFeeToken()
     await registerTx.wait()
 
     const json = await env.l2Provider.send('eth_getTransactionReceipt', [
@@ -1267,7 +1252,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const spender = Boba_GasPriceOracle.address
       const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const value = (
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       ).toString()
       const nonce = (
         await secondaryFeeToken.nonces(env.l2Wallet_2.address)
@@ -1289,7 +1274,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
       const sig = ethers.utils.splitSignature(signature)
 
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         env.l2Wallet_2.address
       )
       const BobaBalanceBefore = await env.l2Wallet_2.getBalance()
@@ -1297,7 +1282,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      await Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
         owner,
         spender,
         value,
@@ -1307,7 +1292,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         sig.s
       )
 
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         env.l2Wallet_2.address
       )
       const BobaBalanceAfter = await env.l2Wallet_2.getBalance()
@@ -1315,8 +1300,8 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      expect(SecondardyFeeTokenBalanceAfter).to.be.deep.eq(
-        SecondardyFeeTokenBalanceBefore.sub(BigNumber.from(value))
+      expect(SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+        SecondaryFeeTokenBalanceBefore.sub(BigNumber.from(value))
       )
       expect(BobaBalanceAfter).to.be.deep.eq(
         BobaBalanceBefore.add(receivedBOBAAmount)
@@ -1330,7 +1315,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
       const value = (
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       ).toString()
       const nonce = (
         await secondaryFeeToken.nonces(env.l2Wallet_2.address)
@@ -1353,7 +1338,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+        Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
           owner,
           spender,
           value,
@@ -1369,7 +1354,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const owner = env.l2Wallet_2.address
       const spender = Boba_GasPriceOracle.address
       const value = (
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       ).toString()
       const nonce = (
         await secondaryFeeToken.nonces(env.l2Wallet_2.address)
@@ -1409,7 +1394,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       await expect(
         Boba_GasPriceOracle.connect(
           env.l2Wallet_2
-        ).swapSecondardyFeeTokenForBOBAMetaTransaction(
+        ).swapSecondaryFeeTokenForBOBAMetaTransaction(
           owner,
           spender,
           value,
@@ -1432,7 +1417,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const owner = env.l2Wallet_2.address
       const spender = env.addressesBOBA.FeedRegistry
       const value = (
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       ).toString()
       const nonce = (
         await secondaryFeeToken.nonces(env.l2Wallet_2.address)
@@ -1455,7 +1440,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+        Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
           owner,
           spender,
           value,
@@ -1492,7 +1477,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const sig = ethers.utils.splitSignature(signature)
 
       await expect(
-        Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+        Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
           owner,
           spender,
           value,
@@ -1518,7 +1503,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       )
       await Boba_GasPriceOracle.connect(
         newWallet
-      ).useSecondardyFeeTokenAsFeeToken()
+      ).useSecondaryFeeTokenAsFeeToken()
 
       // Get BOBA
       await secondaryFeeToken.transfer(
@@ -1533,7 +1518,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         value: BobaBalance,
       })
 
-      const SecondardyFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceBefore = await secondaryFeeToken.balanceOf(
         newWallet.address
       )
       const BobaBalanceBefore = await newWallet.getBalance()
@@ -1545,7 +1530,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
       const spender = Boba_GasPriceOracle.address
       const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const value = (
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       ).toString()
       const nonce = (
         await secondaryFeeToken.nonces(newWallet.address)
@@ -1567,7 +1552,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
 
       const sig = ethers.utils.splitSignature(signature)
 
-      await Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
         owner,
         spender,
         value,
@@ -1577,7 +1562,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         sig.s
       )
 
-      const SecondardyFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
+      const SecondaryFeeTokenBalanceAfter = await secondaryFeeToken.balanceOf(
         newWallet.address
       )
       const BobaBalanceAfter = await newWallet.getBalance()
@@ -1585,8 +1570,8 @@ describe('Boba Fee Payment Integration Tests', async () => {
         Boba_GasPriceOracle.address
       )
 
-      expect(SecondardyFeeTokenBalanceAfter).to.be.deep.eq(
-        SecondardyFeeTokenBalanceBefore.sub(BigNumber.from(value))
+      expect(SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+        SecondaryFeeTokenBalanceBefore.sub(BigNumber.from(value))
       )
       expect(BobaBalanceAfter).to.be.deep.eq(
         BobaBalanceBefore.add(receivedBOBAAmount)

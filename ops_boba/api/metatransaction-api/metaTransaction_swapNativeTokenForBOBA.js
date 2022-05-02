@@ -18,13 +18,13 @@ const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
 // ABI
 const BobaGasPriceOracleInterface = new ethers.utils.Interface([
   'function useBobaAsFeeToken()',
-  'function useSecondardyFeeTokenAsFeeToken()',
+  'function useSecondaryFeeTokenAsFeeToken()',
   'function secondaryFeeTokenUsers(address) view returns (bool)',
-  'function swapSecondardyFeeTokenForBOBAMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+  'function swapSecondaryFeeTokenForBOBAMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
   'function metaTransactionFee() view returns (uint256)',
   'function marketPriceRatio() view returns (uint256)',
   'function receivedBOBAAmount() view returns (uint256)',
-  'function getSecondardyFeeTokenForSwap() view returns (uint256)',
+  'function getSecondaryFeeTokenForSwap() view returns (uint256)',
 ])
 
 const L2SecondaryFeeTokenInterface = new ethers.utils.Interface([
@@ -87,7 +87,7 @@ const verifyBobay = async (body) => {
     }
   }
 
-  const totalCost = await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+  const totalCost = await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
   const L2SecondaryFeeTokenBalance = await L2SecondaryFeeToken.balanceOf(owner)
   const bigNumberValue = ethers.BigNumber.from(value)
   if (bigNumberValue.lt(totalCost)) {
@@ -130,7 +130,7 @@ module.exports.mainnetHandler = async (event, context, callback) => {
   // Send transaction to node
   try {
     const tx =
-      await Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
         owner,
         spender,
         value,
@@ -177,7 +177,7 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
   // Send transaction to node
   try {
     const tx =
-      await Boba_GasPriceOracle.swapSecondardyFeeTokenForBOBAMetaTransaction(
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
         owner,
         spender,
         value,

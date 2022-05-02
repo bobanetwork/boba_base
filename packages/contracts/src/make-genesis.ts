@@ -145,7 +145,7 @@ export const makeL2GenesisFile = async (
     Boba_GasPriceOracle: {
       _owner: cfg.gasPriceOracleOwner,
       feeWallet: cfg.l1FeeWalletAddress,
-      secondardyFeeTokenAddress: predeploys.L2_L1NativeToken,
+      secondaryFeeTokenAddress: predeploys.L2_L1NativeToken,
       minPriceRatio: 500,
       maxPriceRatio: 5000,
       priceRatio: 2000,

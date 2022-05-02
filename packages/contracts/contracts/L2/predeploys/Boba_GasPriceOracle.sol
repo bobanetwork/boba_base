@@ -39,7 +39,7 @@ contract Boba_GasPriceOracle {
     address public feeWallet;
 
     // L1 native token token L2 address
-    address public secondardyFeeTokenAddress = Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS;
+    address public secondaryFeeTokenAddress = Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS;
 
     // The maximum price ratio of BOBA and BOBA
     uint256 public maxPriceRatio = 5000;
@@ -75,8 +75,8 @@ contract Boba_GasPriceOracle {
 
     event TransferOwnership(address, address);
     event UseBOBAAsFeeToken(address);
-    event SwapSecondardyFeeTokenForBOBAMetaTransaction(address);
-    event UseSecondardyFeeTokenAsFeeToken(address);
+    event SwapSecondaryFeeTokenForBOBAMetaTransaction(address);
+    event UseSecondaryFeeTokenAsFeeToken(address);
     event UpdatePriceRatio(address, uint256, uint256);
     event UpdateMaxPriceRatio(address, uint256);
     event UpdateMinPriceRatio(address, uint256);
@@ -85,7 +85,7 @@ contract Boba_GasPriceOracle {
     event UpdateReceivedBOBAAmount(address, uint256);
     event UpdateDecimals(address, uint256);
     event WithdrawBOBA(address, address);
-    event WithdrawSecondardyFeeToken(address, address);
+    event WithdrawSecondaryFeeToken(address, address);
 
     /**********************
      * Function Modifiers *
@@ -141,7 +141,7 @@ contract Boba_GasPriceOracle {
     {
         require(_feeWallet != address(0) && _l2BobaAddress != address(0));
         feeWallet = _feeWallet;
-        secondardyFeeTokenAddress = _l2BobaAddress;
+        secondaryFeeTokenAddress = _l2BobaAddress;
 
         // Initialize the parameters
         _owner = msg.sender;
@@ -168,7 +168,7 @@ contract Boba_GasPriceOracle {
     /**
      * Swap native token for BOBA
      */
-    function swapSecondardyFeeTokenForBOBAMetaTransaction(
+    function swapSecondaryFeeTokenForBOBAMetaTransaction(
         address tokenOwner,
         address spender,
         uint256 value,
@@ -184,26 +184,26 @@ contract Boba_GasPriceOracle {
             metaTransactionFee
         );
         require(value >= totalCost, "Value is not enough");
-        L2_L1NativeToken secondardyFeeToken = L2_L1NativeToken(secondardyFeeTokenAddress);
-        secondardyFeeToken.permit(tokenOwner, spender, value, deadline, v, r, s);
-        IERC20(secondardyFeeToken).safeTransferFrom(tokenOwner, address(this), totalCost);
+        L2_L1NativeToken secondaryFeeToken = L2_L1NativeToken(secondaryFeeTokenAddress);
+        secondaryFeeToken.permit(tokenOwner, spender, value, deadline, v, r, s);
+        IERC20(secondaryFeeToken).safeTransferFrom(tokenOwner, address(this), totalCost);
         (bool sent, ) = address(tokenOwner).call{ value: receivedBOBAAmount }("");
         require(sent, "Failed to send BOBA");
-        emit SwapSecondardyFeeTokenForBOBAMetaTransaction(tokenOwner);
+        emit SwapSecondaryFeeTokenForBOBAMetaTransaction(tokenOwner);
     }
 
     /**
      * Add the users that want to use L1 native token as the fee token
      */
-    function useSecondardyFeeTokenAsFeeToken() public {
+    function useSecondaryFeeTokenAsFeeToken() public {
         require(!Address.isContract(msg.sender), "Account not EOA");
         // Users should have more than 0.002 l1 native token
         require(
-            L2_L1NativeToken(secondardyFeeTokenAddress).balanceOf(msg.sender) >= 2e18,
+            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >= 2e18,
             "Insufficient Boba balance"
         );
         secondaryFeeTokenUsers[msg.sender] = true;
-        emit UseSecondardyFeeTokenAsFeeToken(msg.sender);
+        emit UseSecondaryFeeTokenAsFeeToken(msg.sender);
     }
 
     /**
@@ -283,7 +283,7 @@ contract Boba_GasPriceOracle {
     /**
      * Get the price for swapping l1 native token for BOBA
      */
-    function getSecondardyFeeTokenForSwap() public view returns (uint256) {
+    function getSecondaryFeeTokenForSwap() public view returns (uint256) {
         // marketPriceRatio = native token price / boba price
         uint256 multiplier = 10**decimals;
         return receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(metaTransactionFee);
@@ -293,7 +293,7 @@ contract Boba_GasPriceOracle {
      * Get L1 native token fee for fee estimation
      * @param _txData the data payload
      */
-    function getSecondardyFeeTokenFee(bytes memory _txData) public view returns (uint256) {
+    function getSecondaryFeeTokenFee(bytes memory _txData) public view returns (uint256) {
         uint256 multiplier = 10**decimals;
         OVM_GasPriceOracle gasPriceOracleContract = OVM_GasPriceOracle(gasPriceOracleAddress);
         return gasPriceOracleContract.getL1Fee(_txData).mul(priceRatio).div(multiplier);
@@ -302,22 +302,22 @@ contract Boba_GasPriceOracle {
     /**
      * withdraw l1 native token from l2 to l1 fee wallet
      */
-    function withdrawSecondardyFeeToken() public {
+    function withdrawSecondaryFeeToken() public {
         require(
-            L2_L1NativeToken(secondardyFeeTokenAddress).balanceOf(address(this)) >=
+            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(address(this)) >=
                 MIN_WITHDRAWAL_AMOUNT,
             // solhint-disable-next-line max-line-length
             "Boba_GasPriceOracle: withdrawal amount must be greater than minimum withdrawal amount"
         );
 
         L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
-            secondardyFeeTokenAddress,
+            secondaryFeeTokenAddress,
             feeWallet,
-            L2_L1NativeToken(secondardyFeeTokenAddress).balanceOf(address(this)),
+            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(address(this)),
             0,
             bytes("")
         );
-        emit WithdrawSecondardyFeeToken(owner(), feeWallet);
+        emit WithdrawSecondaryFeeToken(owner(), feeWallet);
     }
 
     /**

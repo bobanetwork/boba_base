@@ -562,10 +562,10 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('withdrawSecondardyFeeToken', () => {
+  describe('withdrawSecondaryFeeToken', () => {
     it('should revert if the balance is not enough', async () => {
       await expect(
-        Boba_GasPriceOracle.connect(signer2).withdrawSecondardyFeeToken()
+        Boba_GasPriceOracle.connect(signer2).withdrawSecondaryFeeToken()
       ).to.be.reverted
     })
   })
@@ -594,10 +594,10 @@ describe('Boba_GasPriceOracle', () => {
     })
   })
 
-  describe('getSecondardyFeeTokenForSwap', () => {
+  describe('getSecondaryFeeTokenForSwap', () => {
     it('should get correct BOBA for swapping L1 native token for BOBA', async () => {
-      const SecondardyFeeTokenCost =
-        await Boba_GasPriceOracle.getSecondardyFeeTokenForSwap()
+      const SecondaryFeeTokenCost =
+        await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
       const receivedBOBAAmount = await Boba_GasPriceOracle.receivedBOBAAmount()
       const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
       const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
@@ -608,7 +608,7 @@ describe('Boba_GasPriceOracle', () => {
           .mul(marketPriceRatio)
           .div(multiplier)
           .add(metaTransactionFee)
-      ).to.equal(SecondardyFeeTokenCost)
+      ).to.equal(SecondaryFeeTokenCost)
     })
   })
 
@@ -638,8 +638,8 @@ describe('Boba_GasPriceOracle', () => {
         )
         await tx.wait()
         const priceRatio = await Boba_GasPriceOracle.priceRatio()
-        const SecondardyFeeTokenFee =
-          await Boba_GasPriceOracle.getSecondardyFeeTokenFee(input)
+        const SecondaryFeeTokenFee =
+          await Boba_GasPriceOracle.getSecondaryFeeTokenFee(input)
 
         const priceRatioDecimals = await Boba_GasPriceOracle.decimals()
         const multiplier = BigNumber.from(10).pow(priceRatioDecimals)
@@ -653,7 +653,7 @@ describe('Boba_GasPriceOracle', () => {
         )
           .mul(priceRatio)
           .div(multiplier)
-        expect(SecondardyFeeTokenFee).to.deep.equal(expected)
+        expect(SecondaryFeeTokenFee).to.deep.equal(expected)
       })
     }
   })
