@@ -133,15 +133,15 @@ contract Boba_GasPriceOracle {
     }
 
     /**
-     * Initialize feeWallet and l2BobaAddress.
+     * Initialize feeWallet and secondaryFeeToken.
      */
-    function initialize(address payable _feeWallet, address _l2BobaAddress)
+    function initialize(address payable _feeWallet, address _secondaryFeeToken)
         public
         onlyNotInitialized
     {
-        require(_feeWallet != address(0) && _l2BobaAddress != address(0));
+        require(_feeWallet != address(0) && _secondaryFeeToken != address(0));
         feeWallet = _feeWallet;
-        secondaryFeeTokenAddress = _l2BobaAddress;
+        secondaryFeeTokenAddress = _secondaryFeeToken;
 
         // Initialize the parameters
         _owner = msg.sender;
@@ -200,7 +200,7 @@ contract Boba_GasPriceOracle {
         // Users should have more than 0.002 l1 native token
         require(
             L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >= 2e18,
-            "Insufficient Boba balance"
+            "Insufficient secondary fee token balance"
         );
         secondaryFeeTokenUsers[msg.sender] = true;
         emit UseSecondaryFeeTokenAsFeeToken(msg.sender);

@@ -745,7 +745,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
         if (_tokenAddress == Lib_PredeployAddresses.L2_BOBA) {
-            require(_amount <= address(this).balance, "Requested ETH exceeds pool balance");
+            require(_amount <= address(this).balance, "Requested BOBA exceeds pool balance");
             L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
                 L1LiquidityPoolAddress,
