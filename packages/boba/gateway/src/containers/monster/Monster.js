@@ -1,9 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
+import Copy from 'components/copy/Copy'
+import { Md5 } from 'ts-md5/dist/md5'
 
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Monster.styles'
+import * as G from 'containers/Global.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 
@@ -26,7 +29,8 @@ class Monster extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      walletAddress
     } = this.props.setup
 
     this.state = {
@@ -37,7 +41,9 @@ class Monster extends React.Component {
       accountEnabled,
       netLayer,
       monsterNumber,
-      monsterInfo
+      monsterInfo,
+      walletAddress,
+      bobaTag: ''
     }
 
   }
@@ -52,7 +58,8 @@ class Monster extends React.Component {
 
     const {
       accountEnabled,
-      netLayer
+      netLayer,
+      walletAddress
     } = this.props.setup
 
     if (!isEqual(prevState.nft.list, list)) {
@@ -78,6 +85,11 @@ class Monster extends React.Component {
       this.setState({ accountEnabled })
     }
 
+    if (!isEqual(prevState.setup.walletAddress, walletAddress)) {
+      this.setState({ walletAddress })
+      this.setState({ bobaTag: Md5.hashStr(walletAddress.substring(2)) })
+    }
+
     if (!isEqual(prevState.setup.netLayer, netLayer)) {
       this.setState({ netLayer })
     }
@@ -96,15 +108,19 @@ class Monster extends React.Component {
     networkService.addNFT(this.state.contractAddress, this.state.tokenID)
   }
 
-
   render() {
 
     const {
       list,
       netLayer,
       monsterInfo,
-      accountEnabled
+      accountEnabled,
+      bobaTag
     } = this.state
+
+    let BT = ''
+    if(bobaTag)
+      BT = 'BOBA' + bobaTag.substring(0,9).toUpperCase()
 
     let tokenIDverified = null
 
@@ -112,10 +128,10 @@ class Monster extends React.Component {
     let monsterType = 'Monster'
 
     // since it uses FIND, this code will only find one of your monsters
-    // FIX ME to show the 'top' monster for this wallet if you have several 
-    // in which case you are lucky. 
+    // FIX ME to show the 'top' monster for this wallet if you have several
+    // in which case you are lucky.
     if(monsterInfo.length > 0) {
-      
+
       tokenIDverified = monsterInfo.find(e => e.tokenID)
 
       if(typeof(tokenIDverified) !== 'undefined') {
@@ -128,7 +144,7 @@ class Monster extends React.Component {
 
       if(type === 'crowned') {
         monsterType = 'Crowned Monster'
-      } 
+      }
       else if (type === 'wizard') {
         monsterType = 'Wizard Monster'
       }
@@ -143,7 +159,7 @@ class Monster extends React.Component {
 
         <PageTitle title={'MonsterVerse'} />
 
-        <Connect 
+        <Connect
           userPrompt={'Please connect to Boba'}
           accountEnabled={accountEnabled}
           connectToBoba={true}
@@ -162,13 +178,24 @@ class Monster extends React.Component {
                     MonsterVerse
                   </Typography>
                 </Box>
-                <S.DividerLine />
-                <Typography variant="body1" >
-                  <br/>Welcome, esteemed {monsterType} {tokenIDverified}
-                </Typography>
-                {tokenIDverified === null && 
+                <G.DividerLine />
+                {tokenIDverified &&
+                  <Typography variant="body1">
+                    <br/>Welcome, {monsterType} {tokenIDverified}
+                  </Typography>
+                }
+                {tokenIDverified &&
+                  <Box style={{ display: 'inline-block' }}>
+                    <Typography variant="body1">
+                      Your Boba Bubble:{' '} 
+                      <span style={{ opacity: 0.65}}>{BT} <Copy value={BT} light={false} /></span> 
+                    </Typography>
+                  </Box>
+                }
+                {tokenIDverified === null &&
                   <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    You have one or more Turing Monsters, but you have not added them to your NFT page (<strong>Wallet>NFT>Add NFT</strong>). 
+                    <br/>You have one or more Turing Monsters, but you have not added them 
+                    to your NFT page (<strong>{'Wallet > NFT > Add NFT'}</strong>).
                     Please add them to join the MonsterVerse.
                   </Typography>
                 }
@@ -199,25 +226,40 @@ class Monster extends React.Component {
               <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
                 paddingTop: '10px'
               }}>
-                <Typography variant="body2" sx={{ opacity: 0.95 }}>
+                <Typography variant="body2" sx={{ opacity: 0.95, margin: '0' }}>
                   Meetups
                 </Typography>
 
-                <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong. 
-                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will 
-                  go live later in April. 
+                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: '10px' }}>
+                  Turing monster holders will be invited to meetups in different regions, such as Amsterdam, Dubai, and Hong Kong.
+                  If you would like to host a meetup, or would like to propose one in your city, let us know - a signup system will
+                  go live later in April.
                 </Typography>
 
                 <Typography variant="body2" sx={{ opacity: 0.95 }}>
                   First look: Experimental Features
                 </Typography>
 
-                <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: '10px' }}>
                   Here is where we will showcase new features and projects, for you to see first.
+                  Check out the top right of the screen to test the new dual fee system. You can toggle
+                  back and forth between ETH and BOBA. This is a beta feature which is currently being tested,
+                  so it might not work smoothly in all circumstances. Any feedback welcome - looking forward to
+                  MUIs!!! Haha.
+                </Typography>
+
+                <Typography variant="body2" sx={{ opacity: 0.95 }}>
+                  Boba Bubble
+                </Typography>
+
+                <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: '10px' }}>
+                  You can use your Boba Bubble to obtain developer tokens on the Boba testnet, and 
+                  also, to support content creators, journalists, artists, and developers. When they use their 
+                  Boba Bubble on social media and in their art, you will be able to send BOBA and ETH to 
+                  their Boba wallet. The system is powered by Turing, which does all 
+                  the heavy lifting in the background. 
                 </Typography>
 
               </Box>

@@ -20,7 +20,7 @@ import { selectModalState } from 'selectors/uiSelector'
 import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
-import { Grid, Link, Typography } from '@mui/material'
+import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 import * as S from './Home.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
 
@@ -71,7 +71,6 @@ import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
-import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -109,12 +108,16 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 require('dotenv').config()
 
 function Home() {
 
   const dispatch = useDispatch()
+  const theme = useTheme()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
@@ -130,7 +133,6 @@ function Home() {
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
 
   const exitModalState = useSelector(selectModalState('exitModal'))
-  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
@@ -247,7 +249,6 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
-      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
@@ -271,6 +272,8 @@ function Home() {
       >
         {alertMessage}
       </Alert>
+
+      { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
         <Box sx={{
