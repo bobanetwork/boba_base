@@ -4,29 +4,29 @@ import { expect } from '../../../setup'
 import { ethers } from 'hardhat'
 import { ContractFactory, Contract, Signer } from 'ethers'
 
-describe('OVM_ETH', () => {
+describe('L2_BOBA', () => {
   let signer1: Signer
   let signer2: Signer
   before(async () => {
     ;[signer1, signer2] = await ethers.getSigners()
   })
 
-  let Factory__OVM_ETH: ContractFactory
+  let Factory__L2_BOBA: ContractFactory
   before(async () => {
-    Factory__OVM_ETH = await ethers.getContractFactory('OVM_ETH')
+    Factory__L2_BOBA = await ethers.getContractFactory('L2_BOBA')
   })
 
-  let OVM_ETH: Contract
+  let L2_BOBA: Contract
   beforeEach(async () => {
-    OVM_ETH = await Factory__OVM_ETH.deploy()
+    L2_BOBA = await Factory__L2_BOBA.deploy(ethers.constants.AddressZero)
   })
 
   describe('transfer', () => {
     it('should revert', async () => {
       await expect(
-        OVM_ETH.transfer(await signer2.getAddress(), 100)
+        L2_BOBA.transfer(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
-        'OVM_ETH: transfer is disabled pending further community discussion.'
+        'L2_BOBA: transfer is disabled pending further community discussion.'
       )
     })
   })
@@ -34,9 +34,9 @@ describe('OVM_ETH', () => {
   describe('approve', () => {
     it('should revert', async () => {
       await expect(
-        OVM_ETH.approve(await signer2.getAddress(), 100)
+        L2_BOBA.approve(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
-        'OVM_ETH: approve is disabled pending further community discussion.'
+        'L2_BOBA: approve is disabled pending further community discussion.'
       )
     })
   })
@@ -44,13 +44,13 @@ describe('OVM_ETH', () => {
   describe('transferFrom', () => {
     it('should revert', async () => {
       await expect(
-        OVM_ETH.transferFrom(
+        L2_BOBA.transferFrom(
           await signer1.getAddress(),
           await signer2.getAddress(),
           100
         )
       ).to.be.revertedWith(
-        'OVM_ETH: transferFrom is disabled pending further community discussion.'
+        'L2_BOBA: transferFrom is disabled pending further community discussion.'
       )
     })
   })
@@ -58,9 +58,9 @@ describe('OVM_ETH', () => {
   describe('increaseAllowance', () => {
     it('should revert', async () => {
       await expect(
-        OVM_ETH.increaseAllowance(await signer2.getAddress(), 100)
+        L2_BOBA.increaseAllowance(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
-        'OVM_ETH: increaseAllowance is disabled pending further community discussion.'
+        'L2_BOBA: increaseAllowance is disabled pending further community discussion.'
       )
     })
   })
@@ -68,9 +68,9 @@ describe('OVM_ETH', () => {
   describe('decreaseAllowance', () => {
     it('should revert', async () => {
       await expect(
-        OVM_ETH.decreaseAllowance(await signer2.getAddress(), 100)
+        L2_BOBA.decreaseAllowance(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
-        'OVM_ETH: decreaseAllowance is disabled pending further community discussion.'
+        'L2_BOBA: decreaseAllowance is disabled pending further community discussion.'
       )
     })
   })

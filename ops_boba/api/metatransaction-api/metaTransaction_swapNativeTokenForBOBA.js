@@ -9,7 +9,7 @@ const env = YAML.parse(file)
 const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_URL
 const PRIVATE_KEY = env.PRIVATE_KEY
 const BOBA_GASPRICEORACLE_ADDRESS = env.BOBA_GASPRICEORACLE_ADDRESS
-const L2_BOBA_ADDRESS = env.L2_BOBA_ADDRESS
+const L2_SECONDARY_FEE_TOKEN_ADDRESS = env.L2_SECONDARY_FEE_TOKEN_ADDRESS
 
 // Get provider and wallet
 const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
@@ -18,15 +18,16 @@ const l2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(l2Provider)
 // ABI
 const BobaGasPriceOracleInterface = new ethers.utils.Interface([
   'function useBobaAsFeeToken()',
-  'function useETHAsFeeToken()',
-  'function bobaFeeTokenUsers(address) view returns (bool)',
-  'function swapBOBAForETHMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+  'function useSecondaryFeeTokenAsFeeToken()',
+  'function secondaryFeeTokenUsers(address) view returns (bool)',
+  'function swapSecondaryFeeTokenForBOBAMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
   'function metaTransactionFee() view returns (uint256)',
   'function marketPriceRatio() view returns (uint256)',
-  'function receivedETHAmount() view returns (uint256)',
+  'function receivedBOBAAmount() view returns (uint256)',
+  'function getSecondaryFeeTokenForSwap() view returns (uint256)',
 ])
 
-const L2BobaInterface = new ethers.utils.Interface([
+const L2SecondaryFeeTokenInterface = new ethers.utils.Interface([
   'function balanceOf(address) view returns (uint256)',
 ])
 
@@ -36,7 +37,11 @@ const Boba_GasPriceOracle = new ethers.Contract(
   BobaGasPriceOracleInterface,
   l2Wallet
 )
-const L2Boba = new ethers.Contract(L2_BOBA_ADDRESS, L2BobaInterface, l2Wallet)
+const L2SecondaryFeeToken = new ethers.Contract(
+  L2_SECONDARY_FEE_TOKEN_ADDRESS,
+  L2SecondaryFeeTokenInterface,
+  l2Wallet
+)
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -82,13 +87,8 @@ const verifyBobay = async (body) => {
     }
   }
 
-  const metaTransactionFee = await Boba_GasPriceOracle.metaTransactionFee()
-  const marketPriceRatio = await Boba_GasPriceOracle.marketPriceRatio()
-  const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-  const totalCost = receivedETHAmount
-    .mul(marketPriceRatio)
-    .add(metaTransactionFee)
-  const L2BobaBalance = await L2Boba.balanceOf(owner)
+  const totalCost = await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+  const L2SecondaryFeeTokenBalance = await L2SecondaryFeeToken.balanceOf(owner)
   const bigNumberValue = ethers.BigNumber.from(value)
   if (bigNumberValue.lt(totalCost)) {
     return {
@@ -96,7 +96,7 @@ const verifyBobay = async (body) => {
       errorMessage: 'Invalid value',
     }
   }
-  if (bigNumberValue.gt(L2BobaBalance)) {
+  if (bigNumberValue.gt(L2SecondaryFeeTokenBalance)) {
     return {
       isVerified: false,
       errorMessage: 'Insufficient balance',
@@ -129,15 +129,16 @@ module.exports.mainnetHandler = async (event, context, callback) => {
   const sig = ethers.utils.splitSignature(signature)
   // Send transaction to node
   try {
-    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
-      owner,
-      spender,
-      value,
-      deadline,
-      sig.v,
-      sig.r,
-      sig.s
-    )
+    const tx =
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
+        owner,
+        spender,
+        value,
+        deadline,
+        sig.v,
+        sig.r,
+        sig.s
+      )
     await tx.wait()
   } catch (err) {
     return callback(null, {
@@ -175,15 +176,16 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
   const sig = ethers.utils.splitSignature(signature)
   // Send transaction to node
   try {
-    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
-      owner,
-      spender,
-      value,
-      deadline,
-      sig.v,
-      sig.r,
-      sig.s
-    )
+    const tx =
+      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
+        owner,
+        spender,
+        value,
+        deadline,
+        sig.v,
+        sig.r,
+        sig.s
+      )
     await tx.wait()
   } catch (err) {
     return callback(null, {

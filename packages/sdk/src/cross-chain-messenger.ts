@@ -1017,7 +1017,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     )
   }
 
-  public async depositETH(
+  public async depositNativeToken(
     amount: NumberLike,
     opts?: {
       recipient?: AddressLike
@@ -1027,11 +1027,11 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
   ): Promise<TransactionResponse> {
     return (opts?.signer || this.l1Signer).sendTransaction(
-      await this.populateTransaction.depositETH(amount, opts)
+      await this.populateTransaction.depositNativeToken(amount, opts)
     )
   }
 
-  public async withdrawETH(
+  public async withdrawSecondaryFeeToken(
     amount: NumberLike,
     opts?: {
       recipient?: AddressLike
@@ -1040,7 +1040,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
   ): Promise<TransactionResponse> {
     return (opts?.signer || this.l2Signer).sendTransaction(
-      await this.populateTransaction.withdrawETH(amount, opts)
+      await this.populateTransaction.withdrawSecondaryFeeToken(amount, opts)
     )
   }
 
@@ -1256,7 +1256,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     },
 
-    depositETH: async (
+    depositNativeToken: async (
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -1266,13 +1266,13 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<TransactionRequest> => {
       return this.bridges.ETH.populateTransaction.deposit(
         ethers.constants.AddressZero,
-        predeploys.OVM_ETH,
+        predeploys.L2_L1NativeToken,
         amount,
         opts
       )
     },
 
-    withdrawETH: async (
+    withdrawSecondaryFeeToken: async (
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -1281,7 +1281,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     ): Promise<TransactionRequest> => {
       return this.bridges.ETH.populateTransaction.withdraw(
         ethers.constants.AddressZero,
-        predeploys.OVM_ETH,
+        predeploys.L2_L1NativeToken,
         amount,
         opts
       )
@@ -1381,7 +1381,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       )
     },
 
-    depositETH: async (
+    depositNativeToken: async (
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -1390,11 +1390,11 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     ): Promise<BigNumber> => {
       return this.l1Provider.estimateGas(
-        await this.populateTransaction.depositETH(amount, opts)
+        await this.populateTransaction.depositNativeToken(amount, opts)
       )
     },
 
-    withdrawETH: async (
+    withdrawSecondaryFeeToken: async (
       amount: NumberLike,
       opts?: {
         recipient?: AddressLike
@@ -1402,7 +1402,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       }
     ): Promise<BigNumber> => {
       return this.l2Provider.estimateGas(
-        await this.populateTransaction.withdrawETH(amount, opts)
+        await this.populateTransaction.withdrawSecondaryFeeToken(amount, opts)
       )
     },
 

@@ -13,7 +13,6 @@ import { loadContract } from '@eth-optimism/contracts'
 import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
-import DiscretionaryExitBurnJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitBurn.sol/DiscretionaryExitBurn.json'
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
@@ -24,6 +23,7 @@ interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
   l1RpcProvider: providers.StaticJsonRpcProvider
   l2RpcProvider: providers.StaticJsonRpcProvider
+  l2BobaETHProvider: providers.StaticJsonRpcProvider
 
   // Address Manager address
   addressManagerAddress: string
@@ -77,7 +77,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Lib_AddressManager: Contract
     OVM_GasPriceOracle: Contract
     Proxy__L1StandardBridge: Contract
-    DiscretionaryExitBurn: Contract
     Proxy__L1LiquidityPool: Contract
     Proxy__L2LiquidityPool: Contract
     CanonicalTransactionChain: Contract
@@ -87,7 +86,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
     L2BOBA: Contract
-    BobaStraw_ETHUSD: Contract
+    secondaryFeeTokenUSD: Contract
     BobaStraw_BOBAUSD: Contract
     L1ETHBalance: BigNumber
     L1ETHCostFee: BigNumber
@@ -143,18 +142,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     )
     this.logger.info('Connected to Proxy__L1StandardBridge', {
       address: this.state.Proxy__L1StandardBridge.address,
-    })
-
-    this.logger.info('Connecting to DiscretionaryExitBurn...')
-    const DiscretionaryExitBurnAddress =
-      await this.state.Lib_AddressManager.getAddress('DiscretionaryExitBurn')
-    this.state.DiscretionaryExitBurn = new Contract(
-      DiscretionaryExitBurnAddress,
-      DiscretionaryExitBurnJson.abi,
-      this.options.gasPriceOracleOwnerWallet
-    )
-    this.logger.info('Connected to DiscretionaryExitBurn', {
-      address: this.state.DiscretionaryExitBurn.address,
     })
 
     this.logger.info('Connecting to Proxy__L1LiquidityPool...')
@@ -276,24 +263,19 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.BobaBillingContractAddress,
     })
 
-    // Load BOBA straw contracts
-    const BobaStraw_ETHUSDAddress =
-      await this.state.Lib_AddressManager.getAddress('BobaStraw_ETHUSD')
-    const BobaStraw_BOBAUSDAddress =
-      await this.state.Lib_AddressManager.getAddress('BobaStraw_BOBAUSD')
-    this.state.BobaStraw_ETHUSD = new Contract(
-      BobaStraw_ETHUSDAddress,
-      FluxAggregatorJson.abi,
+    this.state.secondaryFeeTokenUSD = new Contract(
+      '0x716C5Ee176c5E327De687744052f43f0292fE140',
+      new utils.Interface(['function lastPrice() view returns (uint256)']),
       this.options.l2RpcProvider
     )
     this.state.BobaStraw_BOBAUSD = new Contract(
-      BobaStraw_BOBAUSDAddress,
+      '0x987AEd89f5BDC3eb863282DBB76065bFe398be17',
       FluxAggregatorJson.abi,
-      this.options.l2RpcProvider
+      this.options.l2BobaETHProvider
     )
     this.logger.info('Connected to BobaStraw', {
-      BobaStraw_ETHUSD: BobaStraw_ETHUSDAddress,
-      BobaStraw_BOBAUSD: BobaStraw_BOBAUSDAddress,
+      BobaStraw_ETHUSD: this.state.secondaryFeeTokenUSD.address,
+      BobaStraw_BOBAUSD: this.state.BobaStraw_BOBAUSD.address,
     })
 
     // Total cost
@@ -321,7 +303,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await sleep(this.options.pollingInterval)
       // token price
       await this._queryTokenPrice('BOBA/USD')
-      await this._queryTokenPrice('ETH/USD')
+      await this._queryTokenPrice('secondaryFeeToken/USD')
       // l2 gas price
       await this._getL1Balance()
       await this._getL2GasCost()
@@ -718,6 +700,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   private async _updatePriceRatio(): Promise<void> {
     const priceRatio = await this.state.Boba_GasPriceOracle.priceRatio()
+    const decimals = await this.state.Boba_GasPriceOracle.decimals()
+    const multiplier = 10 ** decimals
     const priceRatioInt = priceRatio.toNumber()
     this.logger.info('Got Boba and ETH price ratio', {
       priceRatio: priceRatioInt,
@@ -725,11 +709,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     try {
       const targetPriceRatio = Math.floor(
         ((this.state.ETHUSDPrice / this.state.BOBAUSDPrice) *
+          multiplier *
           this.options.bobaFeeRatio100X) /
           100
       )
       const targetMarketPriceRatio = Math.floor(
-        this.state.ETHUSDPrice / this.state.BOBAUSDPrice
+        (this.state.ETHUSDPrice / this.state.BOBAUSDPrice) * multiplier
       )
       if (targetPriceRatio !== priceRatioInt) {
         let targetUpdatedPriceRatio = targetPriceRatio
@@ -897,35 +882,23 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   private async _queryTokenPrice(tokenPair): Promise<void> {
-    if (tokenPair === 'ETH/USD') {
-      const latestAnswer = await this.state.BobaStraw_ETHUSD.latestAnswer()
-      const decimals = await this.state.BobaStraw_ETHUSD.decimals()
+    if (tokenPair === 'secondaryFeeToken/USD') {
+      const latestAnswer = await this.state.secondaryFeeTokenUSD.lastPrice()
+      const decimals = 6 // hardcoded
       // Keep two decimal places
-      if (decimals >= 2) {
-        const preETHUSDPrice = latestAnswer.div(
-          BigNumber.from(10).pow(decimals - 2)
-        )
-        this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
-      } else {
-        this.state.ETHUSDPrice = latestAnswer
-          .div(BigNumber.from(10).pow(decimals))
-          .toNumber()
-      }
+      const preETHUSDPrice = latestAnswer.div(
+        BigNumber.from(10).pow(decimals - 2)
+      )
+      this.state.ETHUSDPrice = preETHUSDPrice.toNumber() / 100
     }
+    // Load BOBA price from L2 BOBAStraw
     if (tokenPair === 'BOBA/USD') {
       const latestAnswer = await this.state.BobaStraw_BOBAUSD.latestAnswer()
       const decimals = await this.state.BobaStraw_BOBAUSD.decimals()
-      // Keep two decimal places
-      if (decimals >= 2) {
-        const preBOBAUSDPrice = latestAnswer.div(
-          BigNumber.from(10).pow(decimals - 2)
-        )
-        this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
-      } else {
-        this.state.BOBAUSDPrice = latestAnswer
-          .div(BigNumber.from(10).pow(decimals))
-          .toNumber()
-      }
+      const preBOBAUSDPrice = latestAnswer.div(
+        BigNumber.from(10).pow(decimals - 2)
+      )
+      this.state.BOBAUSDPrice = preBOBAUSDPrice.toNumber() / 100
     }
   }
 }

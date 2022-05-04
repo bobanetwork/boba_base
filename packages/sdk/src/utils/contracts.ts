@@ -29,10 +29,10 @@ export const DEFAULT_L2_CONTRACT_ADDRESSES: OEL2ContractsLike = {
   OVM_L1BlockNumber: predeploys.OVM_L1BlockNumber,
   OVM_L2ToL1MessagePasser: predeploys.OVM_L2ToL1MessagePasser,
   OVM_DeployerWhitelist: predeploys.OVM_DeployerWhitelist,
-  OVM_ETH: predeploys.OVM_ETH,
+  L2_BOBA: predeploys.L2_BOBA,
   OVM_GasPriceOracle: predeploys.OVM_GasPriceOracle,
   OVM_SequencerFeeVault: predeploys.OVM_SequencerFeeVault,
-  WETH: predeploys.WETH9,
+  L2_L1NativeToken: predeploys.L2_L1NativeToken,
 }
 
 /**
@@ -42,7 +42,6 @@ export const DEFAULT_L2_CONTRACT_ADDRESSES: OEL2ContractsLike = {
 const NAME_REMAPPING = {
   AddressManager: 'Lib_AddressManager',
   OVM_L1BlockNumber: 'iOVM_L1BlockNumber',
-  WETH: 'WETH9',
 }
 
 /**
@@ -125,6 +124,21 @@ export const CONTRACT_ADDRESSES: {
       BondManager: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
       L1MultiMessageRelayer: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
       L1MultiMessageRelayerFast: '0xeF31027350Be2c7439C1b0BE022d49421488b72C',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Moonbeam
+  1281: {
+    l1: {
+      AddressManager: '0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3',
+      L1CrossDomainMessenger: '0xab7785d56697E65c2683c8121Aac93D3A028Ba95',
+      L1CrossDomainMessengerFast: '0xB942FA2273C7Bce69833e891BDdFd7212d2dA415',
+      L1StandardBridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      StateCommitmentChain: '0x294c664f6D63bd1521231a2EeFC26d805ce00a08',
+      CanonicalTransactionChain: '0x598efcBD0B5b4Fd0142bEAae1a38f6Bd4d8a218d',
+      BondManager: '0xEC69d4f48f4f1740976968FAb9828d645Ad1d77f',
+      L1MultiMessageRelayer: '0xad856F238CBeafd064b80D12EadAea3981fB21B5',
+      L1MultiMessageRelayerFast: '0xEF6C56072750ac7F518727189Ae1bC1b9Bf8ae01',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
@@ -221,6 +235,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: CONTRACT_ADDRESSES[31337].l1.L1StandardBridge,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  1281: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
