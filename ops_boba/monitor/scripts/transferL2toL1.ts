@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'local'
 const ethers = require('ethers')
 const { logger } = require('../services/utilities/logger')
-import { predeploys } from '@eth-optimism/contracts'
+const { predeploys } = require('@eth-optimism/contracts')
 const { OptimismEnv } = require('./utilities/env.ts')
-const l2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
 
 
 
@@ -14,15 +13,9 @@ const l2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contract
     const balance = await env.l2Wallet.getBalance()
     logger.info(`balance before ${balance.toString()}`)
 
-    const withdrawAmount = balance.div(2)
+    const withdrawAmount = balance.div(10).mul(9)
 
-    const l2StandardBridgeContract = new ethers.Contract(
-      '0x4200000000000000000000000000000000000010',
-      l2StandardBridgeJson.abi,
-      env.l2Wallet
-    )
-
-    const withdrawTx = await l2StandardBridgeContract.withdraw(
+    const withdrawTx = await env.l2Bridge.withdraw(
       predeploys.OVM_ETH,
       withdrawAmount,
       0,
@@ -30,5 +23,8 @@ const l2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contract
     )
     await withdrawTx.wait()
     logger.info('tx done', { hash: withdrawTx.hash })
+
+    const xDomainTx = await env.waitForXDomainTransaction(withdrawTx)
+    logger.info('xDomain tx', { xDomain: xDomainTx })
   })()
 

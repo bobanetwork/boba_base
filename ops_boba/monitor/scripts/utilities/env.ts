@@ -23,6 +23,7 @@ import {
     l1Wallet,
     l2Wallet,
     getL1Bridge,
+    getL2Bridge,
     getBASEDeployerAddresses,
     getBOBADeployerAddresses,
     envConfig,
@@ -76,6 +77,7 @@ export class OptimismEnv {
         this.addressesBASE = args.addressesBASE
         this.addressesBOBA = args.addressesBOBA
         this.l1Bridge = args.l1Bridge
+        this.l2Bridge = args.l2Bridge
         //this.l1Messenger = args.l1Messenger
         //this.l1BlockNumber = args.l1BlockNumber
         this.ovmEth = args.ovmEth
@@ -104,33 +106,37 @@ export class OptimismEnv {
             addressesBASE.Proxy__L1StandardBridge
         )
 
+        const l2Bridge = await getL2Bridge(
+            l2Wallet,
+            DEFAULT_L2_CONTRACT_ADDRESSES.L2StandardBridge.toString(),
+        )
+
         const network = await l1Provider.getNetwork()
 
         const ovmEth = getOvmEth(l2Wallet)
 
-        // TODO: use returned value from addressesBASE
         const contracts = {
             l1: {
-                AddressManager: "0x08404344A38b1ED3fC365cb2bD74F600540C6c59",
-                L1CrossDomainMessenger: "0xEb0d3b107528FE17b9F55360D03351fe3D0ACaB2",
-                L1CrossDomainMessengerFast: "0xB942FA2273C7Bce69833e891BDdFd7212d2dA415",
-                L1StandardBridge: "0x833e568FFccc6cEde30c0a264CD987BD25AaD472",
-                StateCommitmentChain: "0x2003D25cab7Fbc3E5D006c8AF8292adA6b517583",
-                CanonicalTransactionChain: "0xa07c914699AB12A2975153e2C91Dd25889cC5856",
-                BondManager: "0x71697B855cD2a51204A9c8a5EaF0a63BD378675B",
-                L1MultiMessageRelayer: "0x1b21Fd23828753b2dBbDc77797Ed96Eb6ff9A3ac",
+                AddressManager: addressesBASE.AddressManager,
+                L1CrossDomainMessenger: addressesBASE.Proxy__L1CrossDomainMessenger,
+                L1CrossDomainMessengerFast: "0xB942FA2273C7Bce69833e891BDdFd7212d2dA415", // TODO
+                L1StandardBridge: addressesBASE.Proxy__L1StandardBridge,
+                StateCommitmentChain: addressesBASE.StateCommitmentChain,
+                CanonicalTransactionChain: addressesBASE.CanonicalTransactionChain,
+                BondManager: addressesBASE.BondManager,
+                L1MultiMessageRelayer: addressesBASE.L1MultiMessageRelayer,
             },
             l2: DEFAULT_L2_CONTRACT_ADDRESSES,
         };
         const bridges = {
             Standard: {
                 Adapter: StandardBridgeAdapter,
-                l1Bridge: "0x833e568FFccc6cEde30c0a264CD987BD25AaD472",
+                l1Bridge: addressesBASE.Proxy__L1StandardBridge,
                 l2Bridge: predeploys.L2StandardBridge,
             },
             ETH: {
                 Adapter: ETHBridgeAdapter,
-                l1Bridge: "0x833e568FFccc6cEde30c0a264CD987BD25AaD472",
+                l1Bridge: addressesBASE.Proxy__L1StandardBridge,
                 l2Bridge: predeploys.L2StandardBridge,
             },
         };
@@ -164,6 +170,7 @@ export class OptimismEnv {
             l1Provider,
             l2Provider,
             l1Bridge,
+            l2Bridge,
         })
     }
 

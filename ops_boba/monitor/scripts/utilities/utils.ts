@@ -151,6 +151,24 @@ export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
     return L1StandardBridge
 }
 
+export const getL2Bridge = async (wallet: Wallet, bridgeAddress: string) => {
+    const l1BridgeInterface = getContractInterface('L2StandardBridge')
+
+    if (
+        !utils.isAddress(bridgeAddress) ||
+        bridgeAddress === constants.AddressZero
+    ) {
+        throw new Error('L2StandardBridge not found')
+    }
+
+    const L2StandardBridge = new Contract(
+        bridgeAddress,
+        l1BridgeInterface,
+        wallet
+    )
+    return L2StandardBridge
+}
+
 export const getOvmEth = (wallet: Wallet) => {
     const OVM_ETH = new Contract(
         OVM_ETH_ADDRESS,
