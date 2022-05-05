@@ -8,6 +8,7 @@ import {
 import { remove0x } from '@eth-optimism/core-utils'
 import { utils, BigNumber, constants } from 'ethers'
 import { L2_L1NativeTokenHepler } from './L2_L1NativeTokenHepler'
+import { L2_BOBA  } from './L2_BOBAHelper'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
@@ -181,6 +182,8 @@ export const makeL2GenesisFile = async (
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')
       dump[predeployAddress].code = artifact.deployedBytecode
+    } else if (predeployName === 'L2_BOBA') {
+      dump[predeployAddress].code = L2_BOBA.L2_BOBABytecode
     } else {
       // Standard case: get the deployed bytecode from the artifact
       const artifact = getContractArtifact(predeployName)
