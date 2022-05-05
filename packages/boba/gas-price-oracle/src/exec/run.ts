@@ -16,8 +16,13 @@ const main = async () => {
 
   const env = process.env
   const L2_BOBA_NODE_WEB3_URL =
-    config.str('l2-boba-node-web3-url', env.L2_NODE_WEB3_URL) ||
+    config.str('l2-boba-node-web3-url', env.L2_BOBA_NODE_WEB3_URL) ||
     'https://mainnet.boba.network'
+  const L1_MOONBEAM_TESTNET_WEB3_URL =
+    config.str(
+      'l1-moonbeam-testnet-web3-url',
+      env.L1_MOONBEAM_TESTNET_WEB3_URL
+    ) || 'https://rpc.api.moonbase.moonbeam.network'
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   const L1_NODE_WEB3_URL = config.str('l1-node-web3-url', env.L1_NODE_WEB3_URL)
 
@@ -125,6 +130,9 @@ const main = async () => {
   const l2BobaETHProvider = new providers.StaticJsonRpcProvider(
     L2_BOBA_NODE_WEB3_URL
   )
+  const l1MoonbeamTestnetProvider = new providers.StaticJsonRpcProvider(
+    L1_MOONBEAM_TESTNET_WEB3_URL
+  )
 
   const gasPriceOracleOwnerWallet = new Wallet(
     GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY,
@@ -148,6 +156,7 @@ const main = async () => {
     l1RpcProvider: l1Provider,
     l2RpcProvider: l2Provider,
     l2BobaETHProvider,
+    l1MoonbeamTestnetProvider,
     addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
     gasPriceOracleAddress: GAS_PRICE_ORACLE_ADDRESS,
     OVM_SequencerFeeVault,
