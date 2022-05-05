@@ -11,8 +11,6 @@ import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
 
 import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
-import L2GovernanceERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
 import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L1NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
@@ -233,9 +231,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this.state.Lib_AddressManager.getAddress(
         'Proxy__Boba_GasPriceOracle'
       )
-    this.state.Boba_GasPriceOracle = new Contract(
+    this.state.Boba_GasPriceOracle = loadContract(
+      'Boba_GasPriceOracle',
       Boba_GasPriceOracleAddress,
-      Boba_GasPriceOracleJson.abi,
       this.options.l2RpcProvider
     ).connect(this.options.gasPriceOracleOwnerWallet)
     this.logger.info('Connected to Boba_GasPriceOracle', {
@@ -245,9 +243,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     this.logger.info('Connecting to L2SecondaryFeeToken...')
     const L2SecondaryFeeTokenAddress =
       await this.state.Lib_AddressManager.getAddress('L2_L1NativeToken')
-    this.state.L2SecondaryFeeToken = new Contract(
+    this.state.L2SecondaryFeeToken = loadContract(
+      'L2_L1NativeToken',
       L2SecondaryFeeTokenAddress,
-      L2GovernanceERC20Json.abi,
       this.options.l2RpcProvider
     )
     this.logger.info('Connected to L2SecondaryFeeToken', {
@@ -721,7 +719,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             (
               Number(
                 utils.formatEther(this.state.L2BOBACollectFee.toString())
-              ) * this.state.L2SecondaryFeeTokenUSDPrice
+              ) * this.state.BOBAUSDPrice
             ).toFixed(2)
           ),
           L2SecondaryFeeTokenCollectFeeUSD: Number(
@@ -730,7 +728,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
                 utils.formatEther(
                   this.state.L2SecondaryFeeTokenCollectFee.toString()
                 )
-              ) * this.state.BOBAUSDPrice
+              ) * this.state.L2SecondaryFeeTokenUSDPrice
             ).toFixed(2)
           ),
           BOBABillingCollectFeeUSD: Number(
