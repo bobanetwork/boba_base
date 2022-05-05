@@ -231,11 +231,15 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       await this.state.Lib_AddressManager.getAddress(
         'Proxy__Boba_GasPriceOracle'
       )
-    this.state.Boba_GasPriceOracle = loadContract(
-      'Boba_GasPriceOracle',
+    this.state.Boba_GasPriceOracle = new Contract(
       Boba_GasPriceOracleAddress,
-      this.options.l2RpcProvider
-    ).connect(this.options.gasPriceOracleOwnerWallet)
+      new utils.Interface([
+        'function priceRatio() view returns (uint256)',
+        'function decimals() view returns (uint256)',
+        'function updatePriceRatio(uint256, uint256) public',
+      ]),
+      this.options.gasPriceOracleOwnerWallet
+    )
     this.logger.info('Connected to Boba_GasPriceOracle', {
       address: this.state.Boba_GasPriceOracle.address,
     })
