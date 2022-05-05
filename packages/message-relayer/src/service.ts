@@ -8,7 +8,11 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
+  DEFAULT_L2_CONTRACT_ADDRESSES,
+  StandardBridgeAdapter,
+  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
+import { predeploys } from '@eth-optimism/contracts'
 
 interface MessageRelayerOptions {
   /**
@@ -81,6 +85,8 @@ interface MessageRelayerOptions {
   maxWaitTxTimeS: number
 
   isFastRelayer: boolean
+
+  baseAddresses: any
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -143,11 +149,43 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
+
+    const contracts = {
+      l1: {
+        AddressManager: this.options.baseAddresses.AddressManager,
+        L1CrossDomainMessenger:
+          this.options.baseAddresses.Proxy__L1CrossDomainMessenger,
+        L1CrossDomainMessengerFast:
+          '0xB942FA2273C7Bce69833e891BDdFd7212d2dA415', // TODO
+        L1StandardBridge: this.options.baseAddresses.Proxy__L1StandardBridge,
+        StateCommitmentChain: this.options.baseAddresses.StateCommitmentChain,
+        CanonicalTransactionChain:
+          this.options.baseAddresses.CanonicalTransactionChain,
+        BondManager: this.options.baseAddresses.BondManager,
+        L1MultiMessageRelayer: this.options.baseAddresses.L1MultiMessageRelayer,
+      },
+      l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+    }
+    const bridges = {
+      Standard: {
+        Adapter: StandardBridgeAdapter,
+        l1Bridge: this.options.baseAddresses.Proxy__L1StandardBridge,
+        l2Bridge: predeploys.L2StandardBridge,
+      },
+      ETH: {
+        Adapter: ETHBridgeAdapter,
+        l1Bridge: this.options.baseAddresses.Proxy__L1StandardBridge,
+        l2Bridge: predeploys.L2StandardBridge,
+      },
+    }
+
     this.state.messenger = new CrossChainMessenger({
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,
       l1ChainId,
       fastRelayer: this.options.isFastRelayer,
+      contracts,
+      bridges,
     })
 
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
