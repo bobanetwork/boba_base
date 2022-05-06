@@ -5,10 +5,6 @@ x-l1_rpc_dtl: &l1_rpc_dtl
 x-l1_rpc_geth: &l1_rpc_geth
   ETH1_HTTP: 'https://rpc.api.moonbase.moonbeam.network'
 
-x-l2_rpc_endpoint: &l2_rpc_endpoint
-  DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://bobabase.boba.network:8545'
-
-
 version: "3.9"
 
 services:
@@ -19,7 +15,7 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-      << : *l2_rpc_endpoint
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.bobabase.boba.network'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 1297
@@ -30,7 +26,7 @@ services:
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     volumes:
-      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+      - ./state-dumps/boba-base:/opt/optimism/packages/data-transport-layer/state-dumps/
     logging:
       driver: "json-file"
       options:
@@ -65,12 +61,13 @@ services:
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
       ROLLUP_POLL_INTERVAL_FLAG: "10s"
       ROLLUP_ENFORCE_FEES: 'true'
-      SEQUENCER_CLIENT_HTTP: https://mainnet.boba.network
       # turing
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
       # fee token
       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+      # sequencer http endpoint
+      SEQUENCER_CLIENT_HTTP: https://bobabase.boba.network
     logging:
       driver: "json-file"
       options:
