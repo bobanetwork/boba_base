@@ -412,6 +412,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     message: MessageLike,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<MessageStatus> {
     const resolved = await this.toCrossChainMessage(message)
@@ -740,6 +741,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     message: MessageLike,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<StateRoot | null> {
     const resolved = await this.toCrossChainMessage(message)
@@ -795,15 +797,28 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     batchIndex: number,
     opts?: {
       fromBlock?: BlockTag
+      blockRange?: number
     }
   ): Promise<ethers.Event | null> {
-    const events = await this.contracts.l1.StateCommitmentChain.queryFilter(
-      this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
-        batchIndex
-      ),
-      opts?.fromBlock
-    )
-
+    const l1BlockNumber = await this.l1Provider.getBlockNumber()
+    // The default block range is 5000
+    const blockRange = opts?.blockRange || 5000
+    let fromBlock = Number(opts?.fromBlock)
+    let toBlock = Math.min(fromBlock + blockRange, l1BlockNumber)
+    let events = []
+    while (fromBlock < l1BlockNumber) {
+      const queriedEvents =
+        await this.contracts.l1.StateCommitmentChain.queryFilter(
+          this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
+            batchIndex
+          ),
+          fromBlock,
+          toBlock
+        )
+      events = [...events, ...queriedEvents]
+      fromBlock = toBlock
+      toBlock = Math.min(toBlock + blockRange, l1BlockNumber)
+    }
     if (events.length === 0) {
       return null
     } else if (events.length > 1) {
@@ -818,6 +833,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     transactionIndex: number,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<ethers.Event | null> {
     const isEventHi = (event: ethers.Event, index: number) => {
@@ -881,6 +897,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     transactionIndex: number,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<StateRootBatch | null> {
     const stateBatchAppendedEvent =
@@ -913,14 +930,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getMessageProof(
-    message: MessageLike
+    message: MessageLike,
+    opts?: {
+      fromBlock?: BlockTag
+    }
   ): Promise<CrossChainMessageProof> {
     const resolved = await this.toCrossChainMessage(message)
     if (resolved.direction === MessageDirection.L1_TO_L2) {
       throw new Error(`can only generate proofs for L2 to L1 messages`)
     }
 
-    const stateRoot = await this.getMessageStateRoot(resolved)
+    const stateRoot = await this.getMessageStateRoot(resolved, opts)
     if (stateRoot === null) {
       throw new Error(`state root for message not yet published`)
     }
@@ -1010,6 +1030,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     opts?: {
       signer?: Signer
       overrides?: Overrides
+      fromBlock?: BlockTag
     }
   ): Promise<TransactionResponse> {
     return (opts?.signer || this.l1Signer).sendTransaction(
@@ -1224,6 +1245,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       messages: Array<MessageLike>,
       opts?: {
         overrides?: Overrides
+        fromBlock?: BlockTag
       }
     ): Promise<TransactionRequest> => {
       const batchMessage = []
@@ -1233,7 +1255,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (resolved.direction === MessageDirection.L1_TO_L2) {
           throw new Error(`cannot finalize L1 to L2 message`)
         }
-        const proof = await this.getMessageProof(resolved)
+        const proof = await this.getMessageProof(resolved, opts)
         batchMessage.push({
           target: resolved.target,
           sender: resolved.sender,
@@ -1374,6 +1396,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       messages: Array<MessageLike>,
       opts?: {
         overrides?: Overrides
+        fromBlock?: BlockTag
       }
     ): Promise<BigNumber> => {
       return this.l1Provider.estimateGas(

@@ -296,6 +296,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                       gasPrice: _gasPrice,
                       nonce,
                     },
+                    fromBlock: this.options.l1StartOffset,
                   })
                 const txReceipt = await txResponse.wait(
                   this.options.numConfirmations
