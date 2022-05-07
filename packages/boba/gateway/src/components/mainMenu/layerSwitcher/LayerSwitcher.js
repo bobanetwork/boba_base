@@ -19,6 +19,7 @@ import { useTheme } from '@mui/styles'
 import { setConnect, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
+import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -225,7 +226,7 @@ function LayerSwitcher({
   if (isMobile) {
     return (
       <S.LayerSwitcherWrapperMobile>
-        <MobileLayer title="Ethereum" layer={layer} icon={<EthereumIcon />}
+        <MobileLayer title="Moonbeam" layer={layer} icon={<MoonbeamIcon />}
           onConnect={() => connectToETH()}
           isConnected={layer === 'L1'}
         />
@@ -247,14 +248,14 @@ function LayerSwitcher({
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          <EthereumIcon selected={layer === 'L1'}/>
+          <MoonbeamIcon selected={layer === 'L1'}/>
         </ToggleButton>
         <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
           <BobaIcon selected={layer === 'L2'} />
         </ToggleButton>
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Moonbeam</Typography>
         <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>

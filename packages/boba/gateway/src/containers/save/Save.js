@@ -296,16 +296,16 @@ class Save extends React.Component {
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
-              
+
               {netLayer === 'L2' && bobaFeeChoice && fee &&
                 <Typography variant="body2" sx={{ mt: 2 }}>
-                  Fee: {fee} BOBA
+                  Fee: {fee} GLMR
                 </Typography>
               }
 
               {netLayer === 'L2' && !bobaFeeChoice && fee &&
                 <Typography variant="body2" sx={{ mt: 2 }}>
-                  Fee: {fee} ETH
+                  Fee: {fee} BOBA
                 </Typography>
               }
 

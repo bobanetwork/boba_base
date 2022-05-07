@@ -2,11 +2,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Fade, Link, useMediaQuery, useTheme } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 
-import { 
-  settle_v0, 
+import {
+  settle_v0,
   settle_v1,
-  settle_v2, 
-  settle_v2OLO  
+  settle_v2,
+  settle_v2OLO
 } from 'actions/networkAction'
 
 import Button from 'components/button/Button'
@@ -27,7 +27,7 @@ function ListToken({
   const [ dropDownBox, setDropDownBox ] = useState(false)
 
   const theme = useTheme()
-  
+
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch();
   const enabled = (networkLayer === chain) ? true : false
@@ -133,7 +133,7 @@ function ListToken({
                     Bridge to L2
                   </Button>
 
-                  <Button
+                  {/* <Button
                     onClick={() => { handleModalClick('depositModal', token, true) }}
                     color='primary'
                     disabled={disabled}
@@ -142,18 +142,18 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L2
-                  </Button>
+                  </Button> */}
                 </>
               }
 
-              {enabled && chain === 'L2' && 
-                token.symbol !== 'OLO' && 
-                token.symbol !== 'xBOBA' && 
-                token.symbol !== 'WAGMIv0' && 
+              {enabled && chain === 'L2' &&
+                token.symbol !== 'OLO' &&
+                token.symbol !== 'xBOBA' &&
+                token.symbol !== 'WAGMIv0' &&
                 token.symbol !== 'WAGMIv1' &&
-                token.symbol !== 'WAGMIv2' && 
+                token.symbol !== 'WAGMIv2' &&
                 token.symbol !== 'WAGMIv2-Oolong' &&
-                token.symbol !== 'WAGMIv3' && 
+                token.symbol !== 'WAGMIv3' &&
                 token.symbol !== 'WAGMIv3-Oolong' &&
                 <>
                   <Button
@@ -165,7 +165,7 @@ function ListToken({
                   >
                     Bridge to L1
                   </Button>
-
+{/*
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, true) }}
                     variant="outlined"
@@ -174,7 +174,7 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L1
-                  </Button>
+                  </Button> */}
 
                   <Button
                     onClick={() => { handleModalClick('transferModal', token, false) }}
@@ -381,7 +381,7 @@ function ListToken({
               >
                 Bridge to L2
               </Button>
-
+{/*
               <Button
                 onClick={() => { handleModalClick('depositModal', token, true) }}
                 color='primary'
@@ -391,13 +391,13 @@ function ListToken({
                 fullWidth
               >
                 Fast Bridge to L2
-              </Button>
+              </Button> */}
             </>
           }
-          {enabled && chain === 'L2' && 
-            token.symbol !== 'OLO' && 
-            token.symbol !== 'xBOBA' && 
-            token.symbol !== 'WAGMIv0' && 
+          {enabled && chain === 'L2' &&
+            token.symbol !== 'OLO' &&
+            token.symbol !== 'xBOBA' &&
+            token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
@@ -413,7 +413,7 @@ function ListToken({
               >
                 Bridge to L1
               </Button>
-              <Button
+              {/* <Button
                 onClick={() => { handleModalClick('exitModal', token, true) }}
                 variant="outlined"
                 disabled={disabled}
@@ -422,7 +422,7 @@ function ListToken({
                 sx={{ whiteSpace: 'nowrap' }}
               >
                 Fast Bridge to L1
-              </Button>
+              </Button> */}
               <Button
                 onClick={() => { handleModalClick('transferModal', token, false) }}
                 variant="contained"

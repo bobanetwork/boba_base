@@ -81,7 +81,7 @@ function FeeSwitcher() {
     }
 
     if (!balanceBOBA && !balanceETH) {
-      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
       return
     }
 

@@ -98,6 +98,29 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
     }
   }
+} else if (process.env.REACT_APP_CHAIN === 'bobaBase') {
+  NETWORK = {
+    bobaBase: {
+      OMGX_WATCHER_URL: null, //Does not exist on local
+      MM_Label:         `BobaBase`,
+      addressManager:   `0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B`,
+      L1: {
+        name: "MoonBase",
+        chainId: 1287,
+        chainIdHex: '0x507',
+        rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
+        blockExplorer: `https://moonbase.moonscan.io/tx/`,
+      },
+      L2: {
+        name: "BobaBase",
+        chainId: 1297,
+        chainIdHex: '0x511',
+        rpcUrl: `https://bobabase.boba.network`,
+        blockExplorer: `https://blockexplorer.bobabase.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
   NETWORK = {
     local: {

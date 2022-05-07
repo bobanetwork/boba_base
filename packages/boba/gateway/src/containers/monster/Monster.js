@@ -104,9 +104,9 @@ class Monster extends React.Component {
     this.setState({ tokenID: event.target.value })
   }
 
-  async addNFT() {
-    networkService.addNFT(this.state.contractAddress, this.state.tokenID)
-  }
+  // async addNFT() {
+  //   networkService.addNFT(this.state.contractAddress, this.state.tokenID)
+  // }
 
   render() {
 
@@ -187,14 +187,14 @@ class Monster extends React.Component {
                 {tokenIDverified &&
                   <Box style={{ display: 'inline-block' }}>
                     <Typography variant="body1">
-                      Your Boba Bubble:{' '} 
-                      <span style={{ opacity: 0.65}}>{BT} <Copy value={BT} light={false} /></span> 
+                      Your Boba Bubble:{' '}
+                      <span style={{ opacity: 0.65}}>{BT} <Copy value={BT} light={false} /></span>
                     </Typography>
                   </Box>
                 }
                 {tokenIDverified === null &&
                   <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                    <br/>You have one or more Turing Monsters, but you have not added them 
+                    <br/>You have one or more Turing Monsters, but you have not added them
                     to your NFT page (<strong>{'Wallet > NFT > Add NFT'}</strong>).
                     Please add them to join the MonsterVerse.
                   </Typography>
@@ -255,11 +255,11 @@ class Monster extends React.Component {
                 </Typography>
 
                 <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: '10px' }}>
-                  You can use your Boba Bubble to obtain developer tokens on the Boba testnet, and 
-                  also, to support content creators, journalists, artists, and developers. When they use their 
-                  Boba Bubble on social media and in their art, you will be able to send BOBA and ETH to 
-                  their Boba wallet. The system is powered by Turing, which does all 
-                  the heavy lifting in the background. 
+                  You can use your Boba Bubble to obtain developer tokens on the Boba testnet, and
+                  also, to support content creators, journalists, artists, and developers. When they use their
+                  Boba Bubble on social media and in their art, you will be able to send BOBA and ETH to
+                  their Boba wallet. The system is powered by Turing, which does all
+                  the heavy lifting in the background.
                 </Typography>
 
               </Box>

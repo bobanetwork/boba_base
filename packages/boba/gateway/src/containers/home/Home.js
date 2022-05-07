@@ -195,22 +195,22 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
+      // dispatch(fetchAirdropStatusL1()) // account specific
+      // dispatch(fetchAirdropStatusL2()) // account specific
+      // dispatch(fetchDaoBalance())      // account specific
+      // dispatch(fetchDaoVotes())        // account specific
+      // dispatch(fetchDaoBalanceX())     // account specific
+      // dispatch(fetchDaoVotesX())       // account specific
       dispatch(fetchExits())           // account specific
-      dispatch(getFS_Saves())          // account specific
-      dispatch(getFS_Info())           // account specific
-      dispatch(getMonsterInfo())       // account specific
+      // dispatch(getFS_Saves())          // account specific
+      // dispatch(getFS_Info())           // account specific
+      // dispatch(getMonsterInfo())       // account specific
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
-      dispatch(getProposalThreshold())
-      dispatch(fetchDaoProposals())
+      // dispatch(fetchVerifierStatus())
+      // dispatch(getProposalThreshold())
+      // dispatch(fetchDaoProposals())
     }
   }, POLL_INTERVAL)
 
@@ -219,15 +219,15 @@ function Home() {
     // load the following functions when the home page is open
     checkVersion()
     dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
-    dispatch(getProposalThreshold())
+    // dispatch(fetchVerifierStatus())
+    // dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
-      dispatch(getMonsterInfo())
+      // dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -336,16 +336,16 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "History" &&
+            {/* {pageDisplay === "History" &&
               <Transactions />
             }
             {pageDisplay === "BobaScope" &&
               <BobaScope />
-            }
+            } */}
             {pageDisplay === "Wallet" &&
               <Wallet />
             }
-            {pageDisplay === "Farm" &&
+            {/* {pageDisplay === "Farm" &&
               <FarmWrapper />
             }
             {pageDisplay === "Save" &&
@@ -368,7 +368,7 @@ function Home() {
             }
             {pageDisplay === "Monster" &&
               <MonsterWrapper />
-            }
+            } */}
           </Container>
           <PageFooter/>
         </Box>

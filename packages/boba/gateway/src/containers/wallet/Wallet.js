@@ -86,7 +86,7 @@ function Wallet() {
   useEffect(() => {
     if (layer === 'L2') {
       if (tooSmallBOBA && tooSmallETH) {
-        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+        dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
       }
     }
   },[tooSmallETH, tooSmallBOBA, layer, dispatch])
@@ -101,7 +101,7 @@ function Wallet() {
     if (layer === 'L2') {
       setChain('Boba Wallet')
     } else if (layer === 'L1') {
-      setChain('Ethereum Wallet')
+      setChain('Moonbeam Wallet')
     }
   }, [ layer ])
 
@@ -158,7 +158,7 @@ function Wallet() {
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Ethereum Wallet' ? 'active' : ''}
+            className={chain === 'Moonbeam Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -166,7 +166,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Ethereum Wallet
+            Moonbeam Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -187,10 +187,13 @@ function Wallet() {
           activeTab={page}
           onClick={(t) => handleSwitch(t)}
           aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
+          // tabs={[ "Token", "NFT" ]}
+          tabs={["Token"]}
         />
       </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+      {/* {page === 'Token' ? <Token /> : <Nft />}
+       */}
+      <Token />
     </S.PageContainer>
   )
 }
