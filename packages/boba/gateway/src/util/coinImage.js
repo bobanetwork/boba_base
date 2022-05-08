@@ -26,8 +26,10 @@ import domLogo from 'images/domLogo.png'
 import wagmiv0Logo from 'images/wagmiv0.png'
 import wagmiv1Logo from 'images/wagmiv1.png'
 import wagmiv2Logo from 'images/wagmiv2.png'
+import wagmiv3Logo from 'images/wagmiv3.png'
 import wagmiv2OLOLogo from 'images/wagmiv2olo.png'
 import oloLogo from 'images/olo.svg'
+import glmrLogo from 'images/glmr.svg'
 
 export const getCoinImage = (symbol) => {
 
@@ -121,11 +123,23 @@ export const getCoinImage = (symbol) => {
     case "WAGMIv2-Oolong":
       logo = wagmiv2OLOLogo;
       break;
+    case "WAGMIv3":
+      logo = wagmiv3Logo;
+      break;
+    case "WAGMIv3-Oolong":
+      logo = wagmiv3Logo;
+      break;
     case "DOM":
       logo = domLogo;
       break;
     case "OLO":
       logo = oloLogo;
+      break;
+    case "GLMR":
+      logo = glmrLogo;
+      break;
+    case "DEV":
+      logo = glmrLogo;
       break;
     default:
       logo = ethLogo;

@@ -22,7 +22,8 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-  selectNetwork
+  selectNetwork,
+  selectMonster
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -45,6 +46,7 @@ function FeeSwitcher() {
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
   const network = useSelector(selectNetwork())
+  const monsterNumber = useSelector(selectMonster())
 
   const layer = useSelector(selectLayer())
 
@@ -79,7 +81,7 @@ function FeeSwitcher() {
     }
 
     if (!balanceBOBA && !balanceETH) {
-      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+      dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
       return
     }
 
@@ -124,7 +126,7 @@ function FeeSwitcher() {
     return null
   }
 
-  if (network === 'mainnet') {
+  if (network === 'mainnet' && monsterNumber < 1) {
     return null
   }
 

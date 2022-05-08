@@ -6,7 +6,7 @@ import Button from 'components/button/Button'
 import { Info } from "@mui/icons-material"
 import { Box, Icon, Typography } from '@mui/material'
 
-import { switchChain, getETHMetaTransaction } from 'actions/setupAction'
+import { getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
@@ -18,7 +18,7 @@ import Connect from 'containers/connect/Connect'
 import * as S from './wallet.styles'
 import * as G from '../Global.styles'
 
-import { 
+import {
   setConnectETH,
   setConnectBOBA
 } from 'actions/setupAction'
@@ -86,7 +86,7 @@ function Wallet() {
   useEffect(() => {
     if (layer === 'L2') {
       if (tooSmallBOBA && tooSmallETH) {
-        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
+        dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
       }
     }
   },[tooSmallETH, tooSmallBOBA, layer, dispatch])
@@ -101,7 +101,7 @@ function Wallet() {
     if (layer === 'L2') {
       setChain('Boba Wallet')
     } else if (layer === 'L1') {
-      setChain('Ethereum Wallet')
+      setChain('Moonbeam Wallet')
     }
   }, [ layer ])
 
@@ -121,15 +121,15 @@ function Wallet() {
 
   return (
     <S.PageContainer>
-      
+
       <PageTitle title={'Wallet'} />
 
-      <Connect 
+      <Connect
         userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH && network === 'rinkeby' && 
+      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
         <G.LayerAlert>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
@@ -140,8 +140,8 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting, 
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use 
+              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
               EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
             </Typography>
           </G.AlertInfo>
@@ -158,7 +158,7 @@ function Wallet() {
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Ethereum Wallet' ? 'active' : ''}
+            className={chain === 'Moonbeam Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -166,7 +166,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Ethereum Wallet
+            Moonbeam Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -187,10 +187,13 @@ function Wallet() {
           activeTab={page}
           onClick={(t) => handleSwitch(t)}
           aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
+          // tabs={[ "Token", "NFT" ]}
+          tabs={["Token"]}
         />
       </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+      {/* {page === 'Token' ? <Token /> : <Nft />}
+       */}
+      <Token />
     </S.PageContainer>
   )
 }

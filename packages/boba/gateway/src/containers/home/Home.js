@@ -20,7 +20,7 @@ import { selectModalState } from 'selectors/uiSelector'
 import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
-import { Grid, Link, Typography } from '@mui/material'
+import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 import * as S from './Home.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
 
@@ -71,7 +71,6 @@ import DAO from 'containers/dao/Dao'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
-import BridgeTypeModal from 'containers/modals/bridgeType/bridgeTypeModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -109,12 +108,16 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 require('dotenv').config()
 
 function Home() {
 
   const dispatch = useDispatch()
+  const theme = useTheme()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
@@ -130,7 +133,6 @@ function Home() {
   const transferNFTModalState = useSelector(selectModalState('transferNFTModal'))
 
   const exitModalState = useSelector(selectModalState('exitModal'))
-  const bridgeTypeModalState = useSelector(selectModalState('bridgeTypeSwitch'));
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
@@ -193,22 +195,22 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
+      // dispatch(fetchAirdropStatusL1()) // account specific
+      // dispatch(fetchAirdropStatusL2()) // account specific
+      // dispatch(fetchDaoBalance())      // account specific
+      // dispatch(fetchDaoVotes())        // account specific
+      // dispatch(fetchDaoBalanceX())     // account specific
+      // dispatch(fetchDaoVotesX())       // account specific
       dispatch(fetchExits())           // account specific
-      dispatch(getFS_Saves())          // account specific
-      dispatch(getFS_Info())           // account specific
-      dispatch(getMonsterInfo())       // account specific
+      // dispatch(getFS_Saves())          // account specific
+      // dispatch(getFS_Info())           // account specific
+      // dispatch(getMonsterInfo())       // account specific
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
-      dispatch(getProposalThreshold())
-      dispatch(fetchDaoProposals())
+      // dispatch(fetchVerifierStatus())
+      // dispatch(getProposalThreshold())
+      // dispatch(fetchDaoProposals())
     }
   }, POLL_INTERVAL)
 
@@ -217,15 +219,15 @@ function Home() {
     // load the following functions when the home page is open
     checkVersion()
     dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
-    dispatch(getProposalThreshold())
+    // dispatch(fetchVerifierStatus())
+    // dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
-      dispatch(getMonsterInfo())
+      // dispatch(getMonsterInfo())
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
@@ -247,7 +249,6 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
-      {!!bridgeTypeModalState && <BridgeTypeModal open={bridgeTypeModalState} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
@@ -271,6 +272,8 @@ function Home() {
       >
         {alertMessage}
       </Alert>
+
+      { isMobile ? <LayerSwitcher visisble={false} /> : null }
 
       {!!maintenance &&
         <Box sx={{
@@ -333,16 +336,16 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "History" &&
+            {/* {pageDisplay === "History" &&
               <Transactions />
             }
             {pageDisplay === "BobaScope" &&
               <BobaScope />
-            }
+            } */}
             {pageDisplay === "Wallet" &&
               <Wallet />
             }
-            {pageDisplay === "Farm" &&
+            {/* {pageDisplay === "Farm" &&
               <FarmWrapper />
             }
             {pageDisplay === "Save" &&
@@ -365,7 +368,7 @@ function Home() {
             }
             {pageDisplay === "Monster" &&
               <MonsterWrapper />
-            }
+            } */}
           </Container>
           <PageFooter/>
         </Box>

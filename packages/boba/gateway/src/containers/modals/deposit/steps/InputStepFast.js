@@ -341,7 +341,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
           lpFee={`${feeRateN}%`}
           estReceive={`${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token) ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})` : ''}`}
           time="20 mins - 3 hours"
-          estFee={`${Number(cost).toFixed(4)} ETH`}
+          estFee={`${Number(cost).toFixed(4)} BOBA`}
         />
 
 

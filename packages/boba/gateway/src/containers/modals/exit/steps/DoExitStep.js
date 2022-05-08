@@ -260,9 +260,9 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} GLMR`
     } else {
-      estGas = `${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} BOBA`
     }
   }
 

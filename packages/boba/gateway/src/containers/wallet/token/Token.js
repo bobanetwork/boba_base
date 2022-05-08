@@ -152,7 +152,7 @@ function TokenPage() {
     <>
       {layer === 'L2' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
-          <Typography variant="body2">
+          {/* <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
             <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
             <G.footerLink
@@ -162,7 +162,7 @@ function TokenPage() {
               style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
             >Oolongswap <Link />
             </G.footerLink>
-          </Typography>
+          </Typography> */}
           {debug &&
             <Button
               onClick={()=>{GasEstimateApprove()}}
@@ -175,9 +175,9 @@ function TokenPage() {
         </Box>
       }
 
-      {!!accountEnabled && inflight.length > 0 && 
+      {!!accountEnabled && inflight.length > 0 &&
         <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
-          <Typography 
+          <Typography
             variant="body2"
             sx={{ cursor: 'pointer' }}
             onClick={() => {
@@ -217,7 +217,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}
@@ -231,7 +231,7 @@ function TokenPage() {
                 disabled={disabled}
               />
             )
-          }) : 
+          }) :
           <S.LoaderContainer>
             <CircularProgress color="secondary" />
           </S.LoaderContainer> : null}

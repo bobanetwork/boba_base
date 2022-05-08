@@ -109,13 +109,13 @@ class Nft extends React.Component {
     this.setState({ tokenID: event.target.value })
   }
 
-  async addNFT() {
-    networkService.addNFT(this.state.contractAddress, this.state.tokenID)
-  }
+  // async addNFT() {
+  //   networkService.addNFT(this.state.contractAddress, this.state.tokenID)
+  // }
 
-  async fetchMyMonsters() {
-    networkService.fetchMyMonsters()
-  }
+  // async fetchMyMonsters() {
+  //   networkService.fetchMyMonsters()
+  // }
 
   render() {
 
@@ -157,7 +157,7 @@ class Nft extends React.Component {
       return (
         <G.Container>
           <G.ContentEmpty>
-            <Connect 
+            <Connect
               userPrompt={'You are on Ethereum. To use Boba NFTs, connect to Boba'}
               accountEnabled={accountEnabled}
               connectToBoba={true}

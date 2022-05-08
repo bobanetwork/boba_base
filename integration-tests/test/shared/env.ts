@@ -31,8 +31,7 @@ import {
   l2Wallet_3,
   l1Wallet_4,
   l2Wallet_4,
-  fundUser,
-  getOvmEth,
+  getL2BOBA,
   getL1Bridge,
   //getL2Bridge,
   //IS_LIVE_NETWORK,
@@ -61,7 +60,7 @@ export class OptimismEnv {
   //scc: Contract
 
   // L2 Contracts
-  ovmEth: Contract
+  L2BOBA: Contract
   //l2Bridge: Contract
   //l2Messenger: Contract
   //gasPriceOracle: Contract
@@ -95,7 +94,7 @@ export class OptimismEnv {
     this.l1Bridge = args.l1Bridge
     //this.l1Messenger = args.l1Messenger
     //this.l1BlockNumber = args.l1BlockNumber
-    this.ovmEth = args.ovmEth
+    this.L2BOBA = args.L2BOBA
     //this.l2Bridge = args.l2Bridge
     //this.l2Messenger = args.l2Messenger
     //this.gasPriceOracle = args.gasPriceOracle
@@ -134,7 +133,7 @@ export class OptimismEnv {
 
     const network = await l1Provider.getNetwork()
 
-    const ovmEth = getOvmEth(l2Wallet)
+    const L2BOBA = getL2BOBA(l2Wallet)
 
     const contracts = {
       l1: {
@@ -185,7 +184,9 @@ export class OptimismEnv {
     const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
     const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
     if (balance.lt(utils.parseEther(min))) {
-      await fundUser(messenger, utils.parseEther(topUp))
+      // NEED TO FIX
+      // await fundUser(messenger, utils.parseEther(topUp))
+      console.error('NEED TO FIX - fundUser')
     }
 
     return new OptimismEnv({
@@ -193,7 +194,7 @@ export class OptimismEnv {
       addressesBOBA,
       messenger,
       messengerFast,
-      ovmEth,
+      L2BOBA,
       l1Wallet,
       l2Wallet,
       l1Wallet_2,
@@ -433,10 +434,12 @@ export class OptimismEnv {
         } catch (err) {
           if (
             err.message.includes('Nonce too low') ||
+            err.message.includes('nonce too low') ||
             err.message.includes('transaction was replaced') ||
             err.message.includes(
               'another transaction with same nonce in the queue'
-            )
+            ) ||
+            err.message.includes('replacement transaction underpriced')
           ) {
             // Sometimes happens when we run tests in parallel.
             await sleep(5000)
