@@ -762,13 +762,13 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     })
     try {
       const targetPriceRatio = Math.floor(
-        ((this.state.L2SecondaryFeeTokenUSDPrice / this.state.BOBAUSDPrice) *
+        ((this.state.BOBAUSDPrice / this.state.L2SecondaryFeeTokenUSDPrice) *
           multiplier *
           this.options.bobaFeeRatio100X) /
           100
       )
       const targetMarketPriceRatio = Math.floor(
-        (this.state.L2SecondaryFeeTokenUSDPrice / this.state.BOBAUSDPrice) *
+        (this.state.BOBAUSDPrice / this.state.L2SecondaryFeeTokenUSDPrice) *
           multiplier
       )
       if (targetPriceRatio !== priceRatioInt) {
