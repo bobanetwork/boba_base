@@ -500,8 +500,8 @@ class NetworkService {
         tx = await bobaFeeContract.useBobaAsFeeToken()
         await tx.wait()
 
-      } else if (targetFee === 'ETH') {
-        tx = await bobaFeeContract.useETHAsFeeToken()
+      } else if (targetFee === 'GLMR') {
+        tx = await bobaFeeContract.useSecondaryFeeTokenAsFeeToken()
         await tx.wait()
       }
 

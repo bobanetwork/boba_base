@@ -52,8 +52,8 @@ function FeeSwitcher() {
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
-  const balanceETH = l2BalanceETH[0]
+  const l2BalanceGLMR = l2Balances.filter((i) => i.symbol === 'GLMR')
+  const balanceGLMR = l2BalanceGLMR[0]
 
   const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
   const balanceBOBA = l2BalanceBOBA[0]
@@ -61,52 +61,52 @@ function FeeSwitcher() {
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
     //console.log("balanceBOBA:",balanceBOBA)
-    //console.log("balanceETH:",balanceETH)
+    //console.log("balanceGLMR:",balanceGLMR)
 
-    let tooSmallETH = false
+    let tooSmallGLMR = false
     let tooSmallBOBA = false
 
     if(typeof(balanceBOBA) === 'undefined') {
       tooSmallBOBA = true
     } else {
       //check actual balance
-      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
+      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(1))
     }
 
-    if(typeof(balanceETH) === 'undefined') {
-      tooSmallETH = true
+    if(typeof(balanceGLMR) === 'undefined') {
+      tooSmallGLMR = true
     } else {
       //check actual balance
-      tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
+      tooSmallGLMR = new BN(logAmount(balanceGLMR.balance, 18)).lt(new BN(0.5))
     }
 
-    if (!balanceBOBA && !balanceETH) {
+    if (!balanceBOBA && !balanceGLMR) {
       dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
       return
     }
 
     let res
 
-    if (feeUseBoba && targetFee === 'BOBA') {
+    if (feeUseBoba && targetFee === 'GLMR') {
       // do nothing - already set to BOBA
     }
-    else if ( !feeUseBoba && targetFee === 'ETH' ) {
+    else if ( !feeUseBoba && targetFee === 'BOBA' ) {
       // do nothing - already set to ETH
     }
-    else if ( !feeUseBoba && targetFee === 'BOBA' ) {
+    else if ( !feeUseBoba && targetFee === 'GLMR' ) {
       // change to BOBA
       if( tooSmallBOBA ) {
-        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA.
-          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.`))
+        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1 GMLR.
+          If you change fee token now, you might get stuck. Please swap some BOBA for GLMR first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
     }
-    else if (feeUseBoba && targetFee === 'ETH') {
+    else if (feeUseBoba && targetFee === 'BOBA') {
       // change to ETH
-      if( tooSmallETH ) {
-        dispatch(openError(`You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH.
-          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.`))
+      if( tooSmallGLMR ) {
+        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1 BOBA.
+          If you change fee token now, you might get stuck. Please swap some GLMR for BOBA first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -116,7 +116,7 @@ function FeeSwitcher() {
       dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
     }
 
-  }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
+  }, [ dispatch, feeUseBoba, balanceGLMR, balanceBOBA ])
 
   if (!accountEnabled) {
     return null
@@ -132,7 +132,7 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
+      <Tooltip title={'BOBA or GLMR will be used across Boba according to your choice.'}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
       <Typography variant="body2">Fee</Typography>
@@ -140,14 +140,14 @@ function FeeSwitcher() {
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={!feeUseBoba ? "ETH" : 'BOBA'}
+        value={!feeUseBoba ? "BOBA" : 'GLMR'}
         options={[ {
-          value: 'ETH',
-          title: 'ETH',
-        },
-        {
           value: 'BOBA',
           title: 'BOBA',
+        },
+        {
+          value: 'GLMR',
+          title: 'GLMR',
         }
         ]}
       />
