@@ -17,6 +17,10 @@ export default function metaTransactionAxiosInstance(networkGateway){
     axiosInstance = axios.create({
       baseURL: getBaseServices().MAINNET_META_TRANSACTION,
     })
+  } else if (networkGateway === 'bobaBase') {
+    axiosInstance = axios.create({
+      baseURL: getBaseServices().BOBABASE_META_TRANSACTION,
+    })
   }
 
   axiosInstance.interceptors.request.use((config) => {

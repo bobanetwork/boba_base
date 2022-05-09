@@ -69,13 +69,13 @@ function Wallet() {
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
       if (l2BalanceETH && l2BalanceETH.balance) {
-        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
+        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(1)))
       } else {
         // in case of zero ETH balance we are setting tooSmallETH
         setTooSmallETH(true)
       }
       if (l2BalanceBOBA && l2BalanceBOBA.balance) {
-        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
+        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(1)))
       } else {
         // in case of zero BOBA balance we are setting tooSmallBOBA
         setTooSmallBOBA(true)
@@ -114,7 +114,7 @@ function Wallet() {
   }
 
   async function emergencySwap () {
-    if(network !== 'rinkeby') return
+    if(network !== 'bobaBase' && network !== 'bobaBeam') return
     const res = await dispatch(getETHMetaTransaction())
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
@@ -129,7 +129,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH && network === 'rinkeby' &&
+      {layer === 'L2' && tooSmallETH && network === 'bobaBase' &&
         <G.LayerAlert>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
@@ -140,9 +140,9 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
-              EMERGENCY SWAP to swap BOBA for 0.05 ETH at market rates.
+              Using GLMR requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
+              EMERGENCY SWAP to swap GLMR for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
           <Button

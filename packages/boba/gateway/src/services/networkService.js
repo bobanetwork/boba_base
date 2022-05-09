@@ -101,6 +101,7 @@ const L2_BOBA_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
+const L2_SecondaryFeeToken_Address = '0x4200000000000000000000000000000000000023'
 
 let allAddresses = {}
 // preload allAddresses
@@ -540,7 +541,7 @@ class NetworkService {
       this.provider.getSigner()
     )
 
-    let value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
+    let value = (await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()).toString()
     const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
     const deadline = Math.floor(Date.now() / 1000) + 300
     const verifyingContract = this.BobaContract.address
@@ -567,11 +568,10 @@ class NetworkService {
     try {
       const response = await metaTransactionAxiosInstance(
         this.networkGateway
-      ).post('/send.swapBOBAForETH', { owner, spender, value, deadline, signature, data })
+      ).post('/send.swapSecondaryFeeToken', { owner, spender, value, deadline, signature, data })
       console.log("response",response)
       await this.getBobaFeeChoice()
     } catch (error) {
-      console.log(error)
       // sigh
       let errorData = error.response.data.error
       if(errorData.hasOwnProperty('error')) {
@@ -873,11 +873,11 @@ class NetworkService {
 
       /*The OMG token*/
       //We need this seperately because OMG is not ERC20 compliant
-      this.L1_OMG_Contract = new ethers.Contract(
-        allTokens.OMG.L1,
-        OMGJson,
-        this.L1Provider
-      )
+      // this.L1_OMG_Contract = new ethers.Contract(
+      //   allTokens.OMG.L1,
+      //   OMGJson,
+      //   this.L1Provider
+      // )
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
@@ -940,31 +940,32 @@ class NetworkService {
       }
 
       this.BobaContract = new ethers.Contract(
-        allTokens.BOBA.L2,
+        L2_SecondaryFeeToken_Address,
         Boba.abi,
         this.L2Provider
       )
 
       this.xBobaContract = new ethers.Contract(
-        allTokens.xBOBA.L2,
+        // allTokens.xBOBA.L2,
+        L2_SecondaryFeeToken_Address,
         Boba.abi,
         this.L2Provider
       )
 
-      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+      // if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+      // if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
-      this.delegateContract = new ethers.Contract(
-        allAddresses.GovernorBravoDelegate,
-        GovernorBravoDelegate.abi,
-        this.L2Provider
-      )
+      // this.delegateContract = new ethers.Contract(
+      //   allAddresses.GovernorBravoDelegate,
+      //   GovernorBravoDelegate.abi,
+      //   this.L2Provider
+      // )
 
-      this.delegatorContract = new ethers.Contract(
-        allAddresses.GovernorBravoDelegator,
-        GovernorBravoDelegator.abi,
-        this.L2Provider
-      )
+      // this.delegatorContract = new ethers.Contract(
+      //   allAddresses.GovernorBravoDelegator,
+      //   GovernorBravoDelegator.abi,
+      //   this.L2Provider
+      // )
 
       this.gasOracleContract = new ethers.Contract(
         L2GasOracle,

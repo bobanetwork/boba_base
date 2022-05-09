@@ -159,6 +159,8 @@ const BaseServices = {
   MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
   // Rinkeby meta transaction
   RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
+  // Bobabase meta transaction
+  BOBABASE_META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
 }
 
 export function getNetwork () {

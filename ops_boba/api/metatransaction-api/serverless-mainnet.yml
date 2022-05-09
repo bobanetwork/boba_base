@@ -1,9 +1,9 @@
-service: sls-boba-mainnet-mb-metaTransaction # NOTE: update this with your service name
+service: sls-bobabeam-metaTransaction # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stackName: sls-boba-mainnet-moonbeam-metaTransaction
+  stackName: sls-bobabeam-metaTransaction
   stage: prod
   region: us-east-1
   role: ${file(env-mainnet.yml):ROLE}
