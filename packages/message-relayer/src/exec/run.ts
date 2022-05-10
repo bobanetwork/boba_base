@@ -116,7 +116,9 @@ const main = async () => {
     parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
   )
 
-  const ADDRESSES_URL = config.str('addresses-url', env.ADDRESSES_URL) || 'http://dtl:8081/addresses.json'
+  const ADDRESSES_URL =
+    config.str('addresses-url', env.ADDRESSES_URL) ||
+    'http://dtl:8081/addresses.json'
 
   let baseAddresses: Object
   if (ADDRESSES_URL) {
