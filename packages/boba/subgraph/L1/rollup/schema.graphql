@@ -28,11 +28,11 @@ type FailedRelayedMessageFastEntity @entity {
 
 type StateBatchAppendedEntity @entity {
   id: ID!
-  batchIndex: BigInt!
-  batchRoot: Bytes!
-  batchSize: BigInt!
-  prevTotalElements: BigInt!
-  extraData: Bytes!
+  _batchIndex: BigInt!
+  _batchRoot: Bytes!
+  _batchSize: BigInt!
+  _prevTotalElements: BigInt!
+  _extraData: Bytes!
   blockNumber: BigInt!
   transactionHash: Bytes! # transaction hash
 }
