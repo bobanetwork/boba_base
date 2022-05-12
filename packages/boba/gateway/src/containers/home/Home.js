@@ -336,12 +336,12 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {/* {pageDisplay === "History" &&
+            {pageDisplay === "History" &&
               <Transactions />
             }
             {pageDisplay === "BobaScope" &&
               <BobaScope />
-            } */}
+            }
             {pageDisplay === "Wallet" &&
               <Wallet />
             }

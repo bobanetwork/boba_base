@@ -74,12 +74,12 @@ const PageFooter = ({maintenance}) => {
             onClick={() => {
               dispatch(setPage('Airdrop'))
             }}
-          >AirDrop</S.FooterLink>
+          >AirDrop</S.FooterLink> */}
           <S.FooterLink
             onClick={() => {
               dispatch(setPage('BobaScope'))
             }}
-          >BobaScope</S.FooterLink> */}
+          >BobaScope</S.FooterLink>
           <S.FooterLink
             href="https://blockexplorer.bobabase.boba.network"
             component="a"
