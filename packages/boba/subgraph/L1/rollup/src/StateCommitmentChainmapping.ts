@@ -18,6 +18,7 @@ export function handleStateCommitmentChain(event: StateBatchAppended): void {
   entity.prevTotalElements = event.params._prevTotalElements
   entity.extraData = event.params._extraData
   entity.blockNumber = event.block.number
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }

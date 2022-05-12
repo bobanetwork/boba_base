@@ -3,6 +3,7 @@ type RelayedMessageEntity @entity {
   msgHash: Bytes! # bytes32
   isSuccess: Boolean! # whether this message is relayed successfully or not
   blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
 }
 
 type FastRelayedMessageEntity @entity {
@@ -10,6 +11,7 @@ type FastRelayedMessageEntity @entity {
   msgHash: Bytes! # bytes32
   isSuccess: Boolean! # whether this message is relayed successfully or not
   blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
 }
 
 type StateBatchAppendedEntity @entity {
@@ -20,5 +22,6 @@ type StateBatchAppendedEntity @entity {
   prevTotalElements: BigInt!
   extraData: Bytes!
   blockNumber: BigInt!
+  transactionHash: Bytes! # transaction hash
 }
 

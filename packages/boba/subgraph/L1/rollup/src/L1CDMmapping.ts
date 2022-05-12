@@ -18,6 +18,7 @@ export function handleFailedRelayedMessage(event: FailedRelayedMessage): void {
   entity.isSuccess = false
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
@@ -31,6 +32,7 @@ export function handleRelayedMessage(event: RelayedMessage): void {
   entity.isSuccess = true
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
