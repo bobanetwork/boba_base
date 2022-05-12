@@ -2,13 +2,12 @@ import {
   FailedRelayedMessage,
   RelayedMessage,
 } from "../generated/L1CrossDomainMessenger/L1CrossDomainMessenger"
-import { RelayedMessageEntity } from "../generated/schema"
+import { RelayedMessageEntity, FailedRelayedMessageEntity } from "../generated/schema"
 
 export function handleFailedRelayedMessage(event: FailedRelayedMessage): void {
   const id = event.transaction.hash.toHex()
-  const entity = new RelayedMessageEntity(id)
+  const entity = new FailedRelayedMessageEntity(id)
   entity.id = id
-  entity.isSuccess = false
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
   entity.transactionHash = event.transaction.hash
@@ -20,7 +19,6 @@ export function handleRelayedMessage(event: RelayedMessage): void {
   const id = event.transaction.hash.toHex()
   const entity = new RelayedMessageEntity(id)
   entity.id = id
-  entity.isSuccess = true
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
   entity.transactionHash = event.transaction.hash

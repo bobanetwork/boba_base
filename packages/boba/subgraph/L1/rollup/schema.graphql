@@ -1,15 +1,27 @@
 type RelayedMessageEntity @entity {
   id: ID!
   msgHash: Bytes! # bytes32
-  isSuccess: Boolean! # whether this message is relayed successfully or not
   blockNumber: BigInt! # block number
   transactionHash: Bytes! # transaction hash
 }
 
-type FastRelayedMessageEntity @entity {
+type RelayedMessageFastEntity @entity {
   id: ID!
   msgHash: Bytes! # bytes32
-  isSuccess: Boolean! # whether this message is relayed successfully or not
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type FailedRelayedMessageEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type FailedRelayedMessageFastEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
   blockNumber: BigInt! # block number
   transactionHash: Bytes! # transaction hash
 }
