@@ -1,0 +1,70 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: L1CrossDomainMessenger
+    network: mbase
+    source:
+      address: '0x76DB375075F1d5Dcd1D70Fc07F69a5c7b40ab877'
+      abi: L1CrossDomainMessenger
+      startBlock: 2103507
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FailedRelayedMessage
+        - RelayedMessage
+      abis:
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+      eventHandlers:
+        - event: FailedRelayedMessage(indexed bytes32)
+          handler: handleFailedRelayedMessage
+        - event: RelayedMessage(indexed bytes32)
+          handler: handleRelayedMessage
+      file: ./src/L1CDMmapping.ts
+  - kind: ethereum
+    name: L1CrossDomainMessengerFast
+    network: mbase
+    source:
+      address: '0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6'
+      abi: L1CrossDomainMessenger
+      startBlock: 2111965
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FailedRelayedMessage
+        - RelayedMessage
+      abis:
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+      eventHandlers:
+        - event: FailedRelayedMessage(indexed bytes32)
+          handler: handleFailedRelayedMessage
+        - event: RelayedMessage(indexed bytes32)
+          handler: handleRelayedMessage
+      file: ./src/L1CDMFastmapping.ts
+  - kind: ethereum
+    name: StateCommitmentChain
+    network: mbase
+    source:
+      address: '0x7Af512914Ab422f9D38aC5eEfc94fa5106FA74C2'
+      abi: StateCommitmentChain
+      startBlock: 2103495
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StateCommitmentChain
+      abis:
+        - name: StateCommitmentChain
+          file: ./abis/StateCommitmentChain.json
+      eventHandlers:
+        - event: StateBatchAppended(indexed uint256,bytes32,uint256,uint256,bytes)
+          handler: handleStateCommitmentChain
+      file: ./src/StateCommitmentChainmapping.ts

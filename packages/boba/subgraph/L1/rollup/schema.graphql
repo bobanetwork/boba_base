@@ -1,0 +1,24 @@
+type RelayedMessageEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  isSuccess: Boolean! # whether this message is relayed successfully or not
+  blockNumber: BigInt! # block number
+}
+
+type FastRelayedMessageEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  isSuccess: Boolean! # whether this message is relayed successfully or not
+  blockNumber: BigInt! # block number
+}
+
+type StateBatchAppendedEntity @entity {
+  id: ID!
+  batchIndex: BigInt!
+  batchRoot: Bytes!
+  batchSize: BigInt!
+  prevTotalElements: BigInt!
+  extraData: Bytes!
+  blockNumber: BigInt!
+}
+
