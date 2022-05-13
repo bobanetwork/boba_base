@@ -1,12 +1,16 @@
 import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 
-export const WHITELIST_CHAIN_ID: [number] = [1287]
+export const WHITELIST_CHAIN_ID: Array<number> = [1287, 1284]
 
 export const GRAPH_API_URL: any = {
   1287: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-rollup',
+  },
+  1284: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-rollup',
   },
 }
 
