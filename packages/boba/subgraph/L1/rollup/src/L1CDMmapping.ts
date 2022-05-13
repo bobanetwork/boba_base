@@ -2,35 +2,26 @@ import {
   FailedRelayedMessage,
   RelayedMessage,
 } from "../generated/L1CrossDomainMessenger/L1CrossDomainMessenger"
-import { RelayedMessageEntity } from "../generated/schema"
+import { RelayedMessageEntity, FailedRelayedMessageEntity } from "../generated/schema"
 
 export function handleFailedRelayedMessage(event: FailedRelayedMessage): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = RelayedMessageEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new RelayedMessageEntity(event.transaction.from.toHex())
-  }
-
-  entity.isSuccess = false
+  const id = event.transaction.hash.toHex()
+  const entity = new FailedRelayedMessageEntity(id)
+  entity.id = id
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
 
 export function handleRelayedMessage(event: RelayedMessage): void {
-  let entity = RelayedMessageEntity.load(event.transaction.from.toHex())
-  if (!entity) {
-    entity = new RelayedMessageEntity(event.transaction.from.toHex())
-  }
-
-  entity.isSuccess = true
+  const id = event.transaction.hash.toHex()
+  const entity = new RelayedMessageEntity(id)
+  entity.id = id
   entity.msgHash = event.params.msgHash
   entity.blockNumber = event.block.number
+  entity.transactionHash = event.transaction.hash
 
   entity.save()
 }
