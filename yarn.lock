@@ -1743,9 +1743,9 @@
     prom-client "^13.1.0"
 
 "@eth-optimism/contracts@^0.5.15":
-  version "0.5.23"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.23.tgz#630243486a583bd12f9116c871df8453b1c979fc"
-  integrity sha512-XSeRhYRyWGebItoBr0pXJNNhbzCerJJDqG9V9jNPuTJ5H18sAGm8jmrdIp4gj3bZnV41qOa4qd7BonHLlgzw0w==
+  version "0.5.24"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.24.tgz#7a71fb530327b8af54824acedcc6fdb4676a993a"
+  integrity sha512-9Z+KUMYAxYZyIZHvpn5Yngz787DzNw1E8HUBib27iPtJ5gAWdKXisuScEkP2gnt4bDcUQ8qtMfGZ9Z7FARbuvQ==
   dependencies:
     "@eth-optimism/core-utils" "0.8.4"
     "@ethersproject/abstract-provider" "^5.5.1"

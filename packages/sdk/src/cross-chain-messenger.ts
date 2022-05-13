@@ -48,6 +48,10 @@ import {
   encodeCrossChainMessage,
   DEPOSIT_CONFIRMATION_BLOCKS,
   CHAIN_BLOCK_TIMES,
+  WHITELIST_CHAIN_ID,
+  getStateBatchAppendedEventByBatchIndexFromGraph,
+  getRelayedMessageEventsFromGraph,
+  getFailedRelayedMessageEventsFromGraph,
 } from './utils'
 
 export class CrossChainMessenger implements ICrossChainMessenger {
@@ -487,11 +491,21 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       console.log('SDK-fast: waiting for MessageReceipt...')
     }
 
-    const relayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.RelayedMessage(messageHash),
-      opts?.fromBlock,
-      opts?.toBlock
-    )
+    let relayedMessageEvents: ethers.Event[] = []
+    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+      relayedMessageEvents = await getRelayedMessageEventsFromGraph(
+        this.l1Provider,
+        messageHash,
+        this.l1ChainId,
+        this.fastRelayer
+      )
+    } else {
+      relayedMessageEvents = await messenger.queryFilter(
+        messenger.filters.RelayedMessage(messageHash),
+        opts?.fromBlock,
+        opts?.toBlock
+      )
+    }
 
     // Great, we found the message. Convert it into a transaction receipt.
     if (relayedMessageEvents.length === 1) {
@@ -507,11 +521,22 @@ export class CrossChainMessenger implements ICrossChainMessenger {
 
     // We didn't find a transaction that relayed the message. We now attempt to find
     // FailedRelayedMessage events instead.
-    const failedRelayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.FailedRelayedMessage(messageHash),
-      opts?.fromBlock,
-      opts?.toBlock
-    )
+
+    let failedRelayedMessageEvents: ethers.Event[] = []
+    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+      failedRelayedMessageEvents = await getFailedRelayedMessageEventsFromGraph(
+        this.l1Provider,
+        messageHash,
+        this.l1ChainId,
+        this.fastRelayer
+      )
+    } else {
+      failedRelayedMessageEvents = await messenger.queryFilter(
+        messenger.filters.FailedRelayedMessage(messageHash),
+        opts?.fromBlock,
+        opts?.toBlock
+      )
+    }
 
     // A transaction can fail to be relayed multiple times. We'll always return the last
     // transaction that attempted to relay the message.
@@ -800,24 +825,20 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       blockRange?: number
     }
   ): Promise<ethers.Event | null> {
-    const l1BlockNumber = await this.l1Provider.getBlockNumber()
-    // The default block range is 5000
-    const blockRange = opts?.blockRange || 5000
-    let fromBlock = Number(opts?.fromBlock) || 0
-    let toBlock = Math.min(fromBlock + blockRange, l1BlockNumber)
-    let events = []
-    while (fromBlock < l1BlockNumber) {
-      const queriedEvents =
-        await this.contracts.l1.StateCommitmentChain.queryFilter(
-          this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
-            batchIndex
-          ),
-          fromBlock,
-          toBlock
-        )
-      events = [...events, ...queriedEvents]
-      fromBlock = toBlock
-      toBlock = Math.min(toBlock + blockRange, l1BlockNumber)
+    let events: ethers.Event[] = []
+    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+      events = await getStateBatchAppendedEventByBatchIndexFromGraph(
+        this.l1Provider,
+        batchIndex,
+        this.l1ChainId
+      )
+    } else {
+      events = await this.contracts.l1.StateCommitmentChain.queryFilter(
+        this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
+          batchIndex
+        ),
+        opts?.fromBlock
+      )
     }
     if (events.length === 0) {
       return null
