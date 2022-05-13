@@ -23,11 +23,11 @@ import {
   setConnectBOBA
 } from 'actions/setupAction'
 
-
 import {
   selectAccountEnabled,
   selectLayer,
   selectNetwork,
+  selectWalletAddress,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -116,6 +116,7 @@ function Wallet() {
   async function emergencySwap () {
     if(network !== 'bobaBase' && network !== 'bobaBeam') return
     const res = await dispatch(getETHMetaTransaction())
+    console.log("emergencySwap - res:",res)
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
