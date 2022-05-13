@@ -803,7 +803,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     const l1BlockNumber = await this.l1Provider.getBlockNumber()
     // The default block range is 5000
     const blockRange = opts?.blockRange || 5000
-    let fromBlock = Number(opts?.fromBlock)
+    let fromBlock = Number(opts?.fromBlock) || 0
     let toBlock = Math.min(fromBlock + blockRange, l1BlockNumber)
     let events = []
     while (fromBlock < l1BlockNumber) {
