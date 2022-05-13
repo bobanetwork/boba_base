@@ -152,17 +152,19 @@ function TokenPage() {
     <>
       {layer === 'L2' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
-          {/* <Typography variant="body2">
+          {/* 
+            <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
             <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-            <G.footerLink
-              target='_blank'
-              href={'https://oolongswap.com/'}
-              aria-label="link"
-              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-            >Oolongswap <Link />
-            </G.footerLink>
-          </Typography> */}
+              <G.footerLink
+                target='_blank'
+                href={'https://oolongswap.com/'}
+                aria-label="link"
+                style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+                  >Oolongswap <Link />
+              </G.footerLink>
+            </Typography> 
+          */}
           {debug &&
             <Button
               onClick={()=>{GasEstimateApprove()}}
