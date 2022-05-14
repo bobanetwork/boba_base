@@ -79,7 +79,7 @@ export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
       query: `
         query {
           stateBatchAppendedEntities(where: {
-            _batchIndex: ${batchIndex}
+            _batchIndex: "${batchIndex}"
           }) {
             _batchIndex
             _batchRoot
@@ -128,7 +128,7 @@ export const getRelayedMessageEventsFromGraph = async (
           ${
             fast ? 'relayedMessageFastEntities' : 'relayedMessageEntities'
           }(where: {
-            msgHash: ${messageHash}
+            msgHash: "${messageHash}"
           }) {
             msgHash
             transactionHash
@@ -177,7 +177,7 @@ export const getFailedRelayedMessageEventsFromGraph = async (
               ? 'failedRelayedMessageFastEntities'
               : 'failedRelayedMessageEntities'
           }(where: {
-            msgHash: ${messageHash}
+            msgHash: "${messageHash}"
           }) {
             msgHash
             transactionHash

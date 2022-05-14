@@ -467,7 +467,6 @@ class BlockMonitorService extends OptimismEnv {
       chainID,
       fast ? true : false
     )
-    console.log(matches)
     if (matches.length > 0) {
       if (matches.length > 1) {
         return false
