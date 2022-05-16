@@ -3,6 +3,7 @@ name: typescript / contracts
 on:
   push:
     branches:
+      - 'main'
       - 'master'
       - 'develop'
       - '*rc'
