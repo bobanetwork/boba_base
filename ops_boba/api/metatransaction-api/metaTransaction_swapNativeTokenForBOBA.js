@@ -29,7 +29,7 @@ const loadContracts = () => {
   const PRIVATE_KEY = env.PRIVATE_KEY || process.env.PRIVATE_KEY
   const BOBA_GASPRICEORACLE_ADDRESS =
     env.BOBA_GASPRICEORACLE_ADDRESS || process.env.BOBA_GASPRICEORACLE_ADDRESS
-  const L2_BOBA_ADDRESS = env.L2_BOBA_ADDRESS || process.env.L2_BOBA_ADDRESS
+  const L2_SECONDARY_FEE_TOKEN_ADDRESS = env.L2_SECONDARY_FEE_TOKEN_ADDRESS
 
   // Get provider and wallet
   const l2Provider = new ethers.providers.JsonRpcProvider(L2_NODE_WEB3_URL)
@@ -38,15 +38,16 @@ const loadContracts = () => {
   // ABI
   const BobaGasPriceOracleInterface = new ethers.utils.Interface([
     'function useBobaAsFeeToken()',
-    'function useETHAsFeeToken()',
-    'function bobaFeeTokenUsers(address) view returns (bool)',
-    'function swapBOBAForETHMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
+    'function useSecondaryFeeTokenAsFeeToken()',
+    'function secondaryFeeTokenUsers(address) view returns (bool)',
+    'function swapSecondaryFeeTokenForBOBAMetaTransaction(address,address,uint256,uint256,uint8,bytes32,bytes32)',
     'function metaTransactionFee() view returns (uint256)',
     'function marketPriceRatio() view returns (uint256)',
-    'function receivedETHAmount() view returns (uint256)',
+    'function receivedBOBAAmount() view returns (uint256)',
+    'function getSecondaryFeeTokenForSwap() view returns (uint256)',
   ])
 
-  const L2BobaInterface = new ethers.utils.Interface([
+  const L2SecondaryFeeTokenInterface = new ethers.utils.Interface([
     'function balanceOf(address) view returns (uint256)',
   ])
 
@@ -56,14 +57,18 @@ const loadContracts = () => {
     BobaGasPriceOracleInterface,
     l2Wallet
   )
-  const L2Boba = new ethers.Contract(L2_BOBA_ADDRESS, L2BobaInterface, l2Wallet)
+  const L2SecondaryFeeToken = new ethers.Contract(
+    L2_SECONDARY_FEE_TOKEN_ADDRESS,
+    L2SecondaryFeeTokenInterface,
+    l2Wallet
+  )
 
-  return [Boba_GasPriceOracle, L2Boba]
+  return [Boba_GasPriceOracle, L2SecondaryFeeToken]
 }
 
 // Decrypt the signature and verify the message
 // Verify the user balance and the value
-const verifyBobay = async (body, Boba_GasPriceOracle, L2Boba) => {
+const verifyBobay = async (body, Boba_GasPriceOracle, L2SecondaryFeeToken) => {
   const { owner, spender, value, deadline, signature, data } = body
 
   if (
@@ -119,8 +124,12 @@ const verifyBobay = async (body, Boba_GasPriceOracle, L2Boba) => {
 module.exports.mainnetHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
-  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
-  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
+  const [Boba_GasPriceOracle, L2SecondaryFeeToken] = loadContracts()
+  const isVerified = await verifyBobay(
+    body,
+    Boba_GasPriceOracle,
+    L2SecondaryFeeToken
+  )
   if (isVerified.isVerified === false) {
     return callback(null, {
       headers,
@@ -167,8 +176,12 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 module.exports.rinkebyHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
-  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
-  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
+  const [Boba_GasPriceOracle, L2SecondaryFeeToken] = loadContracts()
+  const isVerified = await verifyBobay(
+    body,
+    Boba_GasPriceOracle,
+    L2SecondaryFeeToken
+  )
   if (isVerified.isVerified === false) {
     return callback(null, {
       headers,

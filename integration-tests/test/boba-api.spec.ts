@@ -11,18 +11,21 @@ import util from 'util'
 /* Imports: Internal */
 import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
-import { rinkebySwapBOBAForETH, mainnetSwapBOBAForETH } from '@boba/api'
+import {
+  rinkebySwapL2SecondaryFeeTokenForBOBA,
+  mainnetSwapL2SecondaryFeeTokenForBOBA,
+} from '@boba/api'
 
 describe('Boba API Tests', async () => {
   let env: OptimismEnv
-  let L2Boba: Contract
+  let L2SecondaryFeeToken: Contract
   let Boba_GasPriceOracle: Contract
 
   before(async () => {
     env = await OptimismEnv.new()
 
-    L2Boba = getContractFactory('L2GovernanceERC20')
-      .attach(predeploys.L2GovernanceERC20)
+    L2SecondaryFeeToken = getContractFactory('L2_L1NativeToken')
+      .attach(predeploys.L2_L1NativeToken)
       .connect(env.l2Wallet)
     Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
       .attach(predeploys.Proxy__Boba_GasPriceOracle)
@@ -51,11 +54,11 @@ describe('Boba API Tests', async () => {
         { name: 'deadline', type: 'uint256' },
       ]
 
-      name = await L2Boba.name()
+      name = await L2SecondaryFeeToken.name()
       version = '1'
       chainId = (await env.l2Provider.getNetwork()).chainId
 
-      // Add ETH first
+      // Add BOBA first
       await env.l2Wallet.sendTransaction({
         to: Boba_GasPriceOracle.address,
         value: ethers.utils.parseEther('10'),
@@ -65,18 +68,23 @@ describe('Boba API Tests', async () => {
       process.env.L2_NODE_WEB3_URL = env.l2Provider.connection.url
       process.env.PRIVATE_KEY = env.l2Wallet.privateKey
       process.env.BOBA_GASPRICEORACLE_ADDRESS = Boba_GasPriceOracle.address
-      process.env.L2_BOBA_ADDRESS = L2Boba.address
+      process.env.L2_SECONDARY_FEE_TOKEN_ADDRESS = L2SecondaryFeeToken.address
     })
 
     describe('Mainnet', async () => {
-      it('{tag:boba} should swap BOBA for ETH', async () => {
+      it('{tag:boba} should swap L2 secondary token for BOBA', async () => {
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const receivedBOBAAmount =
+          await Boba_GasPriceOracle.receivedBOBAAmount()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -91,55 +99,62 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncMainnetSwapBOBAForETH: any = util.promisify(
-          mainnetSwapBOBAForETH
+        const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          mainnetSwapL2SecondaryFeeTokenForBOBA
         )
 
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        const response = await asyncMainnetSwapBOBAForETH(
+        const response = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload) },
           null
         )
 
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
         expect(response.statusCode).to.equal(201)
 
-        expect(BobaBalanceAfter).to.be.deep.eq(
-          BobaBalanceBefore.sub(BigNumber.from(value))
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore.sub(BigNumber.from(value))
         )
-        expect(ETHBalanceAfter).to.be.deep.eq(
-          ETHBalanceBefore.add(receivedETHAmount)
+        expect(BOBABalanceAfter).to.be.deep.eq(
+          BOBABalanceBefore.add(receivedBOBAAmount)
         )
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(
-          GPO_ETHBalanceBefore.sub(receivedETHAmount)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(
+          GPO_BOBABalanceBefore.sub(receivedBOBAAmount)
         )
       })
 
       it('{tag:boba} should return error messages using the wrong payload', async () => {
         // Get balance
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
         // Missing parameters
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -154,10 +169,10 @@ describe('Boba API Tests', async () => {
         )
 
         const payload_1 = { owner, spender, value, deadline, signature }
-        const asyncMainnetSwapBOBAForETH: any = util.promisify(
-          mainnetSwapBOBAForETH
+        const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          mainnetSwapL2SecondaryFeeTokenForBOBA
         )
-        const response_1 = await asyncMainnetSwapBOBAForETH(
+        const response_1 = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_1) },
           null
         )
@@ -179,7 +194,7 @@ describe('Boba API Tests', async () => {
           data,
         }
 
-        const response_2 = await asyncMainnetSwapBOBAForETH(
+        const response_2 = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_2) },
           null
         )
@@ -217,7 +232,7 @@ describe('Boba API Tests', async () => {
           signature: signature_3,
           data: invalidData,
         }
-        const response_3 = await asyncMainnetSwapBOBAForETH(
+        const response_3 = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_3) },
           null
         )
@@ -226,20 +241,23 @@ describe('Boba API Tests', async () => {
         expect(errorMessage_3).to.equal('Insufficient balance')
 
         // Get balance
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
-        expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore
+        )
+        expect(BOBABalanceAfter).to.be.deep.eq(BOBABalanceBefore)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(GPO_BOBABalanceBefore)
       })
 
-      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
-        // withdraw ETH first
-        await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawETH()
+      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient BOBA', async () => {
+        // withdraw BOBA first
+        await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawBOBA()
         const Boba_GasPriceOracleBalance = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
@@ -248,10 +266,14 @@ describe('Boba API Tests', async () => {
         // should revert
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -266,24 +288,26 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncMainnetSwapBOBAForETH: any = util.promisify(
-          mainnetSwapBOBAForETH
+        const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          mainnetSwapL2SecondaryFeeTokenForBOBA
         )
 
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        const response = await asyncMainnetSwapBOBAForETH(
+        const response = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload) },
           null
         )
 
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
@@ -291,11 +315,13 @@ describe('Boba API Tests', async () => {
         expect(
           JSON.parse(JSON.parse(response.body).error.error.error.body).error
             .message
-        ).to.equal('execution reverted: Failed to send ETH')
+        ).to.equal('execution reverted: Failed to send BOBA')
 
-        expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
-        expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore
+        )
+        expect(BOBABalanceAfter).to.be.deep.eq(BOBABalanceBefore)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(GPO_BOBABalanceBefore)
 
         // Add funds
         await env.l2Wallet.sendTransaction({
@@ -306,14 +332,19 @@ describe('Boba API Tests', async () => {
     })
 
     describe('Rinkeby', async () => {
-      it('{tag:boba} should swap BOBA for ETH', async () => {
+      it('{tag:boba} should swap L2 secondary fee token for BOBA', async () => {
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const receivedETHAmount = await Boba_GasPriceOracle.receivedETHAmount()
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const receivedBOBAAmount =
+          await Boba_GasPriceOracle.receivedBOBAAmount()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -328,55 +359,62 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncRinkebySwapBOBAForETH: any = util.promisify(
-          rinkebySwapBOBAForETH
+        const asyncRinkebySwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          rinkebySwapL2SecondaryFeeTokenForBOBA
         )
 
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        const response = await asyncRinkebySwapBOBAForETH(
+        const response = await asyncRinkebySwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload) },
           null
         )
 
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
         expect(response.statusCode).to.equal(201)
 
-        expect(BobaBalanceAfter).to.be.deep.eq(
-          BobaBalanceBefore.sub(BigNumber.from(value))
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore.sub(BigNumber.from(value))
         )
-        expect(ETHBalanceAfter).to.be.deep.eq(
-          ETHBalanceBefore.add(receivedETHAmount)
+        expect(BOBABalanceAfter).to.be.deep.eq(
+          BOBABalanceBefore.add(receivedBOBAAmount)
         )
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(
-          GPO_ETHBalanceBefore.sub(receivedETHAmount)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(
+          GPO_BOBABalanceBefore.sub(receivedBOBAAmount)
         )
       })
 
       it('{tag:boba} should return error messages using the wrong payload', async () => {
         // Get balance
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
         // Missing parameters
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -391,10 +429,10 @@ describe('Boba API Tests', async () => {
         )
 
         const payload_1 = { owner, spender, value, deadline, signature }
-        const asyncRinkebySwapBOBAForETH: any = util.promisify(
-          rinkebySwapBOBAForETH
+        const asyncRinkebySwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          rinkebySwapL2SecondaryFeeTokenForBOBA
         )
-        const response_1 = await asyncRinkebySwapBOBAForETH(
+        const response_1 = await asyncRinkebySwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_1) },
           null
         )
@@ -416,7 +454,7 @@ describe('Boba API Tests', async () => {
           data,
         }
 
-        const response_2 = await asyncRinkebySwapBOBAForETH(
+        const response_2 = await asyncRinkebySwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_2) },
           null
         )
@@ -454,7 +492,7 @@ describe('Boba API Tests', async () => {
           signature: signature_3,
           data: invalidData,
         }
-        const response_3 = await asyncRinkebySwapBOBAForETH(
+        const response_3 = await asyncRinkebySwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_3) },
           null
         )
@@ -463,20 +501,23 @@ describe('Boba API Tests', async () => {
         expect(errorMessage_3).to.equal('Insufficient balance')
 
         // Get balance
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
-        expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore
+        )
+        expect(BOBABalanceAfter).to.be.deep.eq(BOBABalanceBefore)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(GPO_BOBABalanceBefore)
       })
 
-      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
-        // withdraw ETH first
-        await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawETH()
+      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient BOBA', async () => {
+        // withdraw BOBA first
+        await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawBOBA()
         const Boba_GasPriceOracleBalance = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
@@ -485,10 +526,14 @@ describe('Boba API Tests', async () => {
         // should revert
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
-        const value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
-        const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
+        const value = (
+          await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap()
+        ).toString()
+        const nonce = (
+          await L2SecondaryFeeToken.nonces(env.l2Wallet_2.address)
+        ).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
-        const verifyingContract = L2Boba.address
+        const verifyingContract = L2SecondaryFeeToken.address
 
         const data: any = {
           primaryType: 'Permit',
@@ -503,24 +548,26 @@ describe('Boba API Tests', async () => {
         )
 
         const payload = { owner, spender, value, deadline, signature, data }
-        const asyncRinkebySwapBOBAForETH: any = util.promisify(
-          rinkebySwapBOBAForETH
+        const asyncRinkebySwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
+          rinkebySwapL2SecondaryFeeTokenForBOBA
         )
 
-        const BobaBalanceBefore = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceBefore = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceBefore = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceBefore =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceBefore = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceBefore = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
-        const response = await asyncRinkebySwapBOBAForETH(
+        const response = await asyncRinkebySwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload) },
           null
         )
 
-        const BobaBalanceAfter = await L2Boba.balanceOf(env.l2Wallet_2.address)
-        const ETHBalanceAfter = await env.l2Wallet_2.getBalance()
-        const GPO_ETHBalanceAfter = await env.l2Provider.getBalance(
+        const L2SecondaryFeeTokenBalanceAfter =
+          await L2SecondaryFeeToken.balanceOf(env.l2Wallet_2.address)
+        const BOBABalanceAfter = await env.l2Wallet_2.getBalance()
+        const GPO_BOBABalanceAfter = await env.l2Provider.getBalance(
           Boba_GasPriceOracle.address
         )
 
@@ -528,11 +575,13 @@ describe('Boba API Tests', async () => {
         expect(
           JSON.parse(JSON.parse(response.body).error.error.error.body).error
             .message
-        ).to.equal('execution reverted: Failed to send ETH')
+        ).to.equal('execution reverted: Failed to send BOBA')
 
-        expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
-        expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
-        expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
+        expect(L2SecondaryFeeTokenBalanceAfter).to.be.deep.eq(
+          L2SecondaryFeeTokenBalanceBefore
+        )
+        expect(BOBABalanceAfter).to.be.deep.eq(BOBABalanceBefore)
+        expect(GPO_BOBABalanceAfter).to.be.deep.eq(GPO_BOBABalanceBefore)
 
         // Add funds
         await env.l2Wallet.sendTransaction({
