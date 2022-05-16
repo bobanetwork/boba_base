@@ -64,9 +64,9 @@ const addEventMethods = (
 
 export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
   provider: ethers.providers.Provider,
-  batchIndex: number,
-  chainID: number
+  batchIndex: number
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -111,9 +111,9 @@ export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
 export const getRelayedMessageEventsFromGraph = async (
   provider: ethers.providers.Provider,
   messageHash: string,
-  chainID: number,
   fast: boolean
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -158,9 +158,9 @@ export const getRelayedMessageEventsFromGraph = async (
 export const getFailedRelayedMessageEventsFromGraph = async (
   provider: ethers.providers.Provider,
   messageHash: string,
-  chainID: number,
   fast: boolean
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -202,4 +202,58 @@ export const getFailedRelayedMessageEventsFromGraph = async (
   }
   const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
   return events
+}
+
+export const getAddressSetEventsFromGraph = async (
+  provider: ethers.providers.Provider,
+  name: string
+) => {
+  const chainID = (await provider.getNetwork()).chainId
+  if (!GRAPH_API_URL[chainID]) {
+    return []
+  }
+  const response = await fetch(GRAPH_API_URL[chainID].rollup, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+        query { addressSetEntities
+          (
+            orderBy: blockNumber
+            orderDirection: desc
+            first: 1
+            where: {
+              _name: "${name}"
+            }
+          )
+          {
+            _name
+            _newAddress
+            _oldAddress
+            blockNumber
+            transactionHash
+          }
+        }
+      `,
+    }),
+  })
+  const data = await response.json()
+  if (typeof data.data === 'undefined') {
+    return []
+  }
+  const entity = data.data.addressSetEntities
+  if (entity.length === 0) {
+    return []
+  }
+  const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
+  return events
+}
+
+export const isChainIDForGraph = async (
+  provider: ethers.providers.Provider
+) => {
+  const chainID = (await provider.getNetwork()).chainId
+  return WHITELIST_CHAIN_ID.includes(chainID)
 }

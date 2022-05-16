@@ -460,11 +460,9 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async getL1TransactionReceipt(msgHash, fast = false) {
-    const chainID = (await this.L1Provider.getNetwork()).chainId
     const matches = await getRelayedMessageEventsFromGraph(
       this.L1Provider,
       msgHash,
-      chainID,
       fast ? true : false
     )
     if (matches.length > 0) {

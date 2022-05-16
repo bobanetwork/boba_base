@@ -496,7 +496,6 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       relayedMessageEvents = await getRelayedMessageEventsFromGraph(
         this.l1Provider,
         messageHash,
-        this.l1ChainId,
         this.fastRelayer
       )
     } else {
@@ -527,7 +526,6 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       failedRelayedMessageEvents = await getFailedRelayedMessageEventsFromGraph(
         this.l1Provider,
         messageHash,
-        this.l1ChainId,
         this.fastRelayer
       )
     } else {
@@ -829,8 +827,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
       events = await getStateBatchAppendedEventByBatchIndexFromGraph(
         this.l1Provider,
-        batchIndex,
-        this.l1ChainId
+        batchIndex
       )
     } else {
       events = await this.contracts.l1.StateCommitmentChain.queryFilter(

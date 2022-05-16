@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: L1CrossDomainMessenger
-    network: mbase
+    network: {{network}}
     source:
-      address: '0x76DB375075F1d5Dcd1D70Fc07F69a5c7b40ab877'
+      address: '{{contracts.L1CrossDomainMessenger.address}}'
       abi: L1CrossDomainMessenger
-      startBlock: 2103507
+      startBlock: {{ contracts.L1CrossDomainMessenger.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -27,11 +27,11 @@ dataSources:
       file: ./src/L1CDMmapping.ts
   - kind: ethereum
     name: L1CrossDomainMessengerFast
-    network: mbase
+    network: {{network}}
     source:
-      address: '0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6'
+      address: '{{contracts.L1CrossDomainMessengerFast.address}}'
       abi: L1CrossDomainMessenger
-      startBlock: 2111965
+      startBlock: {{ contracts.L1CrossDomainMessengerFast.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -50,11 +50,11 @@ dataSources:
       file: ./src/L1CDMFastmapping.ts
   - kind: ethereum
     name: StateCommitmentChain
-    network: mbase
+    network: {{network}}
     source:
-      address: '0x7Af512914Ab422f9D38aC5eEfc94fa5106FA74C2'
+      address: '{{contracts.StateCommitmentChain.address}}'
       abi: StateCommitmentChain
-      startBlock: 2103495
+      startBlock: {{ contracts.StateCommitmentChain.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -68,26 +68,3 @@ dataSources:
         - event: StateBatchAppended(indexed uint256,bytes32,uint256,uint256,bytes)
           handler: handleStateCommitmentChain
       file: ./src/StateCommitmentChainmapping.ts
-  - kind: ethereum
-    name: Lib_AddressManager
-    network: mbase
-    source:
-      address: '0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B'
-      abi: Lib_AddressManager
-      startBlock: 2103466
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Lib_AddressManager
-      abis:
-        - name: Lib_AddressManager
-          file: ./abis/Lib_AddressManager.json
-      eventHandlers:
-        - event: AddressSet(indexed string,address,address)
-          handler: handleAddressSet
-      callHandlers:
-        - function: setAddress(string,address)
-          handler: handleSetAddress
-      file: ./src/Lib_AddressManagermapping.ts

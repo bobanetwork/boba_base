@@ -4,8 +4,12 @@ import { BaseService, Metrics } from '@eth-optimism/common-ts'
 import { TypedEvent } from '@eth-optimism/contracts/dist/types/common'
 import { BaseProvider } from '@ethersproject/providers'
 import { LevelUp } from 'levelup'
-import { constants } from 'ethers'
+import { constants, ethers } from 'ethers'
 import { Gauge, Counter } from 'prom-client'
+import {
+  getAddressSetEventsFromGraph,
+  isChainIDUseGraph,
+} from '@eth-optimism/sdk'
 
 /* Imports: Internal */
 import { handleEventsTransactionEnqueued } from './handlers/transaction-enqueued'
@@ -351,14 +355,22 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     // We need to figure out how to make this work without Infura. Mark and I think that infura is
     // doing some indexing of events beyond Geth's native capabilities, meaning some event logic
     // will only work on Infura and not on a local geth instance. Not great.
-    const addressSetEvents =
-      await this.state.contracts.Lib_AddressManager.queryFilter(
-        this.state.contracts.Lib_AddressManager.filters.AddressSet(
-          contractName
-        ),
-        fromL1Block,
-        toL1Block
+    let addressSetEvents: ethers.Event[]
+    if (await isChainIDUseGraph(this.state.l1RpcProvider)) {
+      addressSetEvents = await getAddressSetEventsFromGraph(
+        this.state.l1RpcProvider,
+        contractName
       )
+    } else {
+      addressSetEvents =
+        await this.state.contracts.Lib_AddressManager.queryFilter(
+          this.state.contracts.Lib_AddressManager.filters.AddressSet(
+            contractName
+          ),
+          fromL1Block,
+          toL1Block
+        )
+    }
 
     // We're going to parse things out in ranges because the address of a given contract may have
     // changed in the range provided by the user.
