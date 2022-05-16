@@ -68,3 +68,26 @@ dataSources:
         - event: StateBatchAppended(indexed uint256,bytes32,uint256,uint256,bytes)
           handler: handleStateCommitmentChain
       file: ./src/StateCommitmentChainmapping.ts
+  - kind: ethereum
+    name: Lib_AddressManager
+    network: mbase
+    source:
+      address: '0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B'
+      abi: Lib_AddressManager
+      startBlock: 2103466
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Lib_AddressManager
+      abis:
+        - name: Lib_AddressManager
+          file: ./abis/Lib_AddressManager.json
+      eventHandlers:
+        - event: AddressSet(indexed string,address,address)
+          handler: handleAddressSet
+      callHandlers:
+        - function: setAddress(string,address)
+          handler: handleSetAddress
+      file: ./src/Lib_AddressManagermapping.ts
