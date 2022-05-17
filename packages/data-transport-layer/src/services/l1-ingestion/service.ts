@@ -8,7 +8,7 @@ import { constants, ethers } from 'ethers'
 import { Gauge, Counter } from 'prom-client'
 import {
   getAddressSetEventsFromGraph,
-  isChainIDUseGraph,
+  isChainIDForGraph,
 } from '@eth-optimism/sdk'
 
 /* Imports: Internal */
@@ -356,10 +356,12 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     // doing some indexing of events beyond Geth's native capabilities, meaning some event logic
     // will only work on Infura and not on a local geth instance. Not great.
     let addressSetEvents: ethers.Event[]
-    if (await isChainIDUseGraph(this.state.l1RpcProvider)) {
+    if (await isChainIDForGraph(this.state.l1RpcProvider)) {
       addressSetEvents = await getAddressSetEventsFromGraph(
         this.state.l1RpcProvider,
-        contractName
+        contractName,
+        fromL1Block,
+        toL1Block
       )
     } else {
       addressSetEvents =
@@ -453,12 +455,22 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     contractName: string,
     blockNumber: number
   ): Promise<string> {
-    const events = await this.state.contracts.Lib_AddressManager.queryFilter(
-      this.state.contracts.Lib_AddressManager.filters.AddressSet(contractName),
-      this.state.startingL1BlockNumber,
-      blockNumber
-    )
-
+    let events: ethers.Event[]
+    if (await isChainIDForGraph(this.state.l1RpcProvider)) {
+      events = await getAddressSetEventsFromGraph(
+        this.state.l1RpcProvider,
+        contractName,
+        blockNumber
+      )
+    } else {
+      events = await this.state.contracts.Lib_AddressManager.queryFilter(
+        this.state.contracts.Lib_AddressManager.filters.AddressSet(
+          contractName
+        ),
+        this.state.startingL1BlockNumber,
+        blockNumber
+      )
+    }
     if (events.length > 0) {
       return events[events.length - 1].args._newAddress
     } else {

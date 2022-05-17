@@ -7,10 +7,16 @@ export const GRAPH_API_URL: any = {
   1287: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-address-manager',
   },
   1284: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-address-manager',
   },
 }
 
@@ -29,6 +35,14 @@ const formatStateBatchAppendedEvent = (events: any): any => {
     events[i]._batchSize = intToBigNumber(events[i]._batchSize)
     events[i]._prevTotalElements = intToBigNumber(events[i]._prevTotalElements)
     events[i].blockNumber = intToHex(intToBigNumber(events[i].blockNumber))
+  }
+  return events
+}
+
+const formatAddressSetEvent = (events: any): any => {
+  // eslint-disable-next-line
+  for (var i = 0; i < events.length; i++) {
+    events[i].blockNumber = parseInt(events[i].blockNumber, 10)
   }
   return events
 }
@@ -206,13 +220,15 @@ export const getFailedRelayedMessageEventsFromGraph = async (
 
 export const getAddressSetEventsFromGraph = async (
   provider: ethers.providers.Provider,
-  name: string
+  name: string,
+  fromBlock?: number,
+  toBlock?: number
 ) => {
   const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
-  const response = await fetch(GRAPH_API_URL[chainID].rollup, {
+  const response = await fetch(GRAPH_API_URL[chainID].addressManager, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -226,6 +242,8 @@ export const getAddressSetEventsFromGraph = async (
             first: 1
             where: {
               _name: "${name}"
+              ${fromBlock != null ? `blockNumber_gte: ${fromBlock}` : ''}
+              ${toBlock != null ? `blockNumber_lte: ${toBlock}` : ''}
             }
           )
           {
@@ -243,7 +261,7 @@ export const getAddressSetEventsFromGraph = async (
   if (typeof data.data === 'undefined') {
     return []
   }
-  const entity = data.data.addressSetEntities
+  const entity = formatAddressSetEvent(data.data.addressSetEntities)
   if (entity.length === 0) {
     return []
   }
