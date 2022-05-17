@@ -65,7 +65,7 @@ function TokenPage() {
   let tweet = ''
   if (bobaTag) {
     BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
-    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Network%20" + BT
+    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabeam%20for%20Moonbeam%20" + BT
   }
 
   const pendingL1 = orderedTransactions.filter((i) => {
