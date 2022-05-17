@@ -460,6 +460,7 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
       events = await getAddressSetEventsFromGraph(
         this.state.l1RpcProvider,
         contractName,
+        this.state.startingL1BlockNumber,
         blockNumber
       )
     } else {
