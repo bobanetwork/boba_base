@@ -10,7 +10,7 @@ import { selectTransactions } from 'selectors/transactionSelector'
 import { fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
 
-import { openAlert, openError } from 'actions/uiAction'
+import { openAlert } from 'actions/uiAction'
 
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
@@ -22,7 +22,6 @@ import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
-import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
 import Copy from 'components/copy/Copy'
 
@@ -49,8 +48,6 @@ function TokenPage() {
   const [ isClaimFaucetLoading, setIsClaimFaucetLoading ] = useState(false)
   const [ faucetErrorMsg, setFaucetErrorMsg ] = useState("")
 
-  const [ debug, setDebug ] = useState(false)
-
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
   const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
@@ -68,7 +65,7 @@ function TokenPage() {
   let tweet = ''
   if (bobaTag) {
     BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
-    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Network%20" + BT
+    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20" + BT
   }
 
   const pendingL1 = orderedTransactions.filter((i) => {
@@ -107,15 +104,6 @@ function TokenPage() {
     return false
   })
 
-  useEffect(() => {
-    if (!accountEnabled) return
-    const gasEstimateAccount = networkService.gasEstimateAccount
-    const wAddress = networkService.account
-    if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
-      setDebug(true)
-    }
-  }, [ accountEnabled ])
-
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
     // only run once all the tokens have been added to the tokenList
@@ -143,11 +131,6 @@ function TokenPage() {
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
-  const GasEstimateApprove = () => {
-    let approval = networkService.estimateApprove()
-    console.log("GasEstimateApprove:",approval)
-  }
-
   async function claimAuthenticatedFaucetTokens() {
     try {
       setIsClaimFaucetLoading(true)
@@ -170,6 +153,8 @@ function TokenPage() {
       setIsClaimFaucetLoading(false)
     }
   }
+
+  console.log("network",network)
 
   if (!accountEnabled) {
 
@@ -198,34 +183,8 @@ function TokenPage() {
 
     return (
     <>
-      {layer === 'L2' && network === 'mainnet' &&
-        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
-          {/*
-            <Typography variant="body2">
-            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
-            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-              <G.footerLink
-                target='_blank'
-                href={'https://oolongswap.com/'}
-                aria-label="link"
-                style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-                  >Oolongswap <Link />
-              </G.footerLink>
-            </Typography>
-          */}
-          {debug &&
-            <Button
-              onClick={()=>{GasEstimateApprove()}}
-              color='primary'
-              variant="contained"
-            >
-              GasEstimateApprove
-            </Button>
-          }
-        </Box>
-      }
-
-      {layer === 'L2' && network === 'rinkeby' &&
+     
+      {layer === 'L2' && network === 'bobaBase' &&
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>
 
@@ -238,7 +197,7 @@ function TokenPage() {
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
               Welcome developers.
-              For testnet BOBA and ETH, tweet your Boba Bubble and
+              For testnet BOBA and GLMR, tweet your Boba Bubble and
               then paste the tweet link in the field below.
             </Typography>
 
@@ -279,15 +238,6 @@ function TokenPage() {
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px'}}>
               You are limited to one fountain call per twitter account per day.
               The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba).
-              If you already have some ETH in your wallet to cover gas you can use our
-              <a
-                target='_blank'
-                rel="noopener noreferrer"
-                href={'https://faucets.boba.network/'}
-                aria-label="link"
-                style={{color:'#fff', fontSize: '1.0em', opacity: '1.0', fontWeight: '700', paddingLeft: '3px', textDecoration: 'underline'}}
-              >alternative faucet
-              </a>.
             </Typography>
 
             <Button
