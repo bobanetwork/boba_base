@@ -7,7 +7,6 @@ import { solidity } from 'ethereum-waffle'
 import * as request from 'request-promise-native'
 import TwitterAuthenticatedFaucet from '../artifacts/contracts/AuthenticatedFaucet.sol/AuthenticatedFaucet.json'
 import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import BobaTuringCreditJson from '../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
 
 chai.use(solidity)
@@ -25,12 +24,9 @@ const local_provider = new providers.JsonRpcProvider(cfg['url'])
 const deployerPK = hre.network.config.accounts[0]
 const deployerWallet = new Wallet(deployerPK, local_provider)
 
-let BOBAL2Address
 let BobaTuringCreditAddress
 
 let Factory__BobaTuringCredit: ContractFactory
-let Factory__ERC20Mock: ContractFactory
-let erc20Mock: Contract
 let Factory__TwitterClaim: ContractFactory
 let Factory__TwitterClaimMeta: ContractFactory
 let twitter: Contract
@@ -38,7 +34,6 @@ let twitterMeta: Contract
 let Factory__TuringHelper: ContractFactory
 let turingHelper: Contract
 let turingCredit: Contract
-let L2BOBAToken: Contract
 let addressesBOBA
 
 describe('Verify Twitter post for testnet funds', function () {
@@ -59,10 +54,10 @@ describe('Verify Twitter post for testnet funds', function () {
     )
 
     twitter = await Factory__TwitterClaim.deploy(
-      'https://rsqtbccfs3.execute-api.us-east-1.amazonaws.com/Stage/',
+      'https://pvntcagkg5.execute-api.us-east-1.amazonaws.com/Prod/',
       turingHelper.address,
       10,
-      ethers.utils.parseEther('0.000001'),
+      ethers.utils.parseEther('0.0000001'),
       gasOverride
     )
 
@@ -72,7 +67,7 @@ describe('Verify Twitter post for testnet funds', function () {
     const fTx = await deployerWallet.sendTransaction({
       ...gasOverride,
       to: twitter.address,
-      value: ethers.utils.parseEther('0.000001'),
+      value: ethers.utils.parseEther('875'),
     })
     await fTx.wait()
     console.log('Funded faucet..')
@@ -82,26 +77,17 @@ describe('Verify Twitter post for testnet funds', function () {
     const res1 = await tr1.wait()
     console.log('addingPermittedCaller to TuringHelper', res1.events[0].data)
 
-    if (hre.network.name === 'boba_rinkeby') {
-      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    if (hre.network.name === 'boba_base') {
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
     } else if (hre.network.name === 'boba_mainnet') {
-      BOBAL2Address = '0x_________________'
       BobaTuringCreditAddress = '0x___________________'
     } else {
       const result = await request.get({
         uri: 'http://127.0.0.1:8080/boba-addr.json',
       })
       addressesBOBA = JSON.parse(result)
-      BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
       BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
     }
-
-    L2BOBAToken = new Contract(
-      BOBAL2Address,
-      L2GovernanceERC20Json.abi,
-      deployerWallet
-    )
 
     // prepare to register/fund your Turing Helper
     Factory__BobaTuringCredit = new ContractFactory(
@@ -111,6 +97,11 @@ describe('Verify Twitter post for testnet funds', function () {
     )
 
     turingCredit = await Factory__BobaTuringCredit.attach(
+      BobaTuringCreditAddress
+    )
+    console.log(
+      'Credit contract attached: ',
+      turingCredit,
       BobaTuringCreditAddress
     )
   })
@@ -131,19 +122,16 @@ describe('Verify Twitter post for testnet funds', function () {
   })
 
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
-    const depositAmount = utils.parseEther('0.10')
-
-    const approveTx = await L2BOBAToken.approve(
-      turingCredit.address,
-      depositAmount
-    )
-    await approveTx.wait()
+    const depositAmount = utils.parseEther('100')
 
     const depositTx = await turingCredit.addBalanceTo(
       depositAmount,
-      turingHelper.address
+      turingHelper.address,
+      { value: depositAmount }
     )
-    await depositTx.wait()
+    const tx = await depositTx.wait()
+    console.log('Boba deposited')
+    expect(tx).to.be.ok
   })
 
   it('should return the helper address', async () => {
@@ -186,7 +174,7 @@ describe('Verify Twitter post for testnet funds', function () {
   })*/
 
   it('should conduct basic twitter claim via meta transaction', async () => {
-    const tweetId = '1522128490211991552'
+    const tweetId = '1523935323096506368'
 
     const nonce = parseInt(
       await twitter.getNonce(deployerWallet.address, gasOverride),

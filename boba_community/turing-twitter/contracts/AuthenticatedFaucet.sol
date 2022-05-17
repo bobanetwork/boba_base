@@ -57,7 +57,8 @@ contract AuthenticatedFaucet is Ownable {
 
         bytes memory encRequest = abi.encode(to_, twitterPostID_);
 
-        (uint256 resp, uint256 authorId, uint256 errorMsgVal) = abi.decode(turingHelper.TuringTx(apiUrl, encRequest), (uint256, uint256, uint256));
+        bytes memory turingRes = turingHelper.TuringTx(apiUrl, encRequest);
+        (uint256 resp, uint256 authorId, uint256 errorMsgVal) = abi.decode(turingRes, (uint256, uint256, uint256));
         // 0 = false, 1 = true
         bool isAllowedToClaim = resp != 0;
 
