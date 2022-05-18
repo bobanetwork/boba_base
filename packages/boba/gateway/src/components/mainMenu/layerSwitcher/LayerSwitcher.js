@@ -18,7 +18,6 @@ import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton 
 import { useTheme } from '@mui/styles'
 import { setConnect, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
-import EthereumIcon from 'components/icons/EthereumIcon.js'
 import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
