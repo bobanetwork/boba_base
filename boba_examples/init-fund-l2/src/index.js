@@ -8,39 +8,51 @@ const {
   DEFAULT_L2_CONTRACT_ADDRESSES,
 } = require('../../../packages/sdk')
 const { loadContract } = require('../../../packages/contracts/dist/index.js')
-const fetch = require('node-fetch')
 
 require('dotenv').config()
 
 
-const fetchContracts = async () => {
-  const response = await fetch(process.env.ADDRESSES_URL)
-  const baseAddresses = await response.json()
+const fetchContracts = async (addressManagerAddress, L1Wallet) => {
+  const addressManager = loadContract(
+    'Lib_AddressManager',
+    addressManagerAddress,
+    L1Wallet
+  )
+
+  const L1CrossDomainMessengerAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessenger')
+  const L1CrossDomainMessengerFastAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
+  const L1StandardBridgeAddress = await addressManager.getAddress('Proxy__L1StandardBridge')
+  const stateCommitmentChainAddress = await addressManager.getAddress('StateCommitmentChain')
+  const canonicalTransactionChainAddress = await addressManager.getAddress('CanonicalTransactionChain')
+  const bondManagerAddress = await addressManager.getAddress('BondManager')
+  const L1MultiMessageRelayerAddress = await addressManager.getAddress('L1MultiMessageRelayer')
+  const L1MultiMessageRelayerFastAddress = await addressManager.getAddress('L1MultiMessageRelayerFast')
+  const BOBAAddress = await addressManager.getAddress('TK_L1BOBA')
 
   const contracts = {
     l1: {
-      AddressManager: baseAddresses.AddressManager,
-      L1CrossDomainMessenger: baseAddresses.Proxy__L1CrossDomainMessenger,
-      L1CrossDomainMessengerFast: '0xB942FA2273C7Bce69833e891BDdFd7212d2dA415', // TODO
-      L1StandardBridge: baseAddresses.Proxy__L1StandardBridge,
-      StateCommitmentChain: baseAddresses.StateCommitmentChain,
-      CanonicalTransactionChain: baseAddresses.CanonicalTransactionChain,
-      BondManager: baseAddresses.BondManager,
-      L1MultiMessageRelayer: baseAddresses.L1MultiMessageRelayer,
-      L1MultiMessageRelayerFast: baseAddresses.L1MultiMessageRelayer, // TODO
-      L1BOBA: baseAddresses.TK_L1BOBA,
+      AddressManager: addressManagerAddress,
+      L1CrossDomainMessenger: L1CrossDomainMessengerAddress,
+      L1CrossDomainMessengerFast: L1CrossDomainMessengerFastAddress,
+      L1StandardBridge: L1StandardBridgeAddress,
+      StateCommitmentChain: stateCommitmentChainAddress,
+      CanonicalTransactionChain: canonicalTransactionChainAddress,
+      BondManager: bondManagerAddress,
+      L1MultiMessageRelayer: L1MultiMessageRelayerAddress,
+      L1MultiMessageRelayerFast: L1MultiMessageRelayerFastAddress,
+      L1BOBA: BOBAAddress,
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   }
   const bridges = {
     Standard: {
       Adapter: StandardBridgeAdapter,
-      l1Bridge: baseAddresses.Proxy__L1StandardBridge,
+      l1Bridge: L1StandardBridgeAddress,
       l2Bridge: predeploys.L2StandardBridge,
     },
     ETH: {
       Adapter: ETHBridgeAdapter,
-      l1Bridge: baseAddresses.Proxy__L1StandardBridge,
+      l1Bridge: L1StandardBridgeAddress,
       l2Bridge: predeploys.L2StandardBridge,
     },
   }
@@ -98,11 +110,6 @@ const sendBobaTokenFromL1ToL2 = async (
   L2Provider,
   messenger
 ) => {
-  // const L1BOBA = new ethers.Contract(
-  //   BobaTokenAddress,
-  //   L1ERC20Json.abi,
-  //   L1Wallet
-  // )
 
   const L1BOBA = loadContract('BOBA', BobaTokenAddress, L1Wallet)
 
@@ -174,6 +181,7 @@ const main = async () => {
   const L1_NODE_WEB3_URL = env.L1_NODE_WEB3_URL
   const L2_NODE_WEB3_URL = env.L2_NODE_WEB3_URL
   const PRIVATE_KEY = env.PRIVATE_KEY
+  const addressManagerAddress = env.ADDRESS_MANAGER_ADDRESS
 
   const L1Provider = new ethers.providers.StaticJsonRpcProvider(
     L1_NODE_WEB3_URL
@@ -185,7 +193,8 @@ const main = async () => {
   const L2Wallet = new ethers.Wallet(PRIVATE_KEY).connect(L2Provider)
 
   const network = await L1Provider.getNetwork()
-  const data = await fetchContracts()
+  const data = await fetchContracts(addressManagerAddress, L1Wallet)
+
   const contracts = data.contracts
   const bridges = data.bridges
 
@@ -228,17 +237,7 @@ const main = async () => {
     )}`
   )
 
-  // console.log(`⭐️ ${chalk.red('send native tokens from L1 to L2')}`)
-
-  // await sendNativeTokenL1toL2(
-  //   Proxy__L1StandardBridgeAddress,
-  //   L1Wallet,
-  //   L2Provider,
-  //   messenger
-  // )
-
   console.log(`⭐️ ${chalk.red('send Boba tokens from L1 to L2')}`)
-
   await sendBobaTokenFromL1ToL2(
     Proxy__L1StandardBridgeAddress,
     contracts.l1.L1BOBA,
