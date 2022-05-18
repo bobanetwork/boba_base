@@ -21,9 +21,7 @@ import { openError, openAlert } from 'actions/uiAction'
 import {
   selectAccountEnabled,
   selectBobaFeeChoice,
-  selectLayer,
-  selectNetwork,
-  selectMonster
+  selectLayer
 } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -45,8 +43,6 @@ function FeeSwitcher() {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
-  const network = useSelector(selectNetwork())
-  const monsterNumber = useSelector(selectMonster())
 
   const layer = useSelector(selectLayer())
 

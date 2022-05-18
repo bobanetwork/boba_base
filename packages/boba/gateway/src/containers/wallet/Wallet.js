@@ -4,14 +4,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import Button from 'components/button/Button'
 
 import { Info } from "@mui/icons-material"
-import { Box, Icon, Typography } from '@mui/material'
+import { Icon, Typography } from '@mui/material'
 
 import { getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
-import Tabs from 'components/tabs/Tabs'
-import Nft from 'containers/wallet/nft/Nft'
 import Token from './token/Token'
 import Connect from 'containers/connect/Connect'
 
@@ -27,7 +25,6 @@ import {
   selectAccountEnabled,
   selectLayer,
   selectNetwork,
-  selectWalletAddress,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
@@ -43,9 +40,8 @@ import { logAmount } from 'util/amountConvert.js'
 
 function Wallet() {
 
-  const [ page, setPage ] = useState('Token')
   const [ chain, setChain ] = useState('')
-  const [ tooSmallETH, setTooSmallETH ] = useState(false)
+  const [ tooSmallSEC, setTooSmallSEC ] = useState(false)
   const [ tooSmallBOBA, setTooSmallBOBA ] = useState(false)
 
   const dispatch = useDispatch()
@@ -65,14 +61,14 @@ function Wallet() {
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
 
-      const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
+      const l2BalanceSEC = l2Balances.find((i) => i.symbol === 'GLMR')
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
-      if (l2BalanceETH && l2BalanceETH.balance) {
-        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(1)))
+      if (l2BalanceSEC && l2BalanceSEC.balance) {
+        setTooSmallSEC(new BN(logAmount(l2BalanceSEC.balance, 18)).lt(new BN(1)))
       } else {
-        // in case of zero ETH balance we are setting tooSmallETH
-        setTooSmallETH(true)
+        // in case of zero secondary token balance we are setting tooSmallSEC
+        setTooSmallSEC(true)
       }
       if (l2BalanceBOBA && l2BalanceBOBA.balance) {
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(1)))
@@ -85,11 +81,11 @@ function Wallet() {
 
   useEffect(() => {
     if (layer === 'L2') {
-      if (tooSmallBOBA && tooSmallETH) {
-        dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
+      if (tooSmallBOBA && tooSmallSEC) {
+        dispatch(openError('Wallet empty - please bridge GLMR or BOBA from L1'))
       }
     }
-  },[tooSmallETH, tooSmallBOBA, layer, dispatch])
+  },[tooSmallSEC, tooSmallBOBA, layer, dispatch])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -105,16 +101,7 @@ function Wallet() {
     }
   }, [ layer ])
 
-  const handleSwitch = (l) => {
-    if (l === 'Token') {
-      setPage('Token')
-    } else if (l === 'NFT') {
-      setPage('NFT')
-    }
-  }
-
   async function emergencySwap () {
-    if(network !== 'bobaBase' && network !== 'bobaBeam') return
     const res = await dispatch(getETHMetaTransaction())
     console.log("emergencySwap - res:",res)
     if (res) dispatch(openAlert('Emergency Swap submitted'))
@@ -130,8 +117,8 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH && network === 'bobaBase' &&
-        <G.LayerAlert>
+      {layer === 'L2' && tooSmallBOBA && network === 'bobaBase' &&
+        <G.LayerAlert style={{padding: '20px'}}>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
             <Typography
@@ -141,7 +128,7 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using GLMR requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
+              Using Bobabeam or Bobabase requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
               otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
               EMERGENCY SWAP to swap GLMR for 1 BOBA at market rates.
             </Typography>
@@ -182,18 +169,6 @@ function Wallet() {
           </Typography>
         </G.PageSwitcher>
       </S.WalletActionContainer>
-
-      <Box sx={{ mt: 2 }}>
-        <Tabs
-          activeTab={page}
-          onClick={(t) => handleSwitch(t)}
-          aria-label="Page Tab"
-          // tabs={[ "Token", "NFT" ]}
-          tabs={["Token"]}
-        />
-      </Box>
-      {/* {page === 'Token' ? <Token /> : <Nft />}
-       */}
       <Token />
     </S.PageContainer>
   )

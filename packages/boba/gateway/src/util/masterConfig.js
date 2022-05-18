@@ -158,10 +158,8 @@ const BaseServices = {
   //ETH gas station
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
   // Mainnet meta transaction
-  MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
-  // Rinkeby meta transaction
-  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
-  // Bobabase meta transaction
+  BOBABEAM_META_TRANSACTION: `https://api-meta-transaction.bobabeam.boba.network/`,
+  // Testnet meta transaction
   BOBABASE_META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
 }
 
