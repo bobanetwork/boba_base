@@ -199,7 +199,7 @@ function TokenPage() {
 
     return (
     <>
-      {layer === 'L2' && network === 'mainnet' &&
+      {layer === 'L2' && network === 'bobaBeam' &&
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
           {/*
             <Typography variant="body2">
