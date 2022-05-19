@@ -207,9 +207,9 @@ export const getFailedRelayedMessageEventsFromGraph = async (
   }
   let entity: any
   if (fast) {
-    entity = data.data.fastRelayedMessageEntities
+    entity = data.data.failedRelayedMessageFastEntities
   } else {
-    entity = data.data.relayedMessageEntities
+    entity = data.data.failedRelayedMessageEntities
   }
   if (entity.length === 0) {
     return []
