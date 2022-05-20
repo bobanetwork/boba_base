@@ -56,8 +56,17 @@ function FeeSwitcher() {
 
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
-    //console.log("balanceBOBA:",balanceBOBA)
-    //console.log("balanceGLMR:",balanceGLMR)
+    console.log("balanceBOBA:",balanceBOBA)
+    console.log("balanceGLMR:",balanceGLMR)
+
+    console.log("feeUseBoba:",feeUseBoba) 
+    console.log("targetFee:",targetFee) 
+
+    /*
+    warning - feeUseBoba is flipped compared to its usual meaning
+    */
+
+    const usingBOBA = !feeUseBoba
 
     let tooSmallGLMR = false
     let tooSmallBOBA = false
@@ -83,26 +92,31 @@ function FeeSwitcher() {
 
     let res
 
-    if (feeUseBoba && targetFee === 'GLMR') {
+
+    /*
+    warning - feeUseBoba is flipped compared to its usual meaning
+    */
+
+    if ( usingBOBA && targetFee === 'BOBA' ) {
       // do nothing - already set to BOBA
     }
-    else if ( !feeUseBoba && targetFee === 'BOBA' ) {
-      // do nothing - already set to ETH
+    else if ( !usingBOBA && targetFee === 'GLMR' ) {
+      // do nothing - already set to GLMR
     }
-    else if ( !feeUseBoba && targetFee === 'GLMR' ) {
-      // change to BOBA
-      if( tooSmallBOBA ) {
-        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1 GMLR.
-          If you change fee token now, you might get stuck. Please swap some BOBA for GLMR first.`))
+    else if ( usingBOBA && targetFee === 'GLMR' ) {
+      // change to GLMR
+      if( tooSmallGLMR ) {
+        dispatch(openError(`You cannot change the fee token to GLMR since your GLMR balance is below 0.5.
+          If you change fee token now, you might get stuck. Please obtain some GLMR first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
     }
-    else if (feeUseBoba && targetFee === 'BOBA') {
-      // change to ETH
-      if( tooSmallGLMR ) {
-        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1 BOBA.
-          If you change fee token now, you might get stuck. Please swap some GLMR for BOBA first.`))
+    else if ( !usingBOBA && targetFee === 'BOBA' ) {
+      // change to BOBA
+      if( tooSmallBOBA ) {
+        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1.
+          If you change fee token now, you might get stuck. Please obtain some BOBA first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -122,14 +136,9 @@ function FeeSwitcher() {
     return null
   }
 
-  // enable fee switcher for everyone
-  // if (network === 'mainnet' && monsterNumber < 1) {
-  //   return null
-  // }
-
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip title={'BOBA or GLMR will be used across Boba according to your choice.'}>
+      <Tooltip title={'BOBA or GLMR will be used across Bobabeam according to your choice.'}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
       <Typography variant="body2">Fee</Typography>

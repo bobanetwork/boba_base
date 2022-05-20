@@ -154,8 +154,6 @@ function TokenPage() {
     }
   }
 
-  console.log("network",network)
-
   if (!accountEnabled) {
 
     return (
@@ -181,37 +179,10 @@ function TokenPage() {
 
   } else {
 
-
     return (
     <>
-      {layer === 'L2' && network === 'bobaBeam' &&
-        <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
-          {/*
-            <Typography variant="body2">
-            <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
-            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
-              <G.footerLink
-                target='_blank'
-                href={'https://oolongswap.com/'}
-                aria-label="link"
-                style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
-                  >Oolongswap <Link />
-              </G.footerLink>
-            </Typography>
-          */}
-          {debug &&
-            <Button
-              onClick={()=>{GasEstimateApprove()}}
-              color='primary'
-              variant="contained"
-            >
-              GasEstimateApprove
-            </Button>
-          }
-        </Box>
-      }
-
-      {layer === 'L2' && (network === 'rinkeby' || network === 'bobaBase') &&
+      
+      {layer === 'L2' && network === 'bobaBase' &&
 
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>
@@ -225,7 +196,7 @@ function TokenPage() {
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
               Welcome developers.
-              For testnet BOBA and GLMR, tweet your Boba Bubble and
+              For 10 testnet BOBA, tweet your Boba Bubble and
               then paste the tweet link in the field below.
             </Typography>
 
@@ -264,7 +235,7 @@ function TokenPage() {
             />
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px", marginTop: '3px'}}>
-              You are limited to one fountain call per twitter account per day.
+              You are limited to one fountain call per Twitter account per day.
               The transaction will not show in your history since it's a MetaTransaction (the gas is covered by Boba).
             </Typography>
 

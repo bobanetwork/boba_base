@@ -66,7 +66,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
   const [ max_Float, setMax_Float ] = useState(0.0)                // support for Use Max - a number like 0.09 ETH
   const [ errorString, setErrorString ] = useState('')
 
-
   const [ feeETH, setFeeETH ] = useState(0.0)
   const [ feeBOBA, setFeeBOBA ] = useState(0.0)
 
@@ -88,8 +87,6 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
 
   function setAmount(value) {
-    // (Number(value) + feeBOBA + exitFee) > balance)
-
 
     const balance = Number(logAmount(token.balance, token.decimals))
 

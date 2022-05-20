@@ -67,16 +67,6 @@ const PageFooter = ({maintenance}) => {
         <S.LinkWrapper>
           <S.FooterLink
             onClick={() => {
-              dispatch(setPage('Help'))
-            }}
-          >FAQs</S.FooterLink>
-          {/* <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('Airdrop'))
-            }}
-          >AirDrop</S.FooterLink> */}
-          <S.FooterLink
-            onClick={() => {
               dispatch(setPage('BobaScope'))
             }}
           >BobaScope</S.FooterLink>

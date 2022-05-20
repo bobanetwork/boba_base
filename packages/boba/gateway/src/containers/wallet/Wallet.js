@@ -97,7 +97,7 @@ function Wallet() {
     if (layer === 'L2') {
       setChain('Boba Wallet')
     } else if (layer === 'L1') {
-      setChain('Moonbeam Wallet')
+      setChain('Moonbase Wallet')
     }
   }, [ layer ])
 
@@ -146,7 +146,7 @@ function Wallet() {
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Moonbeam Wallet' ? 'active' : ''}
+            className={chain === 'Moonbase Wallet' ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -154,7 +154,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Moonbeam Wallet
+            Moonbase Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}

@@ -1052,7 +1052,6 @@ class NetworkService {
       const getBalancePromise = []
 
       tA.forEach((token) => {
-        console.log(token)
         if (token.addressL1 === allAddresses.L1_ETH_Address) {
           return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
 

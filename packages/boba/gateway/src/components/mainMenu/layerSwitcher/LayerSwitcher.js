@@ -225,7 +225,7 @@ function LayerSwitcher({
   if (isMobile) {
     return (
       <S.LayerSwitcherWrapperMobile>
-        <MobileLayer title="Moonbeam" layer={layer} icon={<MoonbeamIcon />}
+        <MobileLayer title="Moonbase" layer={layer} icon={<MoonbeamIcon />}
           onConnect={() => connectToETH()}
           isConnected={layer === 'L1'}
         />
@@ -254,7 +254,7 @@ function LayerSwitcher({
         </ToggleButton>
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Moonbeam</Typography>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Moonbase</Typography>
         <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
