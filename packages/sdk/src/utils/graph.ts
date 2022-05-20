@@ -7,10 +7,16 @@ export const GRAPH_API_URL: any = {
   1287: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-address-manager',
   },
   1284: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-address-manager',
   },
 }
 
@@ -29,6 +35,14 @@ const formatStateBatchAppendedEvent = (events: any): any => {
     events[i]._batchSize = intToBigNumber(events[i]._batchSize)
     events[i]._prevTotalElements = intToBigNumber(events[i]._prevTotalElements)
     events[i].blockNumber = intToHex(intToBigNumber(events[i].blockNumber))
+  }
+  return events
+}
+
+const formatAddressSetEvent = (events: any): any => {
+  // eslint-disable-next-line
+  for (var i = 0; i < events.length; i++) {
+    events[i].blockNumber = parseInt(events[i].blockNumber, 10)
   }
   return events
 }
@@ -64,9 +78,9 @@ const addEventMethods = (
 
 export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
   provider: ethers.providers.Provider,
-  batchIndex: number,
-  chainID: number
+  batchIndex: number
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -79,7 +93,7 @@ export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
       query: `
         query {
           stateBatchAppendedEntities(where: {
-            _batchIndex: ${batchIndex}
+            _batchIndex: "${batchIndex}"
           }) {
             _batchIndex
             _batchRoot
@@ -111,9 +125,9 @@ export const getStateBatchAppendedEventByBatchIndexFromGraph = async (
 export const getRelayedMessageEventsFromGraph = async (
   provider: ethers.providers.Provider,
   messageHash: string,
-  chainID: number,
   fast: boolean
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -128,7 +142,7 @@ export const getRelayedMessageEventsFromGraph = async (
           ${
             fast ? 'relayedMessageFastEntities' : 'relayedMessageEntities'
           }(where: {
-            msgHash: ${messageHash}
+            msgHash: "${messageHash}"
           }) {
             msgHash
             transactionHash
@@ -158,9 +172,9 @@ export const getRelayedMessageEventsFromGraph = async (
 export const getFailedRelayedMessageEventsFromGraph = async (
   provider: ethers.providers.Provider,
   messageHash: string,
-  chainID: number,
   fast: boolean
 ): Promise<ethers.Event[] | []> => {
+  const chainID = (await provider.getNetwork()).chainId
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
@@ -177,7 +191,7 @@ export const getFailedRelayedMessageEventsFromGraph = async (
               ? 'failedRelayedMessageFastEntities'
               : 'failedRelayedMessageEntities'
           }(where: {
-            msgHash: ${messageHash}
+            msgHash: "${messageHash}"
           }) {
             msgHash
             transactionHash
@@ -193,13 +207,71 @@ export const getFailedRelayedMessageEventsFromGraph = async (
   }
   let entity: any
   if (fast) {
-    entity = data.data.fastRelayedMessageEntities
+    entity = data.data.failedRelayedMessageFastEntities
   } else {
-    entity = data.data.relayedMessageEntities
+    entity = data.data.failedRelayedMessageEntities
   }
   if (entity.length === 0) {
     return []
   }
   const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
   return events
+}
+
+export const getAddressSetEventsFromGraph = async (
+  provider: ethers.providers.Provider,
+  name: string,
+  fromBlock?: number,
+  toBlock?: number
+) => {
+  const chainID = (await provider.getNetwork()).chainId
+  if (!GRAPH_API_URL[chainID]) {
+    return []
+  }
+  const response = await fetch(GRAPH_API_URL[chainID].addressManager, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+        query { addressSetEntities
+          (
+            orderBy: blockNumber
+            orderDirection: desc
+            first: 1
+            where: {
+              _name: "${name}"
+              ${fromBlock != null ? `blockNumber_gte: ${fromBlock}` : ''}
+              ${toBlock != null ? `blockNumber_lte: ${toBlock}` : ''}
+            }
+          )
+          {
+            _name
+            _newAddress
+            _oldAddress
+            blockNumber
+            transactionHash
+          }
+        }
+      `,
+    }),
+  })
+  const data = await response.json()
+  if (typeof data.data === 'undefined') {
+    return []
+  }
+  const entity = formatAddressSetEvent(data.data.addressSetEntities)
+  if (entity.length === 0) {
+    return []
+  }
+  const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
+  return events
+}
+
+export const isChainIDForGraph = async (
+  provider: ethers.providers.Provider
+) => {
+  const chainID = (await provider.getNetwork()).chainId
+  return WHITELIST_CHAIN_ID.includes(chainID)
 }

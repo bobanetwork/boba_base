@@ -37,3 +37,12 @@ type StateBatchAppendedEntity @entity {
   transactionHash: Bytes! # transaction hash
 }
 
+type AddressSetEntity @entity {
+  id: ID!
+  _name: String
+  _newAddress: Bytes!
+  _oldAddress: Bytes
+  blockNumber: BigInt!
+  transactionHash: Bytes! # transaction hash
+}
+

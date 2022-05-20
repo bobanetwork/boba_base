@@ -12,6 +12,10 @@
     "StateCommitmentChain": {
       "address": "0x7Af512914Ab422f9D38aC5eEfc94fa5106FA74C2",
       "startBlock": 2103495
+    },
+    "Lib_AddressManager": {
+      "address": "0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B",
+      "startBlock": 2103466
     }
   }
 }

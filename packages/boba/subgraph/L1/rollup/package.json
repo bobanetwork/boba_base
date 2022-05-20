@@ -4,10 +4,14 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:bobabase": "mustache config/bobabase.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:bobabeam": "mustache config/bobabeam.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:subgraph:bobabase": "graph deploy --studio boba-network-boba-base",
-    "deploy:subgraph:bobabeam": "graph deploy --studio boba-network-boba-beam"
+    "prepare:bobabase:rollup": "mustache config/bobabase.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "prepare:bobabeam:rollup": "mustache config/bobabeam.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "prepare:bobabase:addressManager": "mustache config/bobabase.json subgraph.template.addressManager.yaml > subgraph.yaml",
+    "prepare:bobabeam:addressManager": "mustache config/bobabeam.json subgraph.template.addressManager.yaml > subgraph.yaml",
+    "deploy:subgraph:bobabase:rollup": "graph deploy --product hosted-service bobanetwork/bobabase-rollup",
+    "deploy:subgraph:bobabeam:rollup": "graph deploy --product hosted-service bobanetwork/bobabeam-rollup",
+    "deploy:subgraph:bobabase:addressManager": "graph deploy --product hosted-service bobanetwork/bobabase-address-manager",
+    "deploy:subgraph:bobabeam:addressManager": "graph deploy --product hosted-service bobanetwork/bobabeam-address-manager"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.29.0",
