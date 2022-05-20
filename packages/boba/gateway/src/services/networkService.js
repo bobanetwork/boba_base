@@ -407,7 +407,8 @@ class NetworkService {
           'No testnet funds': 'Faucet drained: Please tell us.',
           'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limit.',
         }
-        errorMsg = errorMap[errorMsg];
+        const errorKey = Object.keys(errorMap).find(k => errorMsg.includes(k))
+        if (errorKey) errorMsg = errorMap[errorKey]
       }
       return errorMsg ?? 'Limits reached or Twitter constraints not met.'
     }
