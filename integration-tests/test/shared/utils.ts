@@ -12,12 +12,16 @@ import {
   getContractFactory,
   getContractInterface,
   predeploys,
+  loadContract
 } from '@eth-optimism/contracts'
 import { remove0x } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
   NumberLike,
   asL2Provider,
+  DEFAULT_L2_CONTRACT_ADDRESSES,
+  StandardBridgeAdapter,
+  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
@@ -33,6 +37,8 @@ export const isLiveNetwork = () => {
 
 export const HARDHAT_CHAIN_ID = 31337
 export const MOONBEAM_CHAIN_ID = 1281
+export const FANTOM_CHAIN_ID = 4003
+export const NON_ETHEREUM_CHAIN = [ MOONBEAM_CHAIN_ID, FANTOM_CHAIN_ID]
 export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
@@ -340,9 +346,9 @@ export const isHardhat = async () => {
   return chainId === HARDHAT_CHAIN_ID
 }
 
-export const isMoonbeam = async () => {
+export const isNonEthereumChain = async () => {
   const chainId = await l1Wallet.getChainId()
-  return chainId === MOONBEAM_CHAIN_ID
+  return NON_ETHEREUM_CHAIN.indexOf(chainId) !== -1
 }
 
 export const die = (...args) => {
@@ -440,6 +446,54 @@ export const getFilteredLogIndex = async (
   )
 
   return filteredLogs[0].logIndex
+}
+
+export const fetchContracts = async (addressManagerAddress, L1Wallet) => {
+  const addressManager = loadContract(
+    'Lib_AddressManager',
+    addressManagerAddress,
+    L1Wallet
+  )
+
+  const L1CrossDomainMessengerAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessenger')
+  const L1CrossDomainMessengerFastAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
+  const L1StandardBridgeAddress = await addressManager.getAddress('Proxy__L1StandardBridge')
+  const stateCommitmentChainAddress = await addressManager.getAddress('StateCommitmentChain')
+  const canonicalTransactionChainAddress = await addressManager.getAddress('CanonicalTransactionChain')
+  const bondManagerAddress = await addressManager.getAddress('BondManager')
+  const L1MultiMessageRelayerAddress = await addressManager.getAddress('L1MultiMessageRelayer')
+  const L1MultiMessageRelayerFastAddress = await addressManager.getAddress('L1MultiMessageRelayerFast')
+  const BOBAAddress = await addressManager.getAddress('TK_L1BOBA')
+
+  const contracts = {
+    l1: {
+      AddressManager: addressManagerAddress,
+      L1CrossDomainMessenger: L1CrossDomainMessengerAddress,
+      L1CrossDomainMessengerFast: L1CrossDomainMessengerFastAddress,
+      L1StandardBridge: L1StandardBridgeAddress,
+      StateCommitmentChain: stateCommitmentChainAddress,
+      CanonicalTransactionChain: canonicalTransactionChainAddress,
+      BondManager: bondManagerAddress,
+      L1MultiMessageRelayer: L1MultiMessageRelayerAddress,
+      L1MultiMessageRelayerFast: L1MultiMessageRelayerFastAddress,
+      L1BOBA: BOBAAddress,
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  }
+  const bridges = {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: L1StandardBridgeAddress,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: L1StandardBridgeAddress,
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  }
+
+  return { contracts, bridges }
 }
 
 // // eslint-disable-next-line @typescript-eslint/no-shadow

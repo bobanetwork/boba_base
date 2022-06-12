@@ -38,6 +38,7 @@ import {
   getBASEDeployerAddresses,
   getBOBADeployerAddresses,
   envConfig,
+  fetchContracts,
 } from './utils'
 
 export interface CrossDomainMessagePair {
@@ -135,32 +136,9 @@ export class OptimismEnv {
 
     const L2BOBA = getL2BOBA(l2Wallet)
 
-    const contracts = {
-      l1: {
-        AddressManager: '0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3',
-        L1CrossDomainMessenger: '0xab7785d56697E65c2683c8121Aac93D3A028Ba95',
-        L1CrossDomainMessengerFast:
-          '0xB942FA2273C7Bce69833e891BDdFd7212d2dA415',
-        L1StandardBridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
-        StateCommitmentChain: '0x294c664f6D63bd1521231a2EeFC26d805ce00a08',
-        CanonicalTransactionChain: '0x598efcBD0B5b4Fd0142bEAae1a38f6Bd4d8a218d',
-        BondManager: '0xEC69d4f48f4f1740976968FAb9828d645Ad1d77f',
-        L1MultiMessageRelayer: '0xad856F238CBeafd064b80D12EadAea3981fB21B5',
-      },
-      l2: DEFAULT_L2_CONTRACT_ADDRESSES,
-    }
-    const bridges = {
-      Standard: {
-        Adapter: StandardBridgeAdapter,
-        l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
-        l2Bridge: predeploys.L2StandardBridge,
-      },
-      ETH: {
-        Adapter: ETHBridgeAdapter,
-        l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
-        l2Bridge: predeploys.L2StandardBridge,
-      },
-    }
+    const data = await fetchContracts(addressesBASE.AddressManager, l1Wallet)
+    const contracts = data.contracts
+    const bridges = data.bridges
 
     const messenger = new CrossChainMessenger({
       l1SignerOrProvider: l1Wallet,
