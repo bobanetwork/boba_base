@@ -1,45 +1,21 @@
 # # Accounts and their usage
-#  0 Alith:
+#  Deployer:
 #- Address: 0xED7c28AFfa5FB717Acf3e9B9BCDE13A7FE1356BE
 #- PrivKey: 0x8ffbfce79f185f4b4fb06cb3b51fcdf0fb7403b6e0d4011893ebabfc68d5187c
 
-## 1 Baltathar:
-#- Address: 0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0
-#- PrivKey: 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
-
-## 2 Charleth:
-#- Address: 0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc
-#- PrivKey: 0x0b6e18cafb6ed99687ec547bd28139cafdd2bffe70e6b688025de6b445aa5c5b
-
-## 3 Dorothy:
-#- Address: 0x773539d4Ac0e786233D90A233654ccEE26a613D9
-#- PrivKey: 0x39539ab1876910bbf3a223d84a29e28f1cb4e2e456503e7e91ed39b2e7223d68
-
-## 4 Ethan:
-#- Address: 0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB
-#- PrivKey: 0x7dce9bc8babb68fec1409be38c8e1a52650206a7ed90ff956ae8a6d15eeaaef4
-
-## 5 Faith:
-#- Address: 0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3
-#- PrivKey: 0xb9d2ea9a615f3165812e8d44de0d24da9bbd164b65c4f0573e1ce2c8dbd9c8df
-
-## 6 Goliath:
-#- Address: 0x7BF369283338E12C90514468aa3868A551AB2929
-#- PrivKey: 0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18
-
-## 7 Heath:
+## Integration 3 PK:
 #- Address: 0x2327691f4EDb2A6341e7a29e3C15ba1Cf79066FD
 #- PrivKey: 0xca2363fa363c2bc26bf070cf96084da59243d518d9c6ac0dc54586fb6c66c6f1
 
-## 8 Ida:
+## Relayer:
 #- Address: 0xAA4843929683CA32367eB1BaCF050F42c562e461
 #- PrivKey: 0xa95aa44137b087b519cb7d2be9340f4c36709cb0d3de94ba6ba2095563a44696
 
-## 9 Judith:
+## Fast Relayer:
 #- Address: 0x2F163d4f8f0eC03888069437313598E9F1De3066
 #- PrivKey: 0xdc5b19a14a3bbb3e9d70da1955114415d9f230ae661c3f8a2b22ad3a67cd2902
 
-# 10 Gerald:
+# Integration 2 PK:
 #- Address: 0xBc9b9eF336066823B3Ae9948e6BFc0d10fb0a395
 #- PrivKey: 0xf71e04bb88b3f497fc2cf9b4e35c7e307c2ec6483b8084f750820d09fbe19b54
 
@@ -146,7 +122,7 @@ services:
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:18545
       L2_NODE_WEB3_URL: http://l2geth:8545
-      ADDRESS_MANAGER_ADDRESS: "0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3"
+      ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
       URL: http://dtl:8081/addresses.json
       # DO NOT use in production
       << : *deployer_pk
@@ -302,6 +278,117 @@ services:
       #aliases are setup, check seed.yml
       BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x6236C601FfD52c4793e3B49B15bcdc1137E6339D"
       BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9"
+
+  integration_tests:
+    image: bobanetwork/integration-tests:latest
+    deploy:
+       replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.integration-tests
+    entrypoint: ./integration-tests.sh
+    environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
+      L1_URL: http://l1_chain:18545
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BASE_URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      << : *integration_pk
+      << : *integration_2_pk
+      << : *integration_3_pk
+
+  replica:
+    depends_on:
+      - dtl
+      - l2geth
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:18545
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
+
+  verifier:
+    depends_on:
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+        ETH1_HTTP: http://l1_chain:18545
+        ROLLUP_TIMESTAMP_REFRESH: 5s
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_CLIENT_HTTP: http://dtl:7878
+        ROLLUP_BACKEND: 'l1'
+        ROLLUP_VERIFIER_ENABLE: 'true'
+        RETRIES: 60
+        # no need to keep this secret, only used internally to sign blocks
+        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+        ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+        EMERGENCY_FORK_NUMBER: 0
+        L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
+
+  fraud-detector:
+    depends_on:
+     - verifier
+     - dtl
+    image: bobanetwork/fraud-detector:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:18545
+      L1_CONFIRMATIONS: 8
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
 
   #in no way should this be running in production
   kms:
