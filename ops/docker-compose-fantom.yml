@@ -298,6 +298,7 @@ services:
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      RETRIES: 200
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
