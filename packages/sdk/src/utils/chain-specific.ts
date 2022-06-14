@@ -1,12 +1,7 @@
-import { Provider } from '@ethersproject/abstract-provider'
 import { providers } from 'ethers'
 
 export const chainID: any = {
   moonbeam: {
-    local: {
-      l1: 1281,
-      l2: 31338,
-    },
     mainnet: {
       l1: 1284,
       l2: 1294,
@@ -31,7 +26,7 @@ export const getChainIDList = (
 }
 
 export const isMoonbeamL1 = async (
-  node: providers.JsonRpcProvider
+  node: providers.BaseProvider
 ): Promise<boolean> => {
   const chainId = (await node.getNetwork()).chainId
   return getChainIDList('moonbeam', 'l1').includes(chainId)
@@ -39,12 +34,12 @@ export const isMoonbeamL1 = async (
 
 // Moonbeam specific for finding the latest confirmed block
 export const getLatestConfirmedBlock = async (
-  node: providers.JsonRpcProvider
+  node: providers.BaseProvider
 ): Promise<number> => {
   const chainId = (await node.getNetwork()).chainId
   if (getChainIDList('moonbeam', 'l1').includes(chainId)) {
-    const finalizedHeadHash = await node.send('chain_getFinalizedHead', [])
-    const finalizedBlockHeader = await node.send('chain_getHeader', [
+    const finalizedHeadHash = await node.perform('chain_getFinalizedHead', [])
+    const finalizedBlockHeader = await node.perform('chain_getHeader', [
       finalizedHeadHash,
     ])
     return parseInt(finalizedBlockHeader.number, 16)
