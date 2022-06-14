@@ -25,21 +25,21 @@ export const getChainIDList = (
   return []
 }
 
-export const isMoonbeamL1 = async (
-  node: providers.BaseProvider
-): Promise<boolean> => {
+export const isMoonbeamL1 = async (l1RpcProvider: string): Promise<boolean> => {
+  const node = new providers.StaticJsonRpcProvider(l1RpcProvider)
   const chainId = (await node.getNetwork()).chainId
   return getChainIDList('moonbeam', 'l1').includes(chainId)
 }
 
 // Moonbeam specific for finding the latest confirmed block
 export const getLatestConfirmedBlock = async (
-  node: providers.BaseProvider
+  l1RpcProvider: string
 ): Promise<number> => {
+  const node = new providers.StaticJsonRpcProvider(l1RpcProvider)
   const chainId = (await node.getNetwork()).chainId
   if (getChainIDList('moonbeam', 'l1').includes(chainId)) {
-    const finalizedHeadHash = await node.perform('chain_getFinalizedHead', [])
-    const finalizedBlockHeader = await node.perform('chain_getHeader', [
+    const finalizedHeadHash = await node.send('chain_getFinalizedHead', [])
+    const finalizedBlockHeader = await node.send('chain_getHeader', [
       finalizedHeadHash,
     ])
     return parseInt(finalizedBlockHeader.number, 16)

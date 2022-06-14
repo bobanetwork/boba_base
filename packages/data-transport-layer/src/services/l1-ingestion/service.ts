@@ -215,9 +215,9 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
 
         // Add special case for Moonbeam
         let latestConfirmedBlock = currentL1Block - this.options.confirmations
-        if (await isMoonbeamL1(this.state.l1RpcProvider)) {
+        if (await isMoonbeamL1(this.options.l1RpcProvider)) {
           latestConfirmedBlock = await getLatestConfirmedBlock(
-            this.state.l1RpcProvider
+            this.options.l1RpcProvider
           )
         }
 
