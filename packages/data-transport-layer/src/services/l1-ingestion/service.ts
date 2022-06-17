@@ -10,6 +10,7 @@ import {
   getAddressSetEventsFromGraph,
   isChainIDForGraph,
 } from '@eth-optimism/sdk'
+import { orderBy } from 'lodash'
 
 /* Imports: Internal */
 import { handleEventsTransactionEnqueued } from './handlers/transaction-enqueued'
@@ -406,14 +407,18 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
 
     for (const eventRange of eventRanges) {
       // Find all relevant events within the range.
-      const events: TypedEvent[] = await this.state.contracts[contractName]
-        .attach(eventRange.address)
-        .queryFilter(
-          this.state.contracts[contractName].filters[eventName](),
-          eventRange.fromBlock,
-          eventRange.toBlock
-        )
-
+      // The events returned by Fantom is not in order, so we need to sort them.
+      const events: TypedEvent[] = orderBy(
+        await this.state.contracts[contractName]
+          .attach(eventRange.address)
+          .queryFilter(
+            this.state.contracts[contractName].filters[eventName](),
+            eventRange.fromBlock,
+            eventRange.toBlock
+          ),
+        'blockNumber',
+        'asc'
+      )
       // Handle events, if any.
       if (events.length > 0) {
         const tick = Date.now()
