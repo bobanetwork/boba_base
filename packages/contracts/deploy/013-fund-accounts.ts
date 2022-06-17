@@ -4,7 +4,6 @@ import { predeploys } from '../src/predeploys'
 
 /* Imports: Internal */
 import { getDeployedContract } from '../src/hardhat-deploy-ethers'
-import { Wallet } from 'ethers'
 
 const MoonbeamDev = {
   chainID: 1281,
@@ -63,27 +62,26 @@ const FantomDev = {
       privateKey:
         '0x8ffbfce79f185f4b4fb06cb3b51fcdf0fb7403b6e0d4011893ebabfc68d5187c',
     },
-    // TODO: failed when init fund for the second account. Still need debug
-    // {
-    //   privateKey:
-    //     '0xa95aa44137b087b519cb7d2be9340f4c36709cb0d3de94ba6ba2095563a44696',
-    // },
-    // {
-    //   privateKey:
-    //     '0xdc5b19a14a3bbb3e9d70da1955114415d9f230ae661c3f8a2b22ad3a67cd2902',
-    // },
-    // {
-    //   privateKey:
-    //     '0xf71e04bb88b3f497fc2cf9b4e35c7e307c2ec6483b8084f750820d09fbe19b54',
-    // },
-    // {
-    //   privateKey:
-    //     '0xca2363fa363c2bc26bf070cf96084da59243d518d9c6ac0dc54586fb6c66c6f1',
-    // },
-    // {
-    //   privateKey:
-    //     '0xa6c4234c9bcae01a8d9d2301ab14ce2fcdd38fe57bc28fa03cd0678630cb8f5a',
-    // },
+    {
+      privateKey:
+        '0xa95aa44137b087b519cb7d2be9340f4c36709cb0d3de94ba6ba2095563a44696',
+    },
+    {
+      privateKey:
+        '0xdc5b19a14a3bbb3e9d70da1955114415d9f230ae661c3f8a2b22ad3a67cd2902',
+    },
+    {
+      privateKey:
+        '0xf71e04bb88b3f497fc2cf9b4e35c7e307c2ec6483b8084f750820d09fbe19b54',
+    },
+    {
+      privateKey:
+        '0xca2363fa363c2bc26bf070cf96084da59243d518d9c6ac0dc54586fb6c66c6f1',
+    },
+    {
+      privateKey:
+        '0xa6c4234c9bcae01a8d9d2301ab14ce2fcdd38fe57bc28fa03cd0678630cb8f5a',
+    },
   ],
 }
 
@@ -96,7 +94,6 @@ const supportedTestNetwork = {
 // to make a modification to hardhat-ovm. However, I don't have the time right now to figure the
 // details of how to make that work cleanly. This is fine in the meantime.
 const deployFn: DeployFunction = async (hre) => {
-
   // Only execute this step if we're on the hardhat chain ID.
   const { chainId } = await hre.ethers.provider.getNetwork()
   const testNet = supportedTestNetwork[chainId]
@@ -121,29 +118,19 @@ const deployFn: DeployFunction = async (hre) => {
       hre.ethers.provider
     )
 
-    const BobaBalance = await L1BobaToken.balanceOf(BobaHolder.getAddress())
-    console.log(`Balance BOBA is ${BobaBalance}`)
-
     // Fund the accounts.
     for (const account of accounts) {
       const wallet = new hre.ethers.Wallet(
         account.privateKey,
         hre.ethers.provider
       )
-
-
       const balance = await wallet.getBalance()
-      console.log(`Balance ${wallet.address} ${balance} FTM`)
       const depositAmount = balance.div(2) // Deposit half of the wallet's balance into L2.
-
-      console.log(
-        `DepositNativeToken to ${wallet.address} with amount ${depositAmount} FTM`
-      )
-
       const fundETHTx = await L1StandardBridge.connect(
         wallet
-      ).depositNativeToken(8_000_000, '0x', {
+      ).depositNativeToken(1_000_000, '0x', {
         value: depositAmount,
+        gasLimit: 200_000,
       })
       await fundETHTx.wait()
       console.log(
@@ -167,8 +154,9 @@ const deployFn: DeployFunction = async (hre) => {
         L2BobaAddress,
         wallet.address,
         depositBobaAmount,
-        8_000_000,
-        '0x'
+        1_000_000,
+        '0x',
+        { gasLimit: 400_000 }
       )
       await fundBobaTx.wait()
       console.log(`✓ Funded ${wallet.address} on L2 with 5000.0 BOBA`)

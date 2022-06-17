@@ -448,54 +448,6 @@ export const getFilteredLogIndex = async (
   return filteredLogs[0].logIndex
 }
 
-export const fetchContracts = async (addressManagerAddress, L1Wallet) => {
-  const addressManager = loadContract(
-    'Lib_AddressManager',
-    addressManagerAddress,
-    L1Wallet
-  )
-
-  const L1CrossDomainMessengerAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessenger')
-  const L1CrossDomainMessengerFastAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
-  const L1StandardBridgeAddress = await addressManager.getAddress('Proxy__L1StandardBridge')
-  const stateCommitmentChainAddress = await addressManager.getAddress('StateCommitmentChain')
-  const canonicalTransactionChainAddress = await addressManager.getAddress('CanonicalTransactionChain')
-  const bondManagerAddress = await addressManager.getAddress('BondManager')
-  const L1MultiMessageRelayerAddress = await addressManager.getAddress('L1MultiMessageRelayer')
-  const L1MultiMessageRelayerFastAddress = await addressManager.getAddress('L1MultiMessageRelayerFast')
-  const BOBAAddress = await addressManager.getAddress('TK_L1BOBA')
-
-  const contracts = {
-    l1: {
-      AddressManager: addressManagerAddress,
-      L1CrossDomainMessenger: L1CrossDomainMessengerAddress,
-      L1CrossDomainMessengerFast: L1CrossDomainMessengerFastAddress,
-      L1StandardBridge: L1StandardBridgeAddress,
-      StateCommitmentChain: stateCommitmentChainAddress,
-      CanonicalTransactionChain: canonicalTransactionChainAddress,
-      BondManager: bondManagerAddress,
-      L1MultiMessageRelayer: L1MultiMessageRelayerAddress,
-      L1MultiMessageRelayerFast: L1MultiMessageRelayerFastAddress,
-      L1BOBA: BOBAAddress,
-    },
-    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
-  }
-  const bridges = {
-    Standard: {
-      Adapter: StandardBridgeAdapter,
-      l1Bridge: L1StandardBridgeAddress,
-      l2Bridge: predeploys.L2StandardBridge,
-    },
-    ETH: {
-      Adapter: ETHBridgeAdapter,
-      l1Bridge: L1StandardBridgeAddress,
-      l2Bridge: predeploys.L2StandardBridge,
-    },
-  }
-
-  return { contracts, bridges }
-}
-
 // // eslint-disable-next-line @typescript-eslint/no-shadow
 // export const isMainnet = async () => {
 //   const chainId = await l1Wallet.getChainId()

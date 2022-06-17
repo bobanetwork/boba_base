@@ -157,6 +157,21 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Fantom local
+  4003: {
+    l1: {
+      AddressManager: '0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0',
+      L1CrossDomainMessenger: '0x03466593AE8Bc085F384bC4EB91d5035F5a7936C',
+      L1CrossDomainMessengerFast: '0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6',
+      L1StandardBridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
+      StateCommitmentChain: '0xC98Dd1b152d9e4cf2A6384a78d4FFE8D50E86C6c',
+      CanonicalTransactionChain: '0xFfB9dF984DC95ab53c561d818b708135612b087f',
+      BondManager: '0xE9BC1f638d05edF64Bf3e23A08ff3e2B0fb8b7F7',
+      L1MultiMessageRelayer: '0x9257aE2144eF338Da70D6884c98BD8CB90Da639E',
+      L1MultiMessageRelayerFast: '0x874a7Ea9722b96924e186f0263866FA90a7C777b',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
 }
 
 /**
@@ -274,6 +289,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0xEcca5FEd8154420403549f5d8F123fcE69fae806',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  4003: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
