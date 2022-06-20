@@ -8,11 +8,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
-  DEFAULT_L2_CONTRACT_ADDRESSES,
-  StandardBridgeAdapter,
-  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
-import { getContractInterface } from '@eth-optimism/contracts'
 
 interface MessageRelayerOptions {
   /**
@@ -540,16 +536,4 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   private async _getGasPriceInGwei(signer): Promise<number> {
     return parseInt(utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10)
   }
-}
-
-export const loadContract = (
-  name: string,
-  address: string,
-  provider: ethers.providers.JsonRpcProvider
-): ethers.Contract => {
-  return new ethers.Contract(
-    address,
-    getContractInterface(name) as any,
-    provider
-  )
 }
