@@ -64,6 +64,16 @@ describe('Boba API Tests', async () => {
         value: ethers.utils.parseEther('10'),
       })
 
+      // Deposit L1 native token
+      await env.waitForXDomainTransaction(
+        env.l1Bridge
+          .connect(env.l1Wallet_2)
+          .depositNativeToken(1_000_000, '0x', {
+            value: ethers.utils.parseEther('100'),
+            gasLimit: 200_000,
+          })
+      )
+
       // Load env
       process.env.L2_NODE_WEB3_URL = env.l2Provider.connection.url
       process.env.PRIVATE_KEY = env.l2Wallet.privateKey

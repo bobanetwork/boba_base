@@ -38,7 +38,6 @@ import {
   getBASEDeployerAddresses,
   getBOBADeployerAddresses,
   envConfig,
-  fetchContracts,
 } from './utils'
 
 export interface CrossDomainMessagePair {
@@ -136,17 +135,11 @@ export class OptimismEnv {
 
     const L2BOBA = getL2BOBA(l2Wallet)
 
-    const data = await fetchContracts(addressesBASE.AddressManager, l1Wallet)
-    const contracts = data.contracts
-    const bridges = data.bridges
-
     const messenger = new CrossChainMessenger({
       l1SignerOrProvider: l1Wallet,
       l2SignerOrProvider: l2Wallet,
       l1ChainId: network.chainId,
       fastRelayer: false,
-      contracts,
-      bridges,
     })
 
     const messengerFast = new CrossChainMessenger({
@@ -154,8 +147,6 @@ export class OptimismEnv {
       l2SignerOrProvider: l2Wallet,
       l1ChainId: network.chainId,
       fastRelayer: true,
-      contracts,
-      bridges,
     })
 
     // fund the user if needed

@@ -36,18 +36,18 @@ if [[ $BUILD == 1 ]]; then
 fi
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-DOCKERFILE="docker-compose-fantom.yml"
+DOCKERFILE="docker-compose.yml"
 
 if [[ $BUILD == 1 ]]; then
-  docker-compose -f docker-compose-fantom.yml build --parallel -- builder l2geth l1_chain
-  docker-compose -f docker-compose-fantom.yml build --parallel -- deployer dtl batch_submitter relayer integration_tests
-  docker-compose -f docker-compose-fantom.yml build -- boba_message-relayer-fast
-  docker-compose -f docker-compose-fantom.yml build -- gas_oracle
-  docker-compose -f docker-compose-fantom.yml build -- boba_deployer
-  docker-compose -f docker-compose-fantom.yml build -- fraud-detector
-  docker-compose -f docker-compose-fantom.yml build -- monitor
-  docker-compose -f docker-compose-fantom.yml build -- verifier
-  docker-compose -f docker-compose-fantom.yml build -- replica
+  docker-compose -f docker-compose.yml build --parallel -- builder l2geth l1_chain
+  docker-compose -f docker-compose.yml build --parallel -- deployer dtl batch_submitter relayer integration_tests
+  docker-compose -f docker-compose.yml build -- boba_message-relayer-fast
+  docker-compose -f docker-compose.yml build -- gas_oracle
+  docker-compose -f docker-compose.yml build -- boba_deployer
+  docker-compose -f docker-compose.yml build -- fraud-detector
+  docker-compose -f docker-compose.yml build -- monitor
+  docker-compose -f docker-compose.yml build -- verifier
+  docker-compose -f docker-compose.yml build -- replica
 elif [[ $BUILD == 0 ]]; then
   docker-compose -f $DIR/$DOCKERFILE pull
   echo 1

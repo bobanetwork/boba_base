@@ -8,14 +8,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
-  DEFAULT_L2_CONTRACT_ADDRESSES,
-  StandardBridgeAdapter,
-  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
-import {
-  predeploys,
-  getContractInterface
-} from '@eth-optimism/contracts'
 
 interface MessageRelayerOptions {
   /**
@@ -153,18 +146,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
 
-    const data = await fetchContracts(
-      this.options.baseAddresses.AddressManager,
-      this.options.l1Wallet
-    )
-
     this.state.messenger = new CrossChainMessenger({
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,
       l1ChainId,
       fastRelayer: this.options.isFastRelayer,
-      contracts: data.contracts,
-      bridges: data.bridges,
     })
 
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
@@ -550,64 +536,4 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   private async _getGasPriceInGwei(signer): Promise<number> {
     return parseInt(utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10)
   }
-}
-
-export const loadContract = (
-  name: string,
-  address: string,
-  provider: ethers.providers.JsonRpcProvider
-): ethers.Contract => {
-  return new ethers.Contract(
-    address,
-    getContractInterface(name) as any,
-    provider
-  )
-}
-
-const fetchContracts = async ( addressManagerAddress, L1Wallet ) => {
-  const addressManager = loadContract(
-    'Lib_AddressManager',
-    addressManagerAddress,
-    L1Wallet
-  )
-
-  const L1CrossDomainMessengerAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessenger')
-  const L1CrossDomainMessengerFastAddress = await addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
-  const L1StandardBridgeAddress = await addressManager.getAddress('Proxy__L1StandardBridge')
-  const stateCommitmentChainAddress = await addressManager.getAddress('StateCommitmentChain')
-  const canonicalTransactionChainAddress = await addressManager.getAddress('CanonicalTransactionChain')
-  const bondManagerAddress = await addressManager.getAddress('BondManager')
-  const L1MultiMessageRelayerAddress = await addressManager.getAddress('L1MultiMessageRelayer')
-  const L1MultiMessageRelayerFastAddress = await addressManager.getAddress('L1MultiMessageRelayerFast')
-  const BOBAAddress = await addressManager.getAddress('TK_L1BOBA')
-
-  const contracts = {
-    l1: {
-      AddressManager: addressManagerAddress,
-      L1CrossDomainMessenger: L1CrossDomainMessengerAddress,
-      L1CrossDomainMessengerFast: L1CrossDomainMessengerFastAddress,
-      L1StandardBridge: L1StandardBridgeAddress,
-      StateCommitmentChain: stateCommitmentChainAddress,
-      CanonicalTransactionChain: canonicalTransactionChainAddress,
-      BondManager: bondManagerAddress,
-      L1MultiMessageRelayer: L1MultiMessageRelayerAddress,
-      L1MultiMessageRelayerFast: L1MultiMessageRelayerFastAddress,
-      L1BOBA: BOBAAddress,
-    },
-    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
-  }
-  const bridges = {
-    Standard: {
-      Adapter: StandardBridgeAdapter,
-      l1Bridge: L1StandardBridgeAddress,
-      l2Bridge: predeploys.L2StandardBridge,
-    },
-    ETH: {
-      Adapter: ETHBridgeAdapter,
-      l1Bridge: L1StandardBridgeAddress,
-      l2Bridge: predeploys.L2StandardBridge,
-    },
-  }
-
-  return { contracts, bridges }
 }
