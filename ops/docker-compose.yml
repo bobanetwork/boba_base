@@ -46,6 +46,9 @@ x-integration_2_pk: &integration_2_pk
 x-integration_3_pk: &integration_3_pk
   PRIVATE_KEY_3: '0xca2363fa363c2bc26bf070cf96084da59243d518d9c6ac0dc54586fb6c66c6f1'
 
+x-integration_4_pk: &integration_4_pk
+  GAS_PRICE_ORACLE_PRIVATE_KEY: '0xa6c4234c9bcae01a8d9d2301ab14ce2fcdd38fe57bc28fa03cd0678630cb8f5a'
+
 version: "3"
 
 services:
@@ -323,6 +326,7 @@ services:
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
+      << : *integration_4_pk
 
   replica:
     depends_on:
