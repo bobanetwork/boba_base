@@ -9,6 +9,8 @@ import { Gauge, Counter } from 'prom-client'
 import {
   getAddressSetEventsFromGraph,
   isChainIDForGraph,
+  getLatestConfirmedBlock,
+  isMoonbeamL1,
 } from '@eth-optimism/sdk'
 
 /* Imports: Internal */
@@ -210,9 +212,18 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
           (await this.state.db.getHighestSyncedL1Block()) ||
           this.state.startingL1BlockNumber
         const currentL1Block = await this.state.l1RpcProvider.getBlockNumber()
+
+        // Add special case for Moonbeam
+        let latestConfirmedBlock = currentL1Block - this.options.confirmations
+        if (await isMoonbeamL1(this.options.l1RpcProvider)) {
+          latestConfirmedBlock = await getLatestConfirmedBlock(
+            this.options.l1RpcProvider
+          )
+        }
+
         const targetL1Block = Math.min(
           highestSyncedL1Block + this.options.logsPerPollingInterval,
-          currentL1Block - this.options.confirmations
+          latestConfirmedBlock
         )
 
         // We're already at the head, so no point in attempting to sync.
