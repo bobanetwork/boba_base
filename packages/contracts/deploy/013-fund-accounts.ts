@@ -98,6 +98,7 @@ const deployFn: DeployFunction = async (hre) => {
   const { chainId } = await hre.ethers.provider.getNetwork()
   const testNet = supportedTestNetwork[chainId]
   if (testNet) {
+    const gasLimitOption = testNet === 'FantomDev' ? { gasLimit: 400_000 } : {}
     const L1StandardBridge = await getDeployedContract(
       hre,
       'Proxy__L1StandardBridge',
@@ -130,7 +131,7 @@ const deployFn: DeployFunction = async (hre) => {
         wallet
       ).depositNativeToken(1_000_000, '0x', {
         value: depositAmount,
-        gasLimit: 200_000,
+        ...gasLimitOption,
       })
       await fundETHTx.wait()
       console.log(
@@ -156,7 +157,7 @@ const deployFn: DeployFunction = async (hre) => {
         depositBobaAmount,
         1_000_000,
         '0x',
-        { gasLimit: 400_000 }
+        { ...gasLimitOption }
       )
       await fundBobaTx.wait()
       console.log(`✓ Funded ${wallet.address} on L2 with 5000.0 BOBA`)
