@@ -76,7 +76,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.monorepo
 
   l1_chain:
-    image: trangenya/lachesis:latest
+    image: bobanetwork/lachesis:latest
     restart: always
     command: >
       --datadir ~/.lachesis
