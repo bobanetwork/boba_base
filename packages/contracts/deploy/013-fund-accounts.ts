@@ -98,6 +98,8 @@ const deployFn: DeployFunction = async (hre) => {
   const { chainId } = await hre.ethers.provider.getNetwork()
   const testNet = supportedTestNetwork[chainId]
   if (testNet) {
+    const gasLimitOption = testNet.chainID === 4003 ? { gasLimit: 400_000 } : {}
+    const depositL2Gas = testNet.chainID === 4003 ? 1_000_000 : 8_000_000
     const L1StandardBridge = await getDeployedContract(
       hre,
       'Proxy__L1StandardBridge',
@@ -128,9 +130,9 @@ const deployFn: DeployFunction = async (hre) => {
       const depositAmount = balance.div(2) // Deposit half of the wallet's balance into L2.
       const fundETHTx = await L1StandardBridge.connect(
         wallet
-      ).depositNativeToken(1_000_000, '0x', {
+      ).depositNativeToken(depositL2Gas, '0x', {
         value: depositAmount,
-        gasLimit: 200_000,
+        ...gasLimitOption,
       })
       await fundETHTx.wait()
       console.log(
@@ -154,9 +156,9 @@ const deployFn: DeployFunction = async (hre) => {
         L2BobaAddress,
         wallet.address,
         depositBobaAmount,
-        1_000_000,
+        depositL2Gas,
         '0x',
-        { gasLimit: 400_000 }
+        { ...gasLimitOption }
       )
       await fundBobaTx.wait()
       console.log(`✓ Funded ${wallet.address} on L2 with 5000.0 BOBA`)
