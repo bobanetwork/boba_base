@@ -178,11 +178,15 @@ export const makeL2GenesisFile = async (
     } else if (predeployName === 'L2_L1NativeToken') {
       // Fix the address(this) of L2GovernanceERC20
       // Different network use the different bytecode
-      // Fantom
-      if (cfg.l1NativeTokenSymbol === 'FTM') {
-        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomBytecode
+      // Fantom local
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomLocalBytecode
       }
-      // Moonbeam
+      // Fantom Testnet
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 4051) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomTestnetBytecode
+      }
+      // Moonbeam local
       if (cfg.l1NativeTokenSymbol === 'GLMR') {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamBytecode
       }
