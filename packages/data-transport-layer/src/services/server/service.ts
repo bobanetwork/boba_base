@@ -368,9 +368,9 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
         const block = await this.state.l1RpcProvider.getBlock(number)
         // Fantom block 0 returns null
         return {
-          blockNumber: block === null ? null : block.number,
-          timestamp: block === null ? null : block.timestamp,
-          blockHash: block === null ? null : block.hash,
+          blockNumber: block.number,
+          timestamp: block.timestamp,
+          blockHash: block.hash,
         }
       }
     )
