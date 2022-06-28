@@ -416,8 +416,14 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
             eventRange.fromBlock,
             eventRange.toBlock
           ),
-        'blockNumber',
-        'asc'
+        [
+          'blockNumber',
+          (event) =>
+            typeof event.args._queueIndex === 'undefined'
+              ? true
+              : event.args._queueIndex.toNumber(),
+        ],
+        ['asc', 'asc']
       )
       // Handle events, if any.
       if (events.length > 0) {
