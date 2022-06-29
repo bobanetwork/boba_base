@@ -38,6 +38,8 @@ import useInterval from "util/useInterval"
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 
+import networkService from 'services/networkService'
+
 function Wallet() {
 
   const [ chain, setChain ] = useState('')
@@ -61,7 +63,7 @@ function Wallet() {
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
 
-      const l2BalanceSEC = l2Balances.find((i) => i.symbol === 'GLMR')
+      const l2BalanceSEC = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
       if (l2BalanceSEC && l2BalanceSEC.balance) {
@@ -82,7 +84,7 @@ function Wallet() {
   useEffect(() => {
     if (layer === 'L2') {
       if (tooSmallBOBA && tooSmallSEC) {
-        dispatch(openError('Wallet empty - please bridge GLMR or BOBA from L1'))
+        dispatch(openError(`Wallet empty - please bridge ${networkService.L1NativeTokenSymbol} or BOBA from L1`))
       }
     }
   },[tooSmallSEC, tooSmallBOBA, layer, dispatch])
@@ -97,7 +99,12 @@ function Wallet() {
     if (layer === 'L2') {
       setChain('Boba Wallet')
     } else if (layer === 'L1') {
-      setChain('Moonbase Wallet')
+      if (networkService.chain === 'bobaBase') {
+        setChain('Moonbase Wallet')
+      }
+      if (networkService.chain === 'bobaOperaTestnet') {
+        setChain('Fantom Testnet Wallet')
+      }
     }
   }, [ layer ])
 
@@ -117,7 +124,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallBOBA && network === 'bobaBase' &&
+      {layer === 'L2' && tooSmallBOBA && ['bobaBase', 'bobaOperaTestnet'].includes(network) &&
         <G.LayerAlert style={{padding: '20px'}}>
           <G.AlertInfo>
             <Icon as={Info} sx={{color:"#BAE21A"}}/>
@@ -130,7 +137,7 @@ function Wallet() {
             >
               Using Bobabeam or Bobabase requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
               otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
-              EMERGENCY SWAP to swap GLMR for 1 BOBA at market rates.
+              EMERGENCY SWAP to swap {networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
           <Button
@@ -146,7 +153,7 @@ function Wallet() {
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Moonbase Wallet' ? 'active' : ''}
+            className={['Moonbase Wallet', 'Fantom Testnet Wallet'].includes(chain) ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -154,7 +161,8 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Moonbase Wallet
+            {networkService.chain === 'bobaOperaTestnet' && 'Fantom Testnet Wallet'}
+            {networkService.chain === 'bobaBase' && 'Moonbase Wallet'}
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}

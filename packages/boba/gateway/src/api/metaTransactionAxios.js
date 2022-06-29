@@ -12,10 +12,15 @@ export default function metaTransactionAxiosInstance(networkGateway){
     axiosInstance = axios.create({
       baseURL: getBaseServices().BOBABEAM_META_TRANSACTION,
     })
-  } 
+  }
   else if (networkGateway === 'bobaBase') {
     axiosInstance = axios.create({
       baseURL: getBaseServices().BOBABASE_META_TRANSACTION,
+    })
+  }
+  else if (networkGateway === 'bobaOperaTestnet') {
+    axiosInstance = axios.create({
+      baseURL: getBaseServices().BOBAOPERATESTNET_META_TRANSACTION,
     })
   }
 

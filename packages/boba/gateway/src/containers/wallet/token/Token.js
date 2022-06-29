@@ -181,8 +181,8 @@ function TokenPage() {
 
     return (
     <>
-      
-      {layer === 'L2' && network === 'bobaBase' &&
+
+      {layer === 'L2' && ['bobaBase', 'bobaOperaTestnet'].includes(network) &&
 
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>

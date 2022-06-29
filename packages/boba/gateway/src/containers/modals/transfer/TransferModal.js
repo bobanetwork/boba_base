@@ -203,7 +203,7 @@ function TransferModal ({ open, token, minHeight }) {
 
         {fee && feeUseBoba && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
-            Fee: {fee} GLMR
+            Fee: {fee} {networkService.L1NativeTokenSymbol}
           </Typography>
         )}
 

@@ -39,6 +39,16 @@ export default function etherScanInstance(networkGateway, layer){
       baseURL: nw.bobaBase.L2.blockExplorer,
     })
   }
+  else if (networkGateway === 'bobaOperaTestnet' && layer === 'L1') {
+    axiosInstance = axios.create({
+      baseURL: nw.bobaOperaTestnet.L1.blockExplorer,
+    })
+  }
+  else if (networkGateway === 'bobaOperaTestnet' && layer === 'L2') {
+    axiosInstance = axios.create({
+      baseURL: nw.bobaOperaTestnet.L2.blockExplorer,
+    })
+  }
 
   axiosInstance.interceptors.request.use((config) => {
     config.headers['Accept'] = 'application/json'
