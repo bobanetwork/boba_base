@@ -70,11 +70,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     OVM_GasPriceOracle: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
-    Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
-    L2SecondaryFeeToken: Contract
-    secondaryFeeTokenUSD: Contract
-    BobaStraw_BOBAUSD: Contract
     L1SecondaryFeeTokenBalance: BigNumber
     L1SecondaryFeeTokenCostFee: BigNumber
     L1RelayerBalance: BigNumber
@@ -83,8 +79,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     L2BOBACollectFee: BigNumber
     L2BOBABillingBalance: BigNumber
     L2BOBABillingCollectFee: BigNumber
-    BOBAUSDPrice: number
-    L2SecondaryFeeTokenUSDPrice: number
     chainID: number
   }
 
@@ -153,32 +147,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     ).connect(this.options.gasPriceOracleOwnerWallet)
     this.logger.info('Connected to OVM_GasPriceOracle', {
       address: this.state.OVM_GasPriceOracle.address,
-    })
-
-    this.logger.info('Connecting to Boba_GasPriceOracle...')
-    const Boba_GasPriceOracleAddress =
-      await this.state.Lib_AddressManager.getAddress(
-        'Proxy__Boba_GasPriceOracle'
-      )
-    this.state.Boba_GasPriceOracle = loadContract(
-      'Boba_GasPriceOracle',
-      Boba_GasPriceOracleAddress,
-      this.options.l2RpcProvider
-    ).connect(this.options.gasPriceOracleOwnerWallet)
-    this.logger.info('Connected to Boba_GasPriceOracle', {
-      address: this.state.Boba_GasPriceOracle.address,
-    })
-
-    this.logger.info('Connecting to L2SecondaryFeeToken...')
-    const L2SecondaryFeeTokenAddress =
-      await this.state.Lib_AddressManager.getAddress('L2_L1NativeToken')
-    this.state.L2SecondaryFeeToken = loadContract(
-      'L2_L1NativeToken',
-      L2SecondaryFeeTokenAddress,
-      this.options.l2RpcProvider
-    )
-    this.logger.info('Connected to L2SecondaryFeeToken', {
-      address: this.state.L2SecondaryFeeToken.address,
     })
 
     this.logger.info('Connecting to Proxy__BobaBillingContract...')
@@ -449,30 +417,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
               ) * 10
             ).toFixed(6)
           ),
-          L1SecondaryFeeTokenCostFeeUSD: Number(
-            (
-              Number(
-                Number(
-                  utils.formatEther(
-                    this.state.L1SecondaryFeeTokenCostFee.toString()
-                  )
-                )
-              ) * this.state.L2SecondaryFeeTokenUSDPrice
-            ).toFixed(2)
-          ),
           L1RelayerCostFee: Number(
             Number(
               utils.formatEther(this.state.L1RelayerCostFee.toString())
             ).toFixed(6)
-          ),
-          L1RelayerCostFeeUSD: Number(
-            (
-              Number(
-                Number(
-                  utils.formatEther(this.state.L1RelayerCostFee.toString())
-                )
-              ) * this.state.L2SecondaryFeeTokenUSDPrice
-            ).toFixed(2)
           ),
         },
       })
@@ -553,24 +501,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
                 utils.formatEther(this.state.L2BOBABillingCollectFee.toString())
               ) * 10
             ).toFixed(6)
-          ),
-          L2BOBACollectFeeUSD: Number(
-            (
-              Number(
-                utils.formatEther(this.state.L2BOBACollectFee.toString())
-              ) * this.state.BOBAUSDPrice
-            ).toFixed(2)
-          ),
-          L2BOBABillingCollectFeeUSD: Number(
-            (
-              Number(
-                utils.formatEther(this.state.L2BOBABillingCollectFee.toString())
-              ) * this.state.BOBAUSDPrice
-            ).toFixed(2)
-          ),
-          BOBAUSDPrice: Number(this.state.BOBAUSDPrice.toFixed(2)),
-          L2SecondaryFeeTokenUSDPrice: Number(
-            this.state.L2SecondaryFeeTokenUSDPrice.toFixed(2)
           ),
         },
       })
