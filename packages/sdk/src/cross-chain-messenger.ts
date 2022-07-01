@@ -492,7 +492,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     }
 
     let relayedMessageEvents: ethers.Event[] = []
-    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+    if (
+      WHITELIST_CHAIN_ID.includes(this.l1ChainId) &&
+      resolved.direction === MessageDirection.L2_TO_L1
+    ) {
       relayedMessageEvents = await getRelayedMessageEventsFromGraph(
         this.l1Provider,
         messageHash,
@@ -522,7 +525,10 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     // FailedRelayedMessage events instead.
 
     let failedRelayedMessageEvents: ethers.Event[] = []
-    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+    if (
+      WHITELIST_CHAIN_ID.includes(this.l1ChainId) &&
+      resolved.direction === MessageDirection.L2_TO_L1
+    ) {
       failedRelayedMessageEvents = await getFailedRelayedMessageEventsFromGraph(
         this.l1Provider,
         messageHash,
