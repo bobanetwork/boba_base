@@ -174,8 +174,6 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService = new GasPriceOracleService({
       l1RpcProvider: ethers.provider,
       l2RpcProvider: ethers.provider,
-      l2BobaETHProvider: ethers.provider,
-      l1MoonbeamTestnetProvider: ethers.provider,
 
       addressManagerAddress: Lib_AddressManager.address,
       gasPriceOracleAddress: gasPriceOracle.address,
@@ -203,7 +201,6 @@ describe('gas-price-oracle', () => {
     await gasPriceOracleService.init()
 
     gasPriceOracleService.state.BOBAUSDPrice = 1
-    gasPriceOracleService.state.L2SecondaryFeeTokenCollectFeeUSD = 1
   })
 
   it('should set history values to 0', async () => {
@@ -220,9 +217,6 @@ describe('gas-price-oracle', () => {
       BigNumber.from('0')
     )
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.eq(
-      BigNumber.from('0')
-    )
-    expect(gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee).to.be.eq(
       BigNumber.from('0')
     )
     expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.eq(
@@ -242,7 +236,6 @@ describe('gas-price-oracle', () => {
     const l2HistoryJsonRaw = await fsPromise.readFile(l2DumpsPath)
     const l2HistoryJSON = JSON.parse(l2HistoryJsonRaw.toString())
 
-    expect(l2HistoryJSON.L2SecondaryFeeTokenCollectFee).to.be.eq('0')
     expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('0')
     expect(l2HistoryJSON.L2BOBABillingCollectFee).to.be.eq('0')
 
@@ -263,8 +256,6 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L1SecondaryFeeTokenCostFee = BigNumber.from('2')
     gasPriceOracleService.state.L1RelayerBalance = BigNumber.from('3')
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('4')
-    gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee =
-      BigNumber.from('5')
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('6')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('7')
 
@@ -279,7 +270,6 @@ describe('gas-price-oracle', () => {
     const l2HistoryJsonRaw = await fsPromise.readFile(l2DumpsPath)
     const l2HistoryJSON = JSON.parse(l2HistoryJsonRaw.toString())
 
-    expect(l2HistoryJSON.L2SecondaryFeeTokenCollectFee).to.be.eq('5')
     expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('6')
     expect(l2HistoryJSON.L2BOBABillingCollectFee).to.be.eq('7')
 
@@ -299,8 +289,6 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L1SecondaryFeeTokenCostFee = BigNumber.from('0')
     gasPriceOracleService.state.L1RelayerBalance = BigNumber.from('0')
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('0')
-    gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee =
-      BigNumber.from('0')
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('0')
 
@@ -464,9 +452,6 @@ describe('gas-price-oracle', () => {
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
       ethers.utils.parseEther('1')
     )
-    expect(gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee).to.be.eq(
-      ethers.utils.parseEther('1')
-    )
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
       ethers.utils.parseEther('1')
     )
@@ -480,8 +465,6 @@ describe('gas-price-oracle', () => {
 
   it('should record l2 revenue correctly after withdrawing fees', async () => {
     const preL2BOBACollectFee = gasPriceOracleService.state.L2BOBACollectFee
-    const preL2SecondaryFeeTokenCollectFee =
-      gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee
     const preL2BOBABillingCollectFee =
       gasPriceOracleService.state.L2BOBABillingCollectFee
 
@@ -505,9 +488,6 @@ describe('gas-price-oracle', () => {
     )
 
     const L2BOBAVaultBalance = await wallet5.getBalance()
-    const L2SecondaryFeeTokenVaultBalance = await L2SecondaryFeeToken.balanceOf(
-      address6
-    )
     const L2BOBABillingBalance = await wallet5.provider.getBalance(address7)
 
     await gasPriceOracleService._getL2GasCost()
@@ -515,18 +495,12 @@ describe('gas-price-oracle', () => {
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.equal(
       preL2BOBACollectFee
     )
-    expect(
-      gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee
-    ).to.be.equal(preL2SecondaryFeeTokenCollectFee)
     expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.equal(
       preL2BOBABillingCollectFee
     )
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.equal(
       L2BOBAVaultBalance
     )
-    expect(
-      gasPriceOracleService.state.L2SecondaryFeeTokenVaultBalance
-    ).to.be.equal(L2SecondaryFeeTokenVaultBalance)
     expect(gasPriceOracleService.state.L2BOBABillingBalance).to.be.equal(
       L2BOBABillingBalance
     )
@@ -537,8 +511,6 @@ describe('gas-price-oracle', () => {
     tempGasPriceOracleService = new GasPriceOracleService({
       l1RpcProvider: ethers.provider,
       l2RpcProvider: ethers.provider,
-      l2BobaETHProvider: ethers.provider,
-      l1MoonbeamTestnetProvider: ethers.provider,
 
       addressManagerAddress: Lib_AddressManager.address,
       gasPriceOracleAddress: gasPriceOracle.address,
@@ -590,8 +562,6 @@ describe('gas-price-oracle', () => {
     tempGasPriceOracleService = new GasPriceOracleService({
       l1RpcProvider: ethers.provider,
       l2RpcProvider: ethers.provider,
-      l2BobaETHProvider: ethers.provider,
-      l1MoonbeamTestnetProvider: ethers.provider,
 
       addressManagerAddress: Lib_AddressManager.address,
       gasPriceOracleAddress: gasPriceOracle.address,
@@ -625,78 +595,5 @@ describe('gas-price-oracle', () => {
 
     const postL1BaseFee = await gasPriceOracle.l1BaseFee()
     expect(postL1BaseFee).to.be.equal(ethers.utils.parseEther('0'))
-  })
-
-  it('should update price ratio', async () => {
-    const Factory__Boba_GasPriceOracle = getContractFactory(
-      'Boba_GasPriceOracle',
-      wallet8
-    )
-    const Boba_GasPriceOracle = await Factory__Boba_GasPriceOracle.deploy()
-    await Boba_GasPriceOracle.deployTransaction.wait()
-
-    await Boba_GasPriceOracle.initialize(address1, address2)
-
-    const registerBoba_GasPriceOralceTx = await Lib_AddressManager.setAddress(
-      'Proxy__Boba_GasPriceOracle',
-      Boba_GasPriceOracle.address
-    )
-    await registerBoba_GasPriceOralceTx.wait()
-
-    // Initialize GasPriceOracleService
-    tempGasPriceOracleService = new GasPriceOracleService({
-      l1RpcProvider: ethers.provider,
-      l2RpcProvider: ethers.provider,
-      l2BobaETHProvider: ethers.provider,
-      l1MoonbeamTestnetProvider: ethers.provider,
-
-      addressManagerAddress: Lib_AddressManager.address,
-      gasPriceOracleAddress: gasPriceOracle.address,
-
-      OVM_SequencerFeeVault: address5,
-
-      gasPriceOracleOwnerWallet: wallet8,
-
-      sequencerAddress: address1,
-      proposerAddress: address2,
-      relayerAddress: address3,
-      fastRelayerAddress: address4,
-
-      pollingInterval: 0,
-      overheadRatio1000X: 10,
-      overheadMinPercentChange: 10,
-      minOverhead: 2000,
-      minL1BaseFee: 50_000_000_000,
-      maxL1BaseFee: 100_000_000_000,
-      bobaFeeRatio100X: 100,
-      bobaFeeRatioMinPercentChange: 10,
-      bobaLocalTestnetChainId: 31337,
-    })
-
-    await tempGasPriceOracleService.init()
-
-    tempGasPriceOracleService.state.L2SecondaryFeeTokenUSDPrice = 10
-    tempGasPriceOracleService.state.BOBAUSDPrice = 1
-
-    const prePriceRatio = await Boba_GasPriceOracle.priceRatio()
-
-    await tempGasPriceOracleService._updatePriceRatio()
-
-    const postPriceRatio = await Boba_GasPriceOracle.priceRatio()
-    expect(postPriceRatio).to.be.equal(prePriceRatio)
-
-    tempGasPriceOracleService.state.L2SecondaryFeeTokenUSDPrice = 1
-    tempGasPriceOracleService.state.BOBAUSDPrice = 2500
-
-    console.log({
-      L2SecondaryFeeTokenUSDPrice:
-        tempGasPriceOracleService.state.L2SecondaryFeeTokenUSDPrice,
-      BOBAUSDPrice: tempGasPriceOracleService.state.BOBAUSDPrice,
-    })
-
-    await tempGasPriceOracleService._updatePriceRatio()
-
-    const updatedPriceRatio = await Boba_GasPriceOracle.priceRatio()
-    expect(updatedPriceRatio).to.be.equal(BigNumber.from('2500'))
   })
 })

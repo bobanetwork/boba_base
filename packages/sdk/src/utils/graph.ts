@@ -1,9 +1,10 @@
 import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 
-export const WHITELIST_CHAIN_ID: Array<number> = [1287, 1284]
+export const WHITELIST_CHAIN_ID: Array<number> = [1287, 1284, 4002, 250]
 
 export const GRAPH_API_URL: any = {
+  // Bobabase
   1287: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-rollup',
@@ -11,12 +12,29 @@ export const GRAPH_API_URL: any = {
     addressManager:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-address-manager',
   },
+  // Bobabeam
   1284: {
     rollup:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-rollup',
     // The process of syncing Lib_addressManager is super slow
     addressManager:
       'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-address-manager',
+  },
+  // Bobaopera testnet
+  4002: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-tn-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-tn-address-manager',
+  },
+  // Bobaopera
+  250: {
+    rollup:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-rollup',
+    // The process of syncing Lib_addressManager is super slow
+    addressManager:
+      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-address-manager',
   },
 }
 

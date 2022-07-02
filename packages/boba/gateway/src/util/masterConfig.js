@@ -111,6 +111,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
         blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://moonbase.moonscan.io/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
       },
       L2: {
         name: "BobaBase",
@@ -119,6 +120,32 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         rpcUrl: `https://bobabase.boba.network`,
         blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
         transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
+    }
+ }
+} else if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
+  NETWORK = {
+    bobaOperaTestnet: {
+      OMGX_WATCHER_URL: `https://api-watcher.testnet.bobaopera.boba.network/`,
+      MM_Label:         `bobaOperaTestnet`,
+      addressManager:   `0x12ad9f501149D3FDd703cC10c567F416B7F0af8b`,
+      L1: {
+        name: "Fantom Testnet",
+        chainId: 4002,
+        chainIdHex: '0xFA2',
+        rpcUrl: `https://rpc.testnet.fantom.network`,
+        blockExplorer: `https://api-testnet.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://testnet.ftmscan.com/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "BobaOpera Testnet",
+        chainId: 4051,
+        chainIdHex: '0xFD3',
+        rpcUrl: `https://testnet.bobaopera.boba.network`,
+        blockExplorer: `https://blockexplorer.testnet.bobaopera.boba.network/`,
+        transaction: `https://blockexplorer.testnet.bobaopera.boba.network/tx/`,
       },
       gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
     }

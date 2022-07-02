@@ -21,10 +21,10 @@ const initialState = {
     currency:  L1ETH,
     addressL1: L1ETH,
     addressL2: L2ETH,
-    symbolL1:  'GLMR',
-    symbolL2:  'GLMR',
+    symbolL1:  process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+    symbolL2:  process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
     decimals:     18,
-    name: 'GLMR',
+    name: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
     redalert:  false,
   },
 }

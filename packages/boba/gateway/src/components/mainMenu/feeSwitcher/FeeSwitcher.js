@@ -38,6 +38,8 @@ import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 import { HelpOutline } from '@mui/icons-material'
 
+import networkService from 'services/networkService'
+
 function FeeSwitcher() {
 
   const dispatch = useDispatch()
@@ -48,8 +50,8 @@ function FeeSwitcher() {
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  const l2BalanceGLMR = l2Balances.filter((i) => i.symbol === 'GLMR')
-  const balanceGLMR = l2BalanceGLMR[0]
+  const l2BalanceL1NativeToken = l2Balances.filter((i) => i.symbol === networkService.L1NativeTokenSymbol)
+  const balanceL1NativeToken = l2BalanceL1NativeToken[0]
 
   const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
   const balanceBOBA = l2BalanceBOBA[0]
@@ -57,10 +59,10 @@ function FeeSwitcher() {
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
     console.log("balanceBOBA:",balanceBOBA)
-    console.log("balanceGLMR:",balanceGLMR)
+    console.log("balanceL1NativeToken:",balanceL1NativeToken)
 
-    console.log("feeUseBoba:",feeUseBoba) 
-    console.log("targetFee:",targetFee) 
+    console.log("feeUseBoba:",feeUseBoba)
+    console.log("targetFee:",targetFee)
 
     /*
     warning - feeUseBoba is flipped compared to its usual meaning
@@ -68,7 +70,7 @@ function FeeSwitcher() {
 
     const usingBOBA = !feeUseBoba
 
-    let tooSmallGLMR = false
+    let tooSmallL1NativeToken = false
     let tooSmallBOBA = false
 
     if(typeof(balanceBOBA) === 'undefined') {
@@ -78,15 +80,15 @@ function FeeSwitcher() {
       tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(1))
     }
 
-    if(typeof(balanceGLMR) === 'undefined') {
-      tooSmallGLMR = true
+    if(typeof(balanceL1NativeToken) === 'undefined') {
+      tooSmallL1NativeToken = true
     } else {
       //check actual balance
-      tooSmallGLMR = new BN(logAmount(balanceGLMR.balance, 18)).lt(new BN(0.5))
+      tooSmallL1NativeToken = new BN(logAmount(balanceL1NativeToken.balance, 18)).lt(new BN(0.5))
     }
 
-    if (!balanceBOBA && !balanceGLMR) {
-      dispatch(openError('Wallet empty - please bridge in GLMR or BOBA from L1'))
+    if (!balanceBOBA && !balanceL1NativeToken) {
+      dispatch(openError(`Wallet empty - please bridge in ${networkService.L1NativeTokenSymbol} or BOBA from L1`))
       return
     }
 
@@ -100,14 +102,14 @@ function FeeSwitcher() {
     if ( usingBOBA && targetFee === 'BOBA' ) {
       // do nothing - already set to BOBA
     }
-    else if ( !usingBOBA && targetFee === 'GLMR' ) {
-      // do nothing - already set to GLMR
+    else if ( !usingBOBA && targetFee === networkService.L1NativeTokenSymbol ) {
+      // do nothing - already set to L1NativeToken
     }
-    else if ( usingBOBA && targetFee === 'GLMR' ) {
-      // change to GLMR
-      if( tooSmallGLMR ) {
-        dispatch(openError(`You cannot change the fee token to GLMR since your GLMR balance is below 0.5.
-          If you change fee token now, you might get stuck. Please obtain some GLMR first.`))
+    else if ( usingBOBA && targetFee === networkService.L1NativeTokenSymbol ) {
+      // change to L1NativeToken
+      if( tooSmallL1NativeToken ) {
+        dispatch(openError(`You cannot change the fee token to ${networkService.L1NativeTokenSymbol} since your ${networkService.L1NativeTokenSymbol} balance is below 0.5.
+          If you change fee token now, you might get stuck. Please obtain some ${networkService.L1NativeTokenSymbol} first.`))
       } else {
         res = await dispatch(switchFee(targetFee))
       }
@@ -126,7 +128,7 @@ function FeeSwitcher() {
       dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
     }
 
-  }, [ dispatch, feeUseBoba, balanceGLMR, balanceBOBA ])
+  }, [ dispatch, feeUseBoba, balanceL1NativeToken, balanceBOBA ])
 
   if (!accountEnabled) {
     return null
@@ -138,7 +140,7 @@ function FeeSwitcher() {
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip title={'BOBA or GLMR will be used across Bobabeam according to your choice.'}>
+      <Tooltip title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across Bobabeam according to your choice.`}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
       <Typography variant="body2">Fee</Typography>
@@ -146,14 +148,14 @@ function FeeSwitcher() {
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={!feeUseBoba ? "BOBA" : 'GLMR'}
+        value={!feeUseBoba ? "BOBA" : networkService.L1NativeTokenSymbol}
         options={[ {
           value: 'BOBA',
           title: 'BOBA',
         },
         {
-          value: 'GLMR',
-          title: 'GLMR',
+          value: networkService.L1NativeTokenSymbol,
+          title: networkService.L1NativeTokenSymbol,
         }
         ]}
       />
