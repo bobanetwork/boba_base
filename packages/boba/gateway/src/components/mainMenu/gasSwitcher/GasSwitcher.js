@@ -37,8 +37,7 @@ function GasSwitcher({ isMobile }) {
     <S.Menu>
       <S.MenuItem>
         <S.Label component="p" variant="body2">
-          {networkService.chain === 'bobaBase'  && 'Moonbase'}
-          {networkService.chain === 'bobaOperaTestnet' && 'Fantom Testnet'}
+          {networkService.L1ChainAsset.name}
         </S.Label>
         <S.Value component="p" variant="body2">{gas.gasL1} Gwei</S.Value>
       </S.MenuItem>

@@ -18,8 +18,6 @@ import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton 
 import { useTheme } from '@mui/styles'
 import { setConnect, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
-import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
-import FantomIcon from 'components/icons/FantomIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -226,18 +224,10 @@ function LayerSwitcher({
   if (isMobile) {
     return (
       <S.LayerSwitcherWrapperMobile>
-        {networkService.chain === 'bobaBase' &&
-          <MobileLayer title="Moonbase" layer={layer} icon={<MoonbeamIcon />}
-            onConnect={() => connectToETH()}
-            isConnected={layer === 'L1'}
-          />
-        }
-        {networkService.chain === 'bobaOperaTestnet' &&
-          <MobileLayer title="Fantom Testnet" layer={layer} icon={<FantomIcon />}
-            onConnect={() => connectToETH()}
-            isConnected={layer === 'L1'}
-          />
-        }
+        <MobileLayer title={networkService.L1ChainAsset.name} layer={layer} icon={networkService.L1ChainAsset.icon}
+          onConnect={() => connectToETH()}
+          isConnected={layer === 'L1'}
+        />
         <S.LayerDivider />
         <MobileLayer title="Boba Network" layer={layer} icon={<BobaIcon />}
           onConnect={() => connectToBOBA()}
@@ -256,8 +246,7 @@ function LayerSwitcher({
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          {networkService.chain === 'bobaBase' && <MoonbeamIcon selected={layer === 'L1'}/>}
-          {networkService.chain === 'bobaOperaTestnet' && <FantomIcon selected={layer === 'L1'}/>}
+          {networkService.L1ChainAsset.icon(layer === 'L1')}
         </ToggleButton>
         <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
           <BobaIcon selected={layer === 'L2'} />
@@ -265,8 +254,7 @@ function LayerSwitcher({
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >
-          {networkService.chain === 'bobaBase'  && 'Moonbase'}
-          {networkService.chain === 'bobaOperaTestnet' && 'Fantom Testnet'}
+          {networkService.L1ChainAsset.name}
         </Typography>
         <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
