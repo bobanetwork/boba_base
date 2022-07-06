@@ -1,0 +1,20 @@
+# Build Geth in a stock Go builder container
+FROM golang:1.17.9-alpine
+
+RUN apk add --no-cache git bash gcc musl-dev curl
+
+WORKDIR $GOPATH
+RUN mkdir -p src/github.com/ava-labs/avalanchego && cd src/github.com/ava-labs
+WORKDIR $GOPATH/src/github.com/ava-labs
+
+# RUN curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-cli/main/scripts/install.sh | sh -s
+RUN git clone https://github.com/ava-labs/avalanchego
+RUN cd avalanchego && ./scripts/build.sh
+
+RUN git clone https://github.com/ava-labs/avalanche-network-runner.git
+WORKDIR $GOPATH/src/github.com/ava-labs/avalanche-network-runner
+RUN go mod vendor
+
+EXPOSE 9650 9652 9654 9656 9658
+ENV AVALANCHEGO_EXEC_PATH $GOPATH/src/github.com/ava-labs/avalanchego/bin/avalanche
+ENTRYPOINT ["go", "run", "examples/local/fivenodenetwork/main.go"]
