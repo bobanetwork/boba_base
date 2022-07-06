@@ -16,7 +16,7 @@ async function main() {
     TwitterAuthenticatedFaucet.abi,
     TwitterAuthenticatedFaucet.bytecode,
     testWallet
-  ).attach('0xCED1459C6B56a85363426a502a24De99fBbF5a83')
+  ).attach(process.env.FAUCET_ADDRESS)
 
   const deployTx = await twitterFactory.setConfig(
     'https://o9gvgzsjw5.execute-api.us-east-1.amazonaws.com/Prod/', 10,
