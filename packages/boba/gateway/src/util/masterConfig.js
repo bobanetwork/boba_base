@@ -121,7 +121,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
         transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`,
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20`
     }
  }
@@ -148,7 +148,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://blockexplorer.testnet.bobaopera.boba.network/`,
         transaction: `https://blockexplorer.testnet.bobaopera.boba.network/tx/`,
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`,
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
     }
  }
