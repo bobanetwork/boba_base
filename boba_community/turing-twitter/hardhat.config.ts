@@ -16,14 +16,9 @@ const config: HardhatUserConfig = {
       url: 'https://testnet.bobaopera.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
-      bridgeCounterpartUrl: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // public RPC
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    } as any,
-    boba_mainnet: {
-      url: 'http://mainnet.boba.network',
-    },
+    boba_base: {
+      url: 'https://bobabase.boba.network/',
+    }
   },
   solidity: {
     compilers: [
