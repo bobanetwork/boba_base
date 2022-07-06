@@ -9,47 +9,16 @@ export default function etherScanInstance(networkGateway, layer){
   if(networkGateway === 'local') {
     return null //does not make sense on local
   }
-  else if (networkGateway === 'rinkeby' && layer === 'L1') {
+  else if (layer === 'L1') {
     axiosInstance = axios.create({
-      baseURL: nw.rinkeby.L1.blockExplorer,
+      baseURL: nw[networkGateway].L1.blockExplorer,
     })
   }
-  else if (networkGateway === 'rinkeby' && layer === 'L2') {
+  else if (layer === 'L2') {
     axiosInstance = axios.create({
-      baseURL: nw.rinkeby.L2.blockExplorer,
+      baseURL: nw[networkGateway].L2.blockExplorer,
     })
   }
-  else if (networkGateway === 'mainnet' && layer === 'L1') {
-    axiosInstance = axios.create({
-      baseURL: nw.mainnet.L1.blockExplorer,
-    })
-  }
-  else if (networkGateway === 'mainnet' && layer === 'L2') {
-    axiosInstance = axios.create({
-      baseURL: nw.mainnet.L2.blockExplorer,
-    })
-  }
-  else if (networkGateway === 'bobaBase' && layer === 'L1') {
-    axiosInstance = axios.create({
-      baseURL: nw.bobaBase.L1.blockExplorer,
-    })
-  }
-  else if (networkGateway === 'bobaBase' && layer === 'L2') {
-    axiosInstance = axios.create({
-      baseURL: nw.bobaBase.L2.blockExplorer,
-    })
-  }
-  else if (networkGateway === 'bobaOperaTestnet' && layer === 'L1') {
-    axiosInstance = axios.create({
-      baseURL: nw.bobaOperaTestnet.L1.blockExplorer,
-    })
-  }
-  else if (networkGateway === 'bobaOperaTestnet' && layer === 'L2') {
-    axiosInstance = axios.create({
-      baseURL: nw.bobaOperaTestnet.L2.blockExplorer,
-    })
-  }
-
   axiosInstance.interceptors.request.use((config) => {
     config.headers['Accept'] = 'application/json'
     config.headers['Content-Type'] = 'application/json'

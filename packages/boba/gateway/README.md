@@ -11,5 +11,3 @@ The new chain information should be added to the following files:
 
 * `src/util/masterConfig.js`
   * Add new network configurations 
-* `src/api/omgxWatcherAxios.js`, `src/api/metaTransactionAxios.js`, `src/api/etherScanAxios.js`
-  * Add the settings in the api instances

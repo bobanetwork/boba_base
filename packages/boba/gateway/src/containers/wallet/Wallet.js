@@ -20,7 +20,6 @@ import {
 import {
   selectAccountEnabled,
   selectLayer,
-  selectNetwork,
 } from "selectors/setupSelector"
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
