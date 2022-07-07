@@ -19,7 +19,7 @@ async function main() {
   ).attach(process.env.FAUCET_ADDRESS)
 
   const deployTx = await twitterFactory.setConfig(
-    'https://o9gvgzsjw5.execute-api.us-east-1.amazonaws.com/Prod/', 10,
+    process.env.TURING_ENDPOINT, 10,
     parseEther('1'), parseEther('0.1')
   )
   const res = await deployTx.wait()
