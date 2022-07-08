@@ -43,7 +43,8 @@ export const executeL1ToL2Transaction = async (
         tx.functionName,
         tx.functionParams
       ),
-      MESSAGE_GAS
+      MESSAGE_GAS,
+      { gasLimit: 10_000_000 }
     )
   )
   await env.waitForXDomainTransaction(receipt)
@@ -67,6 +68,7 @@ export const executeL2ToL1Transaction = async (
       MESSAGE_GAS,
       {
         gasPrice: gasPriceForL2(),
+        gasLimit: 10_000_000,
       }
     )
   )
@@ -86,6 +88,7 @@ export const executeL2Transaction = async (
       .connect(signer)
       .functions[tx.functionName](...tx.functionParams, {
         gasPrice: gasPriceForL2(),
+        gasLimit: 10_000_000,
       })
   )
   await result.wait()
