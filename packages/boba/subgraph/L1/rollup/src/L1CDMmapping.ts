@@ -5,7 +5,7 @@ import {
 import { RelayedMessageEntity, FailedRelayedMessageEntity } from "../generated/schema"
 
 export function handleFailedRelayedMessage(event: FailedRelayedMessage): void {
-  const id = event.transaction.hash.toHex()
+  const id = event.params.msgHash.toHex()
   const entity = new FailedRelayedMessageEntity(id)
   entity.id = id
   entity.msgHash = event.params.msgHash
@@ -16,7 +16,7 @@ export function handleFailedRelayedMessage(event: FailedRelayedMessage): void {
 }
 
 export function handleRelayedMessage(event: RelayedMessage): void {
-  const id = event.transaction.hash.toHex()
+  const id = event.params.msgHash.toHex()
   const entity = new RelayedMessageEntity(id)
   entity.id = id
   entity.msgHash = event.params.msgHash
