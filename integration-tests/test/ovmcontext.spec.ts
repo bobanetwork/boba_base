@@ -1,6 +1,6 @@
 /* Imports: External */
 import { ethers } from 'hardhat'
-import { expectApprox } from '@eth-optimism/core-utils'
+import { expectApprox, sleep } from '@eth-optimism/core-utils'
 import { predeploys } from '@eth-optimism/contracts'
 import { Contract, BigNumber } from 'ethers'
 
@@ -144,6 +144,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     // As atomically as possible, call `rollup_getInfo` and OVMMulticall for the
     // blocknumber and timestamp. If this is not atomic, then the sequencer can
     // happend to update the timestamp between the `eth_call` and the `rollup_getInfo`
+    await sleep(5000)
     const [info, [, returnData]] = await Promise.all([
       env.l2Provider.send('rollup_getInfo', []),
       OVMMulticall.callStatic.aggregate([
