@@ -4,7 +4,7 @@ import { sleep } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */
 import { OptimismEnv } from './env'
-import { gasPriceForL1, gasPriceForL2 } from './utils'
+import { gasPriceForL1, gasPriceForL2, FANTOM_CHAIN_ID } from './utils'
 
 interface TransactionParams {
   contract: ethers.Contract
@@ -33,6 +33,11 @@ export const executeL1ToL2Transaction = async (
   wallet: ethers.Wallet,
   tx: TransactionParams
 ) => {
+  let options = {}
+  const network = await env.l1Provider.getNetwork()
+  if (network.chainId === FANTOM_CHAIN_ID) {
+    options = { gasLimit: 2_000_000 }
+  }
   const signer = wallet.connect(env.l1Wallet.provider)
   const receipt = await retryOnNonceError(async () =>
     env.messenger.contracts.l1.L1CrossDomainMessenger.connect(
@@ -44,7 +49,7 @@ export const executeL1ToL2Transaction = async (
         tx.functionParams
       ),
       MESSAGE_GAS,
-      { gasLimit: 10_000_000 }
+      options
     )
   )
   await env.waitForXDomainTransaction(receipt)
