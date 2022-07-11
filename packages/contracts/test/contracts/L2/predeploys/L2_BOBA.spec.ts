@@ -22,7 +22,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('transfer', () => {
-    it.only('should revert', async () => {
+    it('should revert', async () => {
       await expect(
         L2_BOBA.transfer(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
@@ -32,7 +32,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('approve', () => {
-    it.only('should revert', async () => {
+    it('should revert', async () => {
       await expect(
         L2_BOBA.approve(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
@@ -42,7 +42,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('transferFrom', () => {
-    it.only('should revert', async () => {
+    it('should revert', async () => {
       await expect(
         L2_BOBA.transferFrom(
           await signer1.getAddress(),
@@ -56,7 +56,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('increaseAllowance', () => {
-    it.only('should revert', async () => {
+    it('should revert', async () => {
       await expect(
         L2_BOBA.increaseAllowance(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
@@ -66,7 +66,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('decreaseAllowance', () => {
-    it.only('should revert', async () => {
+    it('should revert', async () => {
       await expect(
         L2_BOBA.decreaseAllowance(await signer2.getAddress(), 100)
       ).to.be.revertedWith(
@@ -76,14 +76,14 @@ describe('L2_BOBA', () => {
   })
 
   describe('transferOwnership', () => {
-    it.only('should transfer ownsership', async () => {
+    it('should transfer ownsership', async () => {
       await L2_BOBA.transferOwnership(await signer2.getAddress())
       expect(await L2_BOBA.owner()).to.equal(await signer2.getAddress())
     })
   })
 
   describe('addWhitelistBridge', () => {
-    it.only('should add signer1 to the whitelist bridge', async () => {
+    it('should add signer1 to the whitelist bridge', async () => {
       const signer1Address = await signer1.getAddress()
       const tx = await L2_BOBA.addWhitelistBridge(signer1Address)
       const receipt = await tx.wait()
@@ -95,7 +95,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('revokeWhitelistBridge', () => {
-    it.only('should revoke signer1 from the whitelist bridge', async () => {
+    it('should revoke signer1 from the whitelist bridge', async () => {
       const signer1Address = await signer1.getAddress()
       const tx = await L2_BOBA.revokeWhitelistBridge(signer1Address)
       const receipt = await tx.wait()
@@ -107,7 +107,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('pause', async () => {
-    it.only('should pause the contract', async () => {
+    it('should pause the contract', async () => {
       const tx = await L2_BOBA.pause()
       const receipt = await tx.wait()
       const [pauseEvent] = receipt.events
@@ -116,7 +116,7 @@ describe('L2_BOBA', () => {
       expect(pauseEvent.event).to.be.eq('Paused')
     })
 
-    it.only('should not be able to mint tokens', async () => {
+    it('should not be able to mint tokens', async () => {
       const signer1Address = await signer1.getAddress()
       await L2_BOBA.addWhitelistBridge(signer1Address)
       await L2_BOBA.pause()
@@ -126,7 +126,7 @@ describe('L2_BOBA', () => {
       ).to.be.revertedWith('Pausable: paused')
     })
 
-    it.only('should not be able to burn tokens', async () => {
+    it('should not be able to burn tokens', async () => {
       const signer1Address = await signer1.getAddress()
       await L2_BOBA.addWhitelistBridge(signer1Address)
       await L2_BOBA.pause()
@@ -138,7 +138,7 @@ describe('L2_BOBA', () => {
   })
 
   describe('unpause', async () => {
-    it.only('should unpause the contract', async () => {
+    it('should unpause the contract', async () => {
       await L2_BOBA.pause()
       const tx = await L2_BOBA.unpause()
       const receipt = await tx.wait()
@@ -148,7 +148,7 @@ describe('L2_BOBA', () => {
       expect(pauseEvent.event).to.be.eq('Unpaused')
     })
 
-    it.only('should be able to mint tokens', async () => {
+    it('should be able to mint tokens', async () => {
       const signer1Address = await signer1.getAddress()
       await L2_BOBA.addWhitelistBridge(signer1Address)
       await L2_BOBA.pause()
@@ -158,7 +158,7 @@ describe('L2_BOBA', () => {
       expect(await L2_BOBA.balanceOf(signer1Address)).to.equal(100)
     })
 
-    it.only('should be able to burn tokens', async () => {
+    it('should be able to burn tokens', async () => {
       const signer1Address = await signer1.getAddress()
       await L2_BOBA.addWhitelistBridge(signer1Address)
       await L2_BOBA.pause()
