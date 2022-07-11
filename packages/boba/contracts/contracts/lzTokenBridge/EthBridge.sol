@@ -5,6 +5,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import { IEthBridge } from "./interfaces/IEthBridge.sol";
 import "./lzApp/NonblockingLzApp.sol";
 
 /**
@@ -15,39 +16,25 @@ import "./lzApp/NonblockingLzApp.sol";
  *
  * Runtime target: EVM
  */
- contract EthBridge is NonblockingLzApp {
+ contract EthBridge is IEthBridge, NonblockingLzApp {
     using SafeERC20 for IERC20;
 
     // set altl1 bridge address as setTrustedDomain()
     uint16 public dstChainId;
 
-    event ERC20DepositInitiated(
-        address indexed _l1Token,
-        address indexed _l2Token,
-        address indexed _from,
-        address _to,
-        uint256 _amount,
-        bytes _data
-    );
-
-    event ERC20WithdrawalFinalized(
-        address indexed _l1Token,
-        address indexed _l2Token,
-        address indexed _from,
-        address _to,
-        uint256 _amount,
-        bytes _data
-    );
-
     // Maps L1 token to wrapped token on alt l1 to balance of the L1 token deposited
     mapping(address => mapping(address => uint256)) public deposits;
 
-    // TODO: convert to Proxy init pattern
-    constructor(address _lzEndpoint, uint16 _dstChainId) NonblockingLzApp(_lzEndpoint) {
+    // Note: Specify the _lzEndpoint on this layer, _dstChainId is not the actual evm chainIds, but the layerZero
+    // proprietary ones, pass the chainId of the destination for _dstChainId
+    function initialize(address _lzEndpoint, uint16 _dstChainId, address _altL1BridgeAddress) public initializer {
+        require(_lzEndpoint != address(0), "lz endpoint cannot be zero address");
+
+        __NonblockingLzApp_init(_lzEndpoint);
         // allow only a specific destination
-        // set altl1 bridge address on destination as setTrustedDomain()
-        // or TODO: consider making setTrustedDomain() non external
         dstChainId = _dstChainId;
+        // set altl1 bridge address on destination as setTrustedDomain()
+        setTrustedRemote(_dstChainId, abi.encodePacked(_altL1BridgeAddress));
     }
 
     /**************
@@ -68,7 +55,7 @@ import "./lzApp/NonblockingLzApp.sol";
         address _l2Token,
         uint256 _amount,
         bytes calldata _data
-    ) external virtual onlyEOA {
+    ) external virtual payable onlyEOA {
         _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, msg.sender, _amount, _data);
     }
 
@@ -78,7 +65,7 @@ import "./lzApp/NonblockingLzApp.sol";
         address _to,
         uint256 _amount,
         bytes calldata _data
-    ) external virtual {
+    ) external virtual payable {
         _initiateERC20Deposit(_l1Token, _l2Token, msg.sender, _to, _amount, _data);
     }
 

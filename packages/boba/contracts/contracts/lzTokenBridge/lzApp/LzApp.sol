@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../interfaces/ILayerZeroReceiver.sol";
 import "../interfaces/ILayerZeroUserApplicationConfig.sol";
 import "../interfaces/ILayerZeroEndpoint.sol";
@@ -10,14 +10,16 @@ import "../interfaces/ILayerZeroEndpoint.sol";
 /*
  * a generic LzReceiver implementation
  */
-abstract contract LzApp is Ownable, ILayerZeroReceiver, ILayerZeroUserApplicationConfig {
-    ILayerZeroEndpoint public immutable lzEndpoint;
+abstract contract LzApp is OwnableUpgradeable, ILayerZeroReceiver, ILayerZeroUserApplicationConfig {
+    ILayerZeroEndpoint public lzEndpoint;
 
     mapping(uint16 => bytes) public trustedRemoteLookup;
 
     event SetTrustedRemote(uint16 _srcChainId, bytes _srcAddress);
 
-    constructor(address _endpoint) {
+    function __LzApp_init(address _endpoint) internal initializer {
+        OwnableUpgradeable.__Ownable_init();
+
         lzEndpoint = ILayerZeroEndpoint(_endpoint);
     }
 
@@ -64,7 +66,7 @@ abstract contract LzApp is Ownable, ILayerZeroReceiver, ILayerZeroUserApplicatio
     }
 
     // allow owner to set it multiple times.
-    function setTrustedRemote(uint16 _srcChainId, bytes calldata _srcAddress) external onlyOwner {
+    function setTrustedRemote(uint16 _srcChainId, bytes memory _srcAddress) public onlyOwner {
         trustedRemoteLookup[_srcChainId] = _srcAddress;
         emit SetTrustedRemote(_srcChainId, _srcAddress);
     }

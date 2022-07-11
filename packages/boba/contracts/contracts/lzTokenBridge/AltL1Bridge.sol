@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import { IL2StandardERC20 } from "@eth-optimism/contracts/contracts/standards/IL2StandardERC20.sol";
 
+import { IAltL1Bridge } from "./interfaces/IAltL1Bridge.sol";
 import "./lzApp/NonblockingLzApp.sol";
 
 /**
@@ -17,36 +18,22 @@ import "./lzApp/NonblockingLzApp.sol";
  *
  * Runtime target: EVM
  */
- contract AltL1Bridge is NonblockingLzApp {
+ contract AltL1Bridge is IAltL1Bridge, NonblockingLzApp {
 
     // set l1(eth) bridge address as setTrustedDomain()
     // dstChainId is primarily ethereum
     uint16 public dstChainId;
 
-    event WithdrawalInitiated(
-        address indexed _l1Token,
-        address indexed _l2Token,
-        address indexed _from,
-        address _to,
-        uint256 _amount,
-        bytes _data
-    );
+    // Note: Specify the _lzEndpoint on this layer, _dstChainId is not the actual evm chainIds, but the layerZero
+    // proprietary ones, pass the chainId of the destination for _dstChainId
+    function initialize(address _lzEndpoint, uint16 _dstChainId, address _ethBridgeAddress) public initializer {
+        require(_lzEndpoint != address(0), "lz endpoint cannot be zero address");
 
-    event DepositFinalized(
-        address indexed _l1Token,
-        address indexed _l2Token,
-        address indexed _from,
-        address _to,
-        uint256 _amount,
-        bytes _data
-    );
-
-    // TODO: convert to Proxy init pattern
-    constructor(address _lzEndpoint, uint16 _dstChainId) NonblockingLzApp(_lzEndpoint) {
+        __NonblockingLzApp_init(_lzEndpoint);
         // allow only a specific destination
-        // set l1(eth) bridge address on destination as setTrustedDomain()
-        // or TODO: consider making setTrustedDomain() non external
         dstChainId = _dstChainId;
+        // set l1(eth) bridge address on destination as setTrustedDomain()
+        setTrustedRemote(_dstChainId, abi.encodePacked(_ethBridgeAddress));
     }
 
     /***************
@@ -57,7 +44,7 @@ import "./lzApp/NonblockingLzApp.sol";
         address _l2Token,
         uint256 _amount,
         bytes calldata _data
-    ) external virtual {
+    ) external virtual payable {
         _initiateWithdrawal(_l2Token, msg.sender, msg.sender, _amount, _data);
     }
 
@@ -66,7 +53,7 @@ import "./lzApp/NonblockingLzApp.sol";
         address _to,
         uint256 _amount,
         bytes calldata _data
-    ) external virtual {
+    ) external virtual payable {
         _initiateWithdrawal(_l2Token, msg.sender, _to, _amount, _data);
     }
 
@@ -93,7 +80,7 @@ import "./lzApp/NonblockingLzApp.sol";
             _data
         );
 
-        // Send payload to the Ethereum
+        // Send payload to Ethereum
         _lzSend(dstChainId, payload, payable(msg.sender), address(0x0), bytes(""));
 
         emit WithdrawalInitiated(l1Token, _l2Token, msg.sender, _to, _amount, _data);
