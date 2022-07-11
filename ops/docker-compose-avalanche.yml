@@ -8,6 +8,31 @@ version: "3"
 # }
 #
 
+
+# PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN
+# 56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027
+
+
+# PUB KEY 7EdyWHDoMHykMKNSfRaFtxfCT7gDPuB8pifvrptdYiFojCAaTH
+# Ava ADDRESS C-custom1etenrecgr0lhywpcuvdc7crkgu4f7pdgx7qrdx
+# Ava PRIV KEY PrivateKey-8kqXG11uHXie4oWep5b4ivm2S5TRzSz6yfiamqeENnQT2rmXv
+# ETH Address 0x56faE09531C4985188BA78B7fB93739eaf1fBF98
+# C-Chain PrivKey 119c49b6a55123600ce73fbfad852f45c015d328b593fb20aca9a68f1588bd7e
+
+
+# PUB KEY 6c7qB6S7k6EPweWCfgfXMrC8SAJcss6rrjizjvALMYaJCZGYZJ
+# Ava ADDRESS C-custom17qjusw0fy9d52tgwpjpak2p6qgu9pc2y6qgpqy
+# Ava PRIV KEY PrivateKey-2M3bTSt99e24dwS7E6i7qkxyBxMZZsipBWQjBXBjVaabjyZJNM
+# ETH Address 0x4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F
+# C-Chain PrivKey b135c8deb7e4f283ad3b8a5e8b557d88f32ccdca730a7d1ee6a02263d565c39c
+
+
+# PUB KEY 7nfXp7SfoWuexpuawJtyMiSTetUpSDWpR8pVT8bCuqFiQzGeYF
+# Ava ADDRESS C-custom1mp5hjf2vlpvk50e7ma4f8lss08w39y9m6gw43e
+# Ava PRIV KEY PrivateKey-2p38JqqbFQ3yruv22mFQFToPfMeZVKPa3Vud2wvorCkHetNxr9
+# ETH Address 0xdae74D7327d123a1E1732C14a75599ceAd1aeeC0
+# C-Chain PrivKey ee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437
+
 services:
   l1_chain:
     image: bobanetwork/avalanche:latest
