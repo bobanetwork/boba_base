@@ -115,7 +115,6 @@ export const makeL2GenesisFile = async (
       l2Bridge:predeploys.L2StandardBridge,
     },
     L2_L1NativeToken: {
-      _owner: cfg.deployer,
       l2Bridge: predeploys.L2StandardBridge,
       l1Token: constants.AddressZero,
       _name: cfg.l1NativeTokenName, // from env
