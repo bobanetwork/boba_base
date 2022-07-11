@@ -7,28 +7,28 @@ version: "3"
 #    "ipv6": true,
 # }
 #
-# 2. Restart docker
-#
-# 3. Then create a ipV6 network first
-# docker network create --ipv6 \
-#   --subnet="fd00:1::/80" \
-#   --gateway="fd00:1::1" \
-#   ava-network
 
 services:
   l1_chain:
     image: bobanetwork/avalanche:latest
+    container_name: l1_chain
     build:
       context: ./docker
       dockerfile: Dockerfile.avalanche
     ports:
       # expose the service to the host for integration testing
-      - ${L1CHAIN_HTTP_PORT:-9545}:8545
+      - "9650:9650"
+      - "9652:9652"
+      - "9654:9654"
+      - "9656:9656"
+      - "9658:9658"
     networks:
       - ava-network
 
 networks:
   ava-network:
-    external: true
-
-
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "fd00:1::/64"
+          # gateway: "fd00:1::1"

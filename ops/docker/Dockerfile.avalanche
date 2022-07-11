@@ -1,7 +1,7 @@
 # Build Geth in a stock Go builder container
 FROM golang:1.17.9-alpine
 
-RUN apk add --no-cache git bash gcc musl-dev curl
+RUN apk add --no-cache git bash gcc musl-dev curl jq
 
 WORKDIR $GOPATH
 RUN mkdir -p src/github.com/ava-labs/avalanchego && cd src/github.com/ava-labs
@@ -14,6 +14,13 @@ RUN cd avalanchego && ./scripts/build.sh
 RUN git clone https://github.com/ava-labs/avalanche-network-runner.git
 WORKDIR $GOPATH/src/github.com/ava-labs/avalanche-network-runner
 RUN go mod vendor
+RUN sed -i 's/127.0.0.1/0.0.0.0/g' local/default/node0/config.json local/default/node1/config.json local/default/node2/config.json local/default/node3/config.json local/default/node4/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node0/config.json > local/default/node0/config.json.tmp && mv local/default/node0/config.json.tmp local/default/node0/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node1/config.json > local/default/node1/config.json.tmp && mv local/default/node1/config.json.tmp local/default/node1/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node2/config.json > local/default/node2/config.json.tmp && mv local/default/node2/config.json.tmp local/default/node2/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node3/config.json > local/default/node3/config.json.tmp && mv local/default/node3/config.json.tmp local/default/node3/config.json
+RUN jq --arg val "0.0.0.0" '. + {"http-host": $val}' local/default/node4/config.json > local/default/node4/config.json.tmp && mv local/default/node4/config.json.tmp local/default/node4/config.json
+
 
 EXPOSE 9650 9652 9654 9656 9658
 ENV AVALANCHEGO_EXEC_PATH $GOPATH/src/github.com/ava-labs/avalanchego/bin/avalanche
