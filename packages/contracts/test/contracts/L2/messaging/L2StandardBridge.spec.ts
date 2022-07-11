@@ -309,10 +309,10 @@ describe('L2StandardBridge', () => {
   describe('standard erc20', () => {
     it('should not allow anyone but the L2 bridge to mint and burn', async () => {
       expect(L2ERC20.connect(alice).mint(aliceAddress, 100)).to.be.revertedWith(
-        'Only whitelist bridge can mint and burn'
+        'Only L2 Bridge can mint and burn'
       )
       expect(L2ERC20.connect(alice).burn(aliceAddress, 100)).to.be.revertedWith(
-        'Only whitelist bridge can mint and burn'
+        'Only L2 Bridge can mint and burn'
       )
     })
 
