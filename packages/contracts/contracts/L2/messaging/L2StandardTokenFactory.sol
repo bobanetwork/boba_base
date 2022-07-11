@@ -36,6 +36,9 @@ contract L2StandardTokenFactory {
             _decimals
         );
 
+        // transfer ownership to sender
+        l2Token.transferOwnership(msg.sender);
+
         emit StandardL2TokenCreated(_l1Token, address(l2Token));
     }
 }

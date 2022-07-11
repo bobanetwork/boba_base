@@ -35,7 +35,8 @@ describe('L2StandardTokenFactory', () => {
         18
       )
       const receipt = await tx.wait()
-      const [tokenCreatedEvent] = receipt.events
+      // [OwnershipTransferred, OwnershipTransferred, StandardL2TokenCreated]
+      const tokenCreatedEvent = receipt.events[2]
 
       // Expect there to be an event emmited for the standard token creation
       expect(tokenCreatedEvent.event).to.be.eq('StandardL2TokenCreated')
@@ -52,6 +53,7 @@ describe('L2StandardTokenFactory', () => {
       expect(await l2Token.l1Token()).to.equal(L1ERC20.address)
       expect(await l2Token.name()).to.equal('L2ERC20')
       expect(await l2Token.symbol()).to.equal('ERC')
+      expect(await l2Token.owner()).to.be.equal(await signer.getAddress())
     })
 
     it('should not be able to create a standard token with a 0 address for l1 token', async () => {
