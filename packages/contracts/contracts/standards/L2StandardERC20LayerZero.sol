@@ -12,7 +12,7 @@ contract L2StandardERC20LayerZero is IL2StandardERC20, ERC20, Pausable, Ownable 
     uint8 private immutable _decimals;
 
     // Allow us to register a bridge to mint and burn tokens
-    mapping (address => bool) public whitelistBridges;
+    mapping(address => bool) public whitelistBridges;
 
     /**
      * @param _l2Bridge Address of the L2 standard bridge.
@@ -37,7 +37,10 @@ contract L2StandardERC20LayerZero is IL2StandardERC20, ERC20, Pausable, Ownable 
     /*      Modifier     */
     /*********************/
     modifier onlyWhitelistBridge() {
-        require(msg.sender == l2Bridge || whitelistBridges[msg.sender], "Only whitelist bridge can mint and burn");
+        require(
+            msg.sender == l2Bridge || whitelistBridges[msg.sender],
+            "Only whitelist bridge can mint and burn"
+        );
         _;
     }
 

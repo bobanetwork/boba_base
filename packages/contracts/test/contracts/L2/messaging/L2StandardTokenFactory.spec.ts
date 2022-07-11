@@ -87,7 +87,7 @@ describe('L2StandardTokenFactory', () => {
       const l2TokenAddress = tokenCreatedEvent.args._l2Token
       const l2Token = new Contract(
         l2TokenAddress,
-        getContractInterface('L2StandardERC20'),
+        getContractInterface('L2StandardERC20LayerZero'),
         signer
       )
 
