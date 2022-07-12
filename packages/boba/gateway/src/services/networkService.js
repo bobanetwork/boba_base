@@ -71,6 +71,11 @@ import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOp
 
 import { bobaBridges } from 'util/bobaBridges'
 
+// Icon
+import * as React from 'react';
+import MoonbeamIcon from 'components/icons/MoonbeamIcon.js'
+import FantomIcon from 'components/icons/FantomIcon.js'
+
 require('dotenv').config()
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -91,6 +96,23 @@ if (process.env.REACT_APP_CHAIN === 'bobaBase') {
 if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
   allAddresses = {
     ...addresses_BobaOperaTestnet,
+  }
+}
+
+// suported chains
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet']
+
+// assets for different chains
+const L1ChainAssets = {
+  'bobaBase': {
+    name: 'Moonbase',
+    icon: (bool) => <MoonbeamIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
+  },
+  'bobaOperaTestnet': {
+    name: 'Fantom Testenet',
+    icon: (bool) => <FantomIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL]
   }
 }
 
@@ -178,6 +200,17 @@ class NetworkService {
 
     // chain
     this.chain = process.env.REACT_APP_CHAIN
+
+    // twitter faucet promotion text
+    this.twitterFaucetPromotionText = ''
+
+    // block explorer urls for the footer
+    this.blockExplorerUrls = getNetwork()[this.chain].L2.blockExplorer
+
+    // supported chain
+    this.supportedMultiChains = supportedMultiChains
+
+    this.L1ChainAsset = L1ChainAssets[this.chain]
   }
 
   bindProviderListeners() {
@@ -360,7 +393,7 @@ class NetworkService {
     console.log("triggering getTestnetETH")
 
     const Boba_AuthenticatedFaucet = new ethers.Contract(
-      addresses_BobaBase.AuthenticatedFaucet,
+      allAddresses.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     )
@@ -484,16 +517,11 @@ class NetworkService {
       this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
       this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
 
-      if (networkGateway === 'bobaBase') {
+      if (this.supportedMultiChains.includes(networkGateway)) {
         this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
         this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
-        console.log('gasEstimateAccount:', this.gasEstimateAccount)
-      }
-      else if (networkGateway === 'bobaOperaTestnet') {
-        this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
-        this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
-        this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
+        this.twitterFaucetPromotionText = nw[networkGateway].twitterFaucetPromotionText
         console.log('gasEstimateAccount:', this.gasEstimateAccount)
       }
       else {
@@ -507,13 +535,9 @@ class NetworkService {
         nw[networkGateway]['L2']['rpcUrl']
       )
 
-      if (networkGateway === 'bobaBase') {
-        addresses = addresses_BobaBase
-        console.log('BobaBase Addresses:', addresses)
-      }
-      if (networkGateway === 'bobaOperaTestnet') {
-        addresses = addresses_BobaOperaTestnet
-        console.log('BobaOpera Testnet Addresses:', addresses)
+      if (this.supportedMultiChains.includes(networkGateway)) {
+        addresses = allAddresses
+        console.log(`${networkGateway} Addresses: ${addresses}`)
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
@@ -576,12 +600,7 @@ class NetworkService {
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
-      if ( networkGateway === 'bobaBase' ) {
-        this.supportedTokens = [ 'BOBA', networkService.L1NativeTokenSymbol]
-      }
-      if ( networkGateway === 'bobaOperaTestnet' ) {
-        this.supportedTokens = [ 'BOBA', networkService.L1NativeTokenSymbol]
-      }
+      this.supportedTokens = networkService.L1ChainAsset.supportedTokens
 
       await Promise.all(this.supportedTokens.map(async (key) => {
 
@@ -634,31 +653,18 @@ class NetworkService {
       )
       //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
-      if (networkGateway === 'bobaBase') {
+      if (this.supportedMultiChains.includes(networkGateway)) {
+        const l1ChainId = (await this.L1Provider.getNetwork()).chainId
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 1287,
+          l1ChainId,
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 1287,
-          fastRelayer: true,
-        })
-      }
-      else if (networkGateway === 'bobaOperaTestnet') {
-        this.watcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4002,
-          fastRelayer: false,
-        })
-        this.fastWatcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4002,
+          l1ChainId,
           fastRelayer: true,
         })
       }
@@ -719,22 +725,12 @@ class NetworkService {
       // also, either L1 or L2
 
       // at this point, we only know whether we want to be on local or rinkeby etc
-      if (networkGateway === 'bobaBase' && networkMM.chainId === L1ChainId) {
+      if (this.supportedMultiChains.includes(networkGateway) && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
         //bobaBase, L1
         this.L1orL2 = 'L1'
       }
-      else if (networkGateway === 'bobaBase' && networkMM.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //bobaBase, L2
-        this.L1orL2 = 'L2'
-      }
-      else if (networkGateway === 'bobaOperaTestnet' && networkMM.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //bobaBase, L1
-        this.L1orL2 = 'L1'
-      }
-      else if (networkGateway === 'bobaOperaTestnet' && networkMM.chainId === L2ChainId) {
+      else if (this.supportedMultiChains.includes(networkGateway) && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //bobaBase, L2
         this.L1orL2 = 'L2'
@@ -962,7 +958,7 @@ class NetworkService {
   async claimAuthenticatedTestnetTokens(tweetId) {
     // Only Rinkeby
     const contract = new ethers.Contract(
-      addresses_BobaBase.AuthenticatedFaucet,
+      allAddresses.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     ).connect()

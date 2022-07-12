@@ -54,8 +54,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         data:
           '0xa44c80e3000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000006a6676813d3d4317442cf84667425c13553f4a760000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000038d7ea4c68000'
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
-
+      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20for%20Rinkeby%20`
     }
   }
 } else if (process.env.REACT_APP_CHAIN === 'mainnet') {
@@ -121,7 +121,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
         transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20`
     }
  }
 } else if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
@@ -147,7 +148,8 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://blockexplorer.testnet.bobaopera.boba.network/`,
         transaction: `https://blockexplorer.testnet.bobaopera.boba.network/tx/`,
       },
-      gasEstimateAccount: `0x1FE67D4a3c73abAa0703a70bAbf0fB81aC572bd2`
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
     }
  }
 } else if (process.env.REACT_APP_CHAIN === 'local') {
@@ -188,6 +190,10 @@ const BaseServices = {
   BOBABEAM_META_TRANSACTION: `https://api-meta-transaction.bobabeam.boba.network/`,
   // Testnet meta transaction
   BOBABASE_META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
+  // Mainnet meta transaction
+  BOBAOPERA_META_TRANSACTION: `https://api-meta-transaction.bobaopera.boba.network/`,
+  // Testnet meta transaction
+  BOBAOPERATESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.bobaopera.boba.network/`,
 }
 
 export function getNetwork () {
