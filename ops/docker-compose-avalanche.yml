@@ -33,6 +33,28 @@ version: "3"
 # ETH Address 0xdae74D7327d123a1E1732C14a75599ceAd1aeeC0
 # C-Chain PrivKey ee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437
 
+
+# PUB KEY 7wxExVLHmceCuno8pGuTy1zs5fqNFmwTdep3tXqrNB8SiYCCrn
+# ADDRESS C-custom1pckvggf8rl8pq6utu30psm7nd5m8c0uzd665ls
+# PRIV KEY PrivateKey-2UaBWxCEeVjzo2314c62CEcujuRocQxdQgcBoWbbQFsiD4DikJ
+# ETH Address 0xb57255024fa928e3d296c41528171b5f67e8d447
+# C-Chain PrivKey c24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c
+
+
+# PUB KEY 6D1Fs4Ty4PFLq5DnvymnMvtTnHxRWT3uPLqRZejd1WrkMavTc7
+# ADDRESS C-custom1eeftxyzhjlu6hx95ycvskcvwnj6vxx7rkaujas
+# PRIV KEY PrivateKey-Vmr4BTLYkPKcaw4nYW6SxEbr275chp3MBktoGkc5auUhjV7wM
+# ETH Address 0x91ef3b19cdb344c5010358718e9347dd5cb2f362
+# C-Chain PrivKey 4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a
+
+
+# PUB KEY 64h63VM7DaBc1t9QHg7kwqoLroSjrsZXyy7MwSxTo6eCseFQbn
+# ADDRESS C-custom1qq26q3pp2qrgyte0hquqdeh4pau82z0tk2l0pc
+# PRIV KEY PrivateKey-nnqZLTSthVBRQbc1kzLt7LMC68XiWcnVbDukKbJHrBSfBiFK6
+# ETH Address 0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea
+# C-Chain PrivKey 67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e
+
+
 services:
   l1_chain:
     image: bobanetwork/avalanche:latest
