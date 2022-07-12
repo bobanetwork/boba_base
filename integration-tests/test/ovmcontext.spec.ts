@@ -1,6 +1,6 @@
 /* Imports: External */
 import { ethers } from 'hardhat'
-import { expectApprox, sleep } from '@eth-optimism/core-utils'
+import { expectApprox } from '@eth-optimism/core-utils'
 import { predeploys } from '@eth-optimism/contracts'
 import { Contract, BigNumber } from 'ethers'
 
