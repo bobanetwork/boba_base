@@ -247,219 +247,219 @@ services:
       - ava-network
 
 
-  # relayer:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #     - l2geth
-  #   image: bobanetwork/message-relayer:latest
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.message-relayer
-  #   entrypoint: ./relayer.sh
-  #   environment:
-  #     L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
-  #     L2_NODE_WEB3_URL: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     # a funded hardhat account
-  #     << : *relayer_pk
-  #     RETRIES: 200
-  #     POLLING_INTERVAL: 6000
-  #     GET_LOGS_INTERVAL: 500
-  #     FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
-  #     FILTER_POLLING_INTERVAL: 30000
-  #     MAX_WAIT_TIME_S: 5
-  #     MAX_WAIT_TX_TIME_S: 5
-  #     RESUBMISSION_TIMEOUT: 5
-  #     MULTI_RELAY_LIMIT: 5
+  relayer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/message-relayer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.message-relayer
+    entrypoint: ./relayer.sh
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      # a funded hardhat account
+      << : *relayer_pk
+      RETRIES: 200
+      POLLING_INTERVAL: 6000
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
 
-  # # a second relay system for messages that need to get to L1 quickly
-  # # NOTE - all withdrawal messages use the standard relayer with its 7 day window
-  # boba_message-relayer-fast:
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #     - l2geth
-  #   image: bobanetwork/boba_message-relayer-fast:latest
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.message-relayer
-  #   entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
-  #   environment:
-  #     L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
-  #     L2_NODE_WEB3_URL: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     BOBA_URL: http://dtl:8081/boba-addr.json
-  #     # This is who pays for the fast message relayer
-  #     << : *fast-relayer_pk
-  #     RETRIES: 200
-  #     POLLING_INTERVAL: 6000
-  #     GET_LOGS_INTERVAL: 500
-  #     FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
-  #     FILTER_POLLING_INTERVAL: 30000
-  #     MAX_WAIT_TIME_S: 5
-  #     MAX_WAIT_TX_TIME_S: 5
-  #     RESUBMISSION_TIMEOUT: 5
-  #     MULTI_RELAY_LIMIT: 5
-  #     FAST_RELAYER: 'true'
+  # a second relay system for messages that need to get to L1 quickly
+  # NOTE - all withdrawal messages use the standard relayer with its 7 day window
+  boba_message-relayer-fast:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_message-relayer-fast:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.message-relayer
+    entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      # This is who pays for the fast message relayer
+      << : *fast-relayer_pk
+      RETRIES: 200
+      POLLING_INTERVAL: 6000
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
+      FAST_RELAYER: 'true'
 
-  # batch_submitter:
-  #   restart: always
-  #   depends_on:
-  #     - l1_chain
-  #     - dtl
-  #     - l2geth
-  #     - kms
-  #   image: bobanetwork/go-batch-submitter:latest
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.batch-submitter
-  #   entrypoint: ./batch-submitter.sh
-  #   env_file:
-  #     - ./envs/batch-submitter.env
-  #   environment:
-  #     L1_ETH_RPC: http://l1_chain:9650/ext/bc/C/rpc
-  #     L2_ETH_RPC: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     RETRIES: 200
-  #     #KMS access setup
-  #     AWS_ACCESS_KEY_ID: "1"
-  #     AWS_SECRET_ACCESS_KEY: "11"
-  #     BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
-  #     BATCH_SUBMITTER_KMS_REGION: us-east-1
-  #     #aliases are setup, check seed.yml
-  #     BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x6236C601FfD52c4793e3B49B15bcdc1137E6339D"
-  #     BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9"
+  batch_submitter:
+    restart: always
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - kms
+    image: bobanetwork/go-batch-submitter:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.batch-submitter
+    entrypoint: ./batch-submitter.sh
+    env_file:
+      - ./envs/batch-submitter.env
+    environment:
+      L1_ETH_RPC: http://l1_chain:9650/ext/bc/C/rpc
+      L2_ETH_RPC: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      RETRIES: 200
+      #KMS access setup
+      AWS_ACCESS_KEY_ID: "1"
+      AWS_SECRET_ACCESS_KEY: "11"
+      BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
+      BATCH_SUBMITTER_KMS_REGION: us-east-1
+      #aliases are setup, check seed.yml
+      BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x6236C601FfD52c4793e3B49B15bcdc1137E6339D"
+      BATCH_SUBMITTER_PROPOSER_KEY_ID: "0x814B1fac2aE5AbBf40Bb289b263ED4c367C50AA9"
 
-  # integration_tests:
-  #   image: bobanetwork/integration-tests:latest
-  #   deploy:
-  #      replicas: 0
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.integration-tests
-  #   entrypoint: ./integration-tests.sh
-  #   environment:
-  #     VERIFIER_URL: http://verifier:8545
-  #     REPLICA_URL: http://replica:8545
-  #     L1_URL: http://l1_chain:9650/ext/bc/C/rpc
-  #     L2_URL: http://l2geth:8545
-  #     URL: http://dtl:8081/addresses.json
-  #     BASE_URL: http://dtl:8081/addresses.json
-  #     BOBA_URL: http://dtl:8081/boba-addr.json
-  #     ENABLE_GAS_REPORT: 1
-  #     NO_NETWORK: 1
-  #     L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
-  #     RETRIES: 200
-  #     << : *integration_pk
-  #     << : *integration_2_pk
-  #     << : *integration_3_pk
-  #     << : *integration_4_pk
+  integration_tests:
+    image: bobanetwork/integration-tests:latest
+    deploy:
+       replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.integration-tests
+    entrypoint: ./integration-tests.sh
+    environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
+      L1_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BASE_URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      RETRIES: 200
+      << : *integration_pk
+      << : *integration_2_pk
+      << : *integration_3_pk
+      << : *integration_4_pk
 
-  # replica:
-  #   depends_on:
-  #     - dtl
-  #     - l2geth
-  #   image: bobanetwork/l2geth:latest
-  #   deploy:
-  #     replicas: 1
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.geth
-  #   entrypoint: sh ./geth.sh
-  #   env_file:
-  #     - ./envs/geth.env
-  #   environment:
-  #     ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
-  #     ROLLUP_TIMESTAMP_REFRESH: 5s
-  #     ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-  #     ROLLUP_CLIENT_HTTP: http://dtl:7878
-  #     ROLLUP_BACKEND: 'l2'
-  #     ROLLUP_VERIFIER_ENABLE: 'true'
-  #     RETRIES: 60
-  #     # CTC height
-  #     ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-  #     # no need to keep this secret, only used internally to sign blocks
-  #     BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-  #     BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-  #     ROLLUP_POLL_INTERVAL_FLAG: "10s"
-  #     TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
-  #     SEQUENCER_CLIENT_HTTP: http://l2geth:8545
-  #     EMERGENCY_FORK_NUMBER: 0
-  #     L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
-  #     BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
-  #   ports:
-  #     - ${L2GETH_HTTP_PORT:-8549}:8545
-  #     - ${L2GETH_WS_PORT:-8550}:8546
+  replica:
+    depends_on:
+      - dtl
+      - l2geth
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # CTC height
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
 
-  # verifier:
-  #   depends_on:
-  #     - dtl
-  #   image: bobanetwork/l2geth:latest
-  #   deploy:
-  #     replicas: 1
-  #   build:
-  #     context: ..
-  #     dockerfile: ./ops/docker/Dockerfile.geth
-  #   entrypoint: sh ./geth.sh
-  #   env_file:
-  #     - ./envs/geth.env
-  #   environment:
-  #       ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
-  #       ROLLUP_TIMESTAMP_REFRESH: 5s
-  #       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-  #       ROLLUP_CLIENT_HTTP: http://dtl:7878
-  #       ROLLUP_BACKEND: 'l1'
-  #       ROLLUP_VERIFIER_ENABLE: 'true'
-  #       RETRIES: 60
-  #       # CTC height
-  #       ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-  #       # no need to keep this secret, only used internally to sign blocks
-  #       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-  #       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-  #       ROLLUP_POLL_INTERVAL_FLAG: "10s"
-  #       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
-  #       EMERGENCY_FORK_NUMBER: 0
-  #       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
-  #       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
-  #   ports:
-  #     - ${VERIFIER_HTTP_PORT:-8547}:8545
-  #     - ${VERIFIER_WS_PORT:-8548}:8546
+  verifier:
+    depends_on:
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+        ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
+        ROLLUP_TIMESTAMP_REFRESH: 5s
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_CLIENT_HTTP: http://dtl:7878
+        ROLLUP_BACKEND: 'l1'
+        ROLLUP_VERIFIER_ENABLE: 'true'
+        RETRIES: 60
+        # CTC height
+        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+        # no need to keep this secret, only used internally to sign blocks
+        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+        ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+        EMERGENCY_FORK_NUMBER: 0
+        L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
 
-  # fraud-detector:
-  #   depends_on:
-  #    - verifier
-  #    - dtl
-  #   image: bobanetwork/fraud-detector:latest
-  #   deploy:
-  #     replicas: 1
-  #   build:
-  #     context: ..
-  #     dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
-  #   environment:
-  #     L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
-  #     L1_CONFIRMATIONS: 8
-  #     L2_NODE_WEB3_URL: http://l2geth:8545
-  #     L2_CHECK_INTERVAL: 10
-  #     VERIFIER_WEB3_URL: http://verifier:8545
-  #     ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
-  #     L1_DEPLOYMENT_BLOCK: 8
-  #     L2_START_BLOCK: 1
-  #   ports:
-  #     - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+  fraud-detector:
+    depends_on:
+     - verifier
+     - dtl
+    image: bobanetwork/fraud-detector:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L1_CONFIRMATIONS: 8
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
 
-  # #in no way should this be running in production
-  # kms:
-  #   image: bobanetwork/local-kms:latest
-  #   environment:
-  #     PORT: "8888"
-  #     KMS_REGION: "us-east-1"
-  #   volumes:
-  #     - type: bind
-  #       source: ./seed-fantom.yaml
-  #       target: /init/seed.yaml
-  #   ports:
-  #     - 8888:8888
+  #in no way should this be running in production
+  kms:
+    image: bobanetwork/local-kms:latest
+    environment:
+      PORT: "8888"
+      KMS_REGION: "us-east-1"
+    volumes:
+      - type: bind
+        source: ./seed-fantom.yaml
+        target: /init/seed.yaml
+    ports:
+      - 8888:8888
 
 
 networks:
