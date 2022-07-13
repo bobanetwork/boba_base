@@ -31,7 +31,7 @@ const deployFn: DeployFunction = async (hre) => {
   const layerZeroEthChainId = '' // 10001 for Rinkeby
   const layerZeroAltL1ChainId = ''
 
-  if (ethProviderEndpoint !== '') {
+  if (ethProviderEndpoint) {
     const ethProvider = new providers.JsonRpcProvider(ethProviderEndpoint)
     const ethDeployer = new Wallet(
       process.env.DEPLOYER_PRIVATE_KEY,
@@ -161,6 +161,43 @@ const deployFn: DeployFunction = async (hre) => {
     )
     await initAltL1BridgeTX.wait()
     console.log(`Proxy__AltL1Bridge initialized: ${initAltL1BridgeTX.hash}`)
+
+    // check owner
+    if (
+      (await Proxy__EthBridge.owner()) !==
+      (hre as any).deployConfig.deployer_l1.address
+    ) {
+      throw new Error('Owner mismatch')
+    }
+    if (
+      (await Proxy__AltL1Bridge.owner()) !==
+      (hre as any).deployConfig.deployer_l1.address
+    ) {
+      throw new Error('Owner mismatch')
+    }
+    // check initialization
+    if (
+      (await Proxy__EthBridge.dstChainId()).toString() !== layerZeroAltL1ChainId
+    ) {
+      throw new Error('chainId mismatch')
+    }
+    if (
+      (await Proxy__AltL1Bridge.dstChainId()).toString() !== layerZeroEthChainId
+    ) {
+      throw new Error('chainId mismatch')
+    }
+    if (
+      (await Proxy__EthBridge.trustedRemoteLookup(layerZeroAltL1ChainId)) !==
+      Proxy__AltL1Bridge.address.toLowerCase()
+    ) {
+      throw new Error('trustedRemote mismatch')
+    }
+    if (
+      (await Proxy__AltL1Bridge.trustedRemoteLookup(layerZeroEthChainId)) !==
+      Proxy__EthBridge.address.toLowerCase()
+    ) {
+      throw new Error('trustedRemote mismatch')
+    }
   }
 }
 
