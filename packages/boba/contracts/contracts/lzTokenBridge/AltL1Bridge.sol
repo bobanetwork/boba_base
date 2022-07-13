@@ -125,8 +125,6 @@ import "./lzApp/NonblockingLzApp.sol";
             // specified the wrong L2 token address to deposit into.
             // In either case, we stop the process here and construct a withdrawal
             // message so that users can get their funds out in some cases.
-            // TODO: since the bridge is only considered to be used for BOBA, user level errors
-            // should not be a major reason for this. determine if we offer a way for refund in this case.
             // since, sending messages will need fees to be paid in the native token, this call cannot succeed directly
             // users, will have to call retryMessage with paying appropriate fee
             bytes memory payload = abi.encode(
@@ -138,7 +136,6 @@ import "./lzApp/NonblockingLzApp.sol";
                 _data
             );
 
-            // TODO: check that this works smoothly
             // this is going to fail on the original relay, to get refund back in this case, user would
             // have to call retryMessage, also paying for the xMessage fee
             _lzSend(dstChainId, payload, payable(msg.sender), address(0x0), bytes(""));
