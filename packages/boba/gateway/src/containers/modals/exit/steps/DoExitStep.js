@@ -40,6 +40,7 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
+import networkService from 'services/networkService'
 
 import BN from 'bignumber.js'
 
@@ -257,7 +258,7 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      estGas = `${Number(feeBOBA).toFixed(4)} GLMR`
+      estGas = `${Number(feeBOBA).toFixed(4)} ${networkService.L1NativeTokenSymbol}`
     } else {
       estGas = `${Number(feeETH).toFixed(4)} BOBA`
     }

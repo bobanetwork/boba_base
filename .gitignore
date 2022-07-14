@@ -60,4 +60,6 @@ packages/boba/gateway/public/env.js
 # api
 env-mainnet.yml
 env-rinkeby.yml
+env-boba-opera-testnet.yml
 ops_boba/api/metatransaction-api/yarn.lock
+.serverless/

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
 
-import Button from 'components/button/Button'
+import { Typography } from '@mui/material'
 
-import { Info } from "@mui/icons-material"
-import { Icon, Typography } from '@mui/material'
-
-import { getETHMetaTransaction } from 'actions/setupAction'
-import { openAlert, openError } from 'actions/uiAction'
+import { openError } from 'actions/uiAction'
 import { fetchTransactions } from 'actions/networkAction'
 
 import Token from './token/Token'
@@ -37,6 +33,8 @@ import useInterval from "util/useInterval"
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 
+import networkService from 'services/networkService'
+
 function Wallet() {
 
   const [ chain, setChain ] = useState('')
@@ -59,7 +57,7 @@ function Wallet() {
   useEffect(()=>{
     if (accountEnabled && l2Balances.length > 0)  {
 
-      const l2BalanceSEC = l2Balances.find((i) => i.symbol === 'GLMR')
+      const l2BalanceSEC = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
       if (l2BalanceSEC && l2BalanceSEC.balance) {
@@ -80,7 +78,7 @@ function Wallet() {
   useEffect(() => {
     if (layer === 'L2') {
       if (tooSmallBOBA && tooSmallSEC) {
-        dispatch(openError('Wallet empty - please bridge GLMR or BOBA from L1'))
+        dispatch(openError(`Wallet empty - please bridge ${networkService.L1NativeTokenSymbol} or BOBA from L1`))
       }
     }
   },[tooSmallSEC, tooSmallBOBA, layer, dispatch])
@@ -95,15 +93,9 @@ function Wallet() {
     if (layer === 'L2') {
       setChain('Boba Wallet')
     } else if (layer === 'L1') {
-      setChain('Moonbase Wallet')
+      setChain(`${networkService.L1ChainAsset.name} Wallet`)
     }
   }, [ layer ])
-
-  async function emergencySwap () {
-    const res = await dispatch(getETHMetaTransaction())
-    console.log("emergencySwap - res:",res)
-    if (res) dispatch(openAlert('Emergency Swap submitted'))
-  }
 
   return (
     <S.PageContainer>
@@ -115,36 +107,10 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallBOBA && network === 'bobaBase' &&
-        <G.LayerAlert style={{padding: '20px'}}>
-          <G.AlertInfo>
-            <Icon as={Info} sx={{color:"#BAE21A"}}/>
-            <Typography
-              flex={4}
-              variant="body2"
-              component="p"
-              ml={2}
-              style={{ opacity: '0.6' }}
-            >
-              Using Bobabeam or Bobabase requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
-              EMERGENCY SWAP to swap GLMR for 1 BOBA at market rates.
-            </Typography>
-          </G.AlertInfo>
-          <Button
-            onClick={()=>{emergencySwap()}}
-            color='primary'
-            variant='outlined'
-          >
-            EMERGENCY SWAP
-          </Button>
-        </G.LayerAlert>
-      }
-
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Moonbase Wallet' ? 'active' : ''}
+            className={chain === `${networkService.L1ChainAsset.name} Wallet` ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -152,7 +118,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Moonbase Wallet
+            {`${networkService.L1ChainAsset.name} Wallet`}
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}

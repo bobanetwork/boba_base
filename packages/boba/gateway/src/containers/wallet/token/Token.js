@@ -65,7 +65,7 @@ function TokenPage() {
   let tweet = ''
   if (bobaTag) {
     BT = "BOBA" + bobaTag.substring(0, 9).toUpperCase()
-    tweet = "https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20" + BT
+    tweet = networkService.twitterFaucetPromotionText + BT
   }
 
   const pendingL1 = orderedTransactions.filter((i) => {
@@ -182,7 +182,7 @@ function TokenPage() {
     return (
     <>
 
-      {layer === 'L2' && network === 'bobaBase' &&
+      {layer === 'L2' && networkService.supportedMultiChains.includes(network) &&
 
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>

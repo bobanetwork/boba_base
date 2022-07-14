@@ -159,7 +159,8 @@ const retryOnNonceError = async (cb: () => Promise<any>): Promise<any> => {
         msg.includes('transaction was replaced') ||
         msg.includes('another transaction with same nonce in the queue') ||
         msg.includes('reverted without a reason') ||
-        msg.includes('replacement transaction underpriced')
+        msg.includes('replacement transaction underpriced') ||
+        msg.includes('Cannot commit transaction in miner')
       ) {
         console.warn('Retrying transaction after nonce error.')
         await sleep(5000)

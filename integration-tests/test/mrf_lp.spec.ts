@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
 
-import { expectLogs, isMoonbeam } from './shared/utils'
+import { expectLogs, isNonEthereumChain } from './shared/utils'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
@@ -1240,7 +1240,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('{tag:mrf} should fail configuring L2LP fee for non DAO', async function () {
-    const isMB = await isMoonbeam()
+    const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
     }
@@ -1251,7 +1251,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('{tag:mrf} the DAO should be able to configure fee for L1LP', async function () {
-    const isMB = await isMoonbeam()
+    const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
     }
@@ -1308,7 +1308,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   it('{tag:mrf} should fail configuring L1LP fee for non DAO', async function () {
-    const isMB = await isMoonbeam()
+    const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
     }

@@ -1742,30 +1742,6 @@
     pino-sentry "^0.7.0"
     prom-client "^13.1.0"
 
-"@eth-optimism/contracts@^0.5.15":
-  version "0.5.24"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.5.24.tgz#7a71fb530327b8af54824acedcc6fdb4676a993a"
-  integrity sha512-9Z+KUMYAxYZyIZHvpn5Yngz787DzNw1E8HUBib27iPtJ5gAWdKXisuScEkP2gnt4bDcUQ8qtMfGZ9Z7FARbuvQ==
-  dependencies:
-    "@eth-optimism/core-utils" "0.8.4"
-    "@ethersproject/abstract-provider" "^5.5.1"
-    "@ethersproject/abstract-signer" "^5.5.0"
-    "@ethersproject/hardware-wallets" "^5.5.0"
-
-"@eth-optimism/core-utils@0.8.4":
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.8.4.tgz#617883bf85c438e40e0e09de427582390359dff9"
-  integrity sha512-HayyAM8rawvRY8wg/Iy/5O4Gn6VPYxlgaQ1vLcbwDDMvXOCbIjONbOBqi+v7LKVPuvfL6xY+3aMibm5tWtrn/g==
-  dependencies:
-    "@ethersproject/abstract-provider" "^5.5.1"
-    "@ethersproject/bytes" "^5.5.0"
-    "@ethersproject/providers" "^5.5.3"
-    "@ethersproject/transactions" "^5.5.0"
-    "@ethersproject/web" "^5.5.1"
-    bufio "^1.0.7"
-    chai "^4.3.4"
-    ethers "^5.5.4"
-
 "@eth-optimism/core-utils@^0.5.1":
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/@eth-optimism/core-utils/-/core-utils-0.5.5.tgz#0e2bb95b23965fb51adfb8ba6841c3afd26a6411"

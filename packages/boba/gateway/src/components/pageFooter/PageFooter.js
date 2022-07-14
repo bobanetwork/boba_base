@@ -8,6 +8,7 @@ import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
+import networkService from 'services/networkService'
 
 const PageFooter = ({maintenance}) => {
 
@@ -71,7 +72,7 @@ const PageFooter = ({maintenance}) => {
             }}
           >BobaScope</S.FooterLink>
           <S.FooterLink
-            href="https://bobascan.com"
+            href={networkService.blockExplorerUrls}
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
