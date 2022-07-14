@@ -59,8 +59,8 @@ function FeeSwitcher() {
     console.log("balanceBOBA:",balanceBOBA)
     console.log("balanceGLMR:",balanceGLMR)
 
-    console.log("feeUseBoba:",feeUseBoba) 
-    console.log("targetFee:",targetFee) 
+    console.log("feeUseBoba:",feeUseBoba)
+    console.log("targetFee:",targetFee)
 
     /*
     warning - feeUseBoba is flipped compared to its usual meaning
@@ -128,12 +128,13 @@ function FeeSwitcher() {
 
   }, [ dispatch, feeUseBoba, balanceGLMR, balanceBOBA ])
 
-  if (!accountEnabled) {
-    return null
-  }
-
-  if (layer !== 'L2') {
-    return null
+  if (!accountEnabled && layer !== 'L2') {
+    return <S.FeeSwitcherWrapper>
+      <Tooltip title={'After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ETH as the gas fee token according to your choice.'}>
+        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+      </Tooltip>
+      <Typography variant="body2">Fee</Typography>
+    </S.FeeSwitcherWrapper>
   }
 
   return (
@@ -150,10 +151,7 @@ function FeeSwitcher() {
         options={[ {
           value: 'BOBA',
           title: 'BOBA',
-        },
-        {
-          value: 'GLMR',
-          title: 'GLMR',
+          description: 'Save another 25% by using Boba as your gas fee token'
         }
         ]}
       />

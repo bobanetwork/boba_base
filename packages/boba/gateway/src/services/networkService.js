@@ -678,12 +678,12 @@ class NetworkService {
         //ok, that's reasonable
         //bobaBase, L1
         this.L1orL2 = 'L1'
-      } 
+      }
       else if (networkGateway === 'bobaBase' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //bobaBase, L2
         this.L1orL2 = 'L2'
-      } 
+      }
       else {
         console.log("ERROR: networkGateway does not match actual network.chainId")
         this.bindProviderListeners()

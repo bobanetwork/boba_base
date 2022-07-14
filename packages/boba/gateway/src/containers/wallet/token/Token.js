@@ -181,7 +181,7 @@ function TokenPage() {
 
     return (
     <>
-      
+
       {layer === 'L2' && network === 'bobaBase' &&
 
           <G.LayerAlert style={{padding: '20px'}}>

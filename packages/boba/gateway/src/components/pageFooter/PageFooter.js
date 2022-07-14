@@ -71,7 +71,7 @@ const PageFooter = ({maintenance}) => {
             }}
           >BobaScope</S.FooterLink>
           <S.FooterLink
-            href="https://blockexplorer.bobabase.boba.network"
+            href="https://bobascan.com"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
