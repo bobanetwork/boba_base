@@ -1,9 +1,9 @@
-name: Publish Packages (bobabeam-release)
+name: Publish Packages (alt-l1-release)
 
 on:
   push:
     branches:
-      - 'moonbeam-release'
+      - 'alt-l1-release'
     tags:
     - '*'
 
@@ -57,8 +57,8 @@ jobs:
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
-            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):moonbeam-${{ steps.tag.outputs.VERSION }}
-            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):mooneam-release
+            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):alt-l1-${{ steps.tag.outputs.VERSION }}
+            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):alt-l1-release
           done
           docker images
           docker images | grep ${{ steps.tag.outputs.VERSION }}

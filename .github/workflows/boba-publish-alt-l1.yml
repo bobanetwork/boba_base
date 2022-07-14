@@ -1,9 +1,9 @@
-name: Publish Packages (moonbeam)
+name: Publish Packages (alt-l1)
 
 on:
   push:
     branches:
-      - 'moonbeam'
+      - 'alt-l1'
 
 jobs:
 
@@ -73,7 +73,7 @@ jobs:
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
-            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):moonbeam-latest
+            docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):alt-l1-latest
           done
           docker images
 
