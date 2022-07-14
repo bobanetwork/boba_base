@@ -12,10 +12,13 @@ const config: HardhatUserConfig = {
     boba_local: {
       url: 'http://localhost:8545',
     },
-    boba_base: {
-      url: 'https://bobabase.boba.network/',
+    boba_opera_testnet: {
+      url: 'https://testnet.bobaopera.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    boba_base: {
+      url: 'https://bobabase.boba.network/',
+    }
   },
   solidity: {
     compilers: [

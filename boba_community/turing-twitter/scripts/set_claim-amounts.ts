@@ -1,7 +1,8 @@
-import hre, { artifacts, ethers } from 'hardhat'
+import hre, { artifacts } from 'hardhat'
 import { ContractFactory, providers, Wallet } from 'ethers'
 // @ts-ignore
 import TuringHelperFactoryJson from './abis/TuringHelperFactory.json'
+import TwitterAuthenticatedFaucet from '../artifacts/contracts/AuthenticatedFaucet.sol/AuthenticatedFaucet.json'
 import { parseEther } from 'ethers/lib/utils'
 
 const cfg = hre.network.config
@@ -11,17 +12,19 @@ async function main() {
   const testPrivateKey = process.env.PRIVATE_KEY ?? '0x___________'
   const testWallet = new Wallet(testPrivateKey, local_provider)
 
-  const turingFactory = new ContractFactory(
-    TuringHelperFactoryJson.abi,
-    TuringHelperFactoryJson.bytecode,
+  const twitterFactory = new ContractFactory(
+    TwitterAuthenticatedFaucet.abi,
+    TwitterAuthenticatedFaucet.bytecode,
     testWallet
-  ).attach('0x58dDFB37998584991d8b75F87baf0A3428dD095e')
+  ).attach(process.env.FAUCET_ADDRESS)
 
-  // TODO: Approve boba
-  const deployTx = await turingFactory.deployMinimal([], parseEther('2'))
+  const deployTx = await twitterFactory.setConfig(
+    process.env.TURING_ENDPOINT, 10,
+    parseEther('1'), parseEther('0.1')
+  )
   const res = await deployTx.wait()
 
-  console.log('Turing Helper contract deployed at', turingFactory.address, deployTx, res)
+  console.log('Have set config..')
 }
 
 main().catch((error) => {
