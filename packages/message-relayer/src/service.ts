@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Wallet, utils, constants, BigNumber } from 'ethers'
+import { Wallet, utils, constants, BigNumber, ethers } from 'ethers'
 import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
@@ -8,11 +8,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
-  DEFAULT_L2_CONTRACT_ADDRESSES,
-  StandardBridgeAdapter,
-  ETHBridgeAdapter,
 } from '@eth-optimism/sdk'
-import { predeploys } from '@eth-optimism/contracts'
 
 interface MessageRelayerOptions {
   /**
@@ -149,6 +145,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
     const l1Network = await this.options.l1Wallet.provider.getNetwork()
     const l1ChainId = l1Network.chainId
+
     this.state.messenger = new CrossChainMessenger({
       l1SignerOrProvider: this.options.l1Wallet,
       l2SignerOrProvider: this.options.l2RpcProvider,

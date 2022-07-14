@@ -53,6 +53,45 @@ const MoonbeamDev = {
         '0x99b3c12287537e38c90a9219d4cb074a89a16e9cdb20bf85728ebd97c343e342',
     },
   ],
+  depositL2Gas: 8_000_000,
+  gasLimitOption: {},
+}
+
+const FantomDev = {
+  chainID: 4003,
+  accounts: [
+    {
+      privateKey:
+        '0x8ffbfce79f185f4b4fb06cb3b51fcdf0fb7403b6e0d4011893ebabfc68d5187c',
+    },
+    {
+      privateKey:
+        '0xa95aa44137b087b519cb7d2be9340f4c36709cb0d3de94ba6ba2095563a44696',
+    },
+    {
+      privateKey:
+        '0xdc5b19a14a3bbb3e9d70da1955114415d9f230ae661c3f8a2b22ad3a67cd2902',
+    },
+    {
+      privateKey:
+        '0xf71e04bb88b3f497fc2cf9b4e35c7e307c2ec6483b8084f750820d09fbe19b54',
+    },
+    {
+      privateKey:
+        '0xca2363fa363c2bc26bf070cf96084da59243d518d9c6ac0dc54586fb6c66c6f1',
+    },
+    {
+      privateKey:
+        '0xa6c4234c9bcae01a8d9d2301ab14ce2fcdd38fe57bc28fa03cd0678630cb8f5a',
+    },
+  ],
+  depositL2Gas: 1_000_000,
+  gasLimitOption: { gasLimit: 400_000 },
+}
+
+const supportedTestNetwork = {
+  1281: MoonbeamDev,
+  4003: FantomDev,
 }
 
 // This is a TEMPORARY way to fund the default hardhat accounts on L2. The better way to do this is
@@ -61,8 +100,8 @@ const MoonbeamDev = {
 const deployFn: DeployFunction = async (hre) => {
   // Only execute this step if we're on the hardhat chain ID.
   const { chainId } = await hre.ethers.provider.getNetwork()
-  // if (chainId === defaultHardhatNetworkParams.chainId) {
-  if (chainId === MoonbeamDev.chainID) {
+  const testNet = supportedTestNetwork[chainId]
+  if (testNet) {
     const L1StandardBridge = await getDeployedContract(
       hre,
       'Proxy__L1StandardBridge',
@@ -75,7 +114,7 @@ const deployFn: DeployFunction = async (hre) => {
       iface: 'BOBA',
     })
 
-    const accounts = MoonbeamDev.accounts
+    const accounts = testNet.accounts
 
     // Boba holder
     const BobaHolder = new hre.ethers.Wallet(
@@ -93,8 +132,9 @@ const deployFn: DeployFunction = async (hre) => {
       const depositAmount = balance.div(2) // Deposit half of the wallet's balance into L2.
       const fundETHTx = await L1StandardBridge.connect(
         wallet
-      ).depositNativeToken(8_000_000, '0x', {
+      ).depositNativeToken(testNet.depositL2Gas, '0x', {
         value: depositAmount,
+        ...testNet.gasLimitOption,
       })
       await fundETHTx.wait()
       console.log(
@@ -118,8 +158,9 @@ const deployFn: DeployFunction = async (hre) => {
         L2BobaAddress,
         wallet.address,
         depositBobaAmount,
-        8_000_000,
-        '0x'
+        testNet.depositL2Gas,
+        '0x',
+        { ...testNet.gasLimitOption }
       )
       await fundBobaTx.wait()
       console.log(`✓ Funded ${wallet.address} on L2 with 5000.0 BOBA`)

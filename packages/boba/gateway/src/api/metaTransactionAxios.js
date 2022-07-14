@@ -8,14 +8,9 @@ export default function metaTransactionAxiosInstance(networkGateway){
   if(networkGateway === 'local') {
     return null //does not make sense on local
   }
-  else if (networkGateway === 'bobaBeam') {
+  else {
     axiosInstance = axios.create({
-      baseURL: getBaseServices().BOBABEAM_META_TRANSACTION,
-    })
-  } 
-  else if (networkGateway === 'bobaBase') {
-    axiosInstance = axios.create({
-      baseURL: getBaseServices().BOBABASE_META_TRANSACTION,
+      baseURL: getBaseServices()[`${networkGateway.toUpperCase()}_META_TRANSACTION`]
     })
   }
 

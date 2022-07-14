@@ -177,7 +177,19 @@ export const makeL2GenesisFile = async (
       dump[predeployAddress].code = cfg.TuringHelperJson.deployedBytecode
     } else if (predeployName === 'L2_L1NativeToken') {
       // Fix the address(this) of L2GovernanceERC20
-      dump[predeployAddress].code = L2_L1NativeTokenHepler.L2_L1NativeTokenBytecode
+      // Different network use the different bytecode
+      // Fantom local
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomLocalBytecode
+      }
+      // Fantom Testnet
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 4051) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomTestnetBytecode
+      }
+      // Moonbeam local
+      if (cfg.l1NativeTokenSymbol === 'GLMR') {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamBytecode
+      }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')
