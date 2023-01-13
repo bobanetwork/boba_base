@@ -29,3 +29,13 @@ Properties:
         HttpGet:
         ...
 ```
+
+## LayerZero bridges
+The LayerZero bridges are intended to be used to - wrap $BOBA, the token (native to Eth) onto other alt Layer 1's (moonbeam for example) (facilitated by LayerZero messaging between Eth and Moonbeam)
+
+where the `EthBridge` is supposed to be deployed to Ethereum and, \
+the `AltL1Bridge` to the alt Layer1 (that is a base layer for a Boba rollup)
+
+
+The `AltL1Bridge`, however should not be deployed to a L2, and in turn the tokens should not be bridged directly from Ethereum to a L2 rollup.
+The native Boba rollup bridges should still be used for this, which is backed by the rollups security, and will facilitate moving the token further from the alt L1 to L2.
