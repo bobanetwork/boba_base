@@ -17,7 +17,6 @@ packages/contracts/deployments/custom
 packages/contracts/coverage*
 packages/contracts/@ens*
 packages/contracts/@openzeppelin*
-packages/contracts/hardhat*
 
 packages/data-transport-layer/db
 
@@ -50,14 +49,17 @@ packages/boba/gateway/build
 packages/boba/gateway/public/env.js
 
 # subgraph
-/packages/boba/subgraph/L1/yarn.lock
+/packages/boba/subgraph/L1/*/yarn.lock
 /packages/boba/subgraph/L2/yarn.lock
-/packages/boba/subgraph/L1/build
+/packages/boba/subgraph/L1/*/build
 /packages/boba/subgraph/L2/build
-/packages/boba/subgraph/L1/generated
-/packages/boba/subgraph/L2/generated
+/packages/boba/subgraph/L1/*/generated
+/packages/boba/subgraph/L2/*/generated
+/packages/boba/subgraph/L1/rollup/subgraph.yaml
 
 # api
 env-mainnet.yml
 env-rinkeby.yml
+env-boba-opera-testnet.yml
 ops_boba/api/metatransaction-api/yarn.lock
+.serverless/

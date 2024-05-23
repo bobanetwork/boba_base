@@ -22,6 +22,10 @@ export class L1DataTransportClient {
     return this._get(`/eth/syncing`)
   }
 
+  public async syncingL2(): Promise<SyncingResponse> {
+    return this._get(`/eth/syncing/l2`)
+  }
+
   public async getEnqueueByIndex(index: number): Promise<EnqueueResponse> {
     return this._get(`/enqueue/index/${index}`)
   }
